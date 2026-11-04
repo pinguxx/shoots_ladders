@@ -404,7 +404,7 @@ impl Room {
             ("🤖 Bot Lupita", "🪅", "#ec4899"),
             ("🤖 Bot Chuy", "🌮", "#f59e0b"),
             ("🤖 Bot Frida", "🎨", "#8b5cf6"),
-            ("🤖 Bot El Santo", "🤼", "#3b82f6"),
+            ("🤖 Bot El Cotorro", "🦜", "#3b82f6"),
             ("🤖 Bot Alebrije", "🐆", "#06b6d4"),
             ("🤖 Bot Cantinflas", "🎭", "#eab308"),
             ("🤖 Bot Mariachi", "🎺", "#f43f5e"),

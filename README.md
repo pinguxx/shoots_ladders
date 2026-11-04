@@ -18,7 +18,7 @@ A high-performance, real-time multiplayer web game of the classic **Serpientes y
    - Private game rooms with quick 6-character room codes (e.g. `SERP72`, `ESCA15`).
    - One-click shareable invite links (`?room=CODE`) with automatic session resume on reconnect.
    - Automatic host migration if the original host disconnects.
-   - Up to 10 simultaneous players with custom avatars (🤠, 💀, 🪅, 🌵, 🤼, 🎸, 🌶️, 🐆, ☀️, 🦅) and player colors.
+   - Up to 10 simultaneous players with custom avatars (🤠, 💀, 🪅, 🌵, 🦜, 🎸, 🌶️, 🐆, ☀️, 🦅) and player colors.
    - **🤖 Solo Play & Bots Mode**: Play alone or fill empty slots with up to 9 automated bots (`🤖 Bot Pancho`, `🤖 Bot Lupita`, `🤖 Bot Chuy`, `🤖 Bot Frida`, etc.) featuring ~1s turn cadence and spontaneous Mexican banter shouts.
 
 3. **⚡ Express Board Mode (50 Tiles) & 100-Tile Classic**:
@@ -146,7 +146,7 @@ Access the game:
    - Creación de salas privadas con códigos rápidos (ej. `SERP72`, `ESCA15`).
    - Enlace directo compartible (`?room=CODIGO`) con reconexión automática de sesión.
    - Traspaso automático de anfitrión si el creador abandona la sala.
-   - Hasta 10 jugadores simultáneos con fichas tradicionales (🤠, 💀, 🪅, 🌵, 🤼, 🎸, 🌶️, 🐆, ☀️, 🦅) y colores personalizados.
+   - Hasta 10 jugadores simultáneos con fichas tradicionales (🤠, 💀, 🪅, 🌵, 🦜, 🎸, 🌶️, 🐆, ☀️, 🦅) y colores personalizados.
    - **🤖 Modo Solitario y Bots Automáticos**: Juega solo o llena lugares vacíos con hasta 9 bots (`🤖 Bot Pancho`, `🤖 Bot Lupita`, `🤖 Bot Chuy`, etc.) con cadencia de ~1s y gritos de feria automáticos.
 
 3. **⚡ Modo Tablero Exprés (50 Casillas) y Clásico (100 Casillas)**:

@@ -340,7 +340,7 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         "#eab308", "#f43f5e",
                                     ];
                                     let default_avatars = [
-                                        "💀", "🪅", "🌵", "🤼", "🎸", "🌶️", "🐆", "☀️", "🦅", "🦎",
+                                        "💀", "🪅", "🌵", "🦜", "🎸", "🌶️", "🐆", "☀️", "🦅", "🦎",
                                     ];
 
                                     let p_idx = room.players.len();
