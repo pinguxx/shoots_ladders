@@ -112,22 +112,22 @@ body {
   pointer-events: none;
   animation: ambientFloatUp linear infinite;
   opacity: 0;
-  filter: drop-shadow(0 0 5px currentColor);
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.25));
 }
 
 @keyframes ambientFloatUp {
   0% {
-    transform: translateY(0) rotate(0deg) scale(0.8);
+    transform: translateY(0) rotate(0deg) scale(0.75);
     opacity: 0;
   }
-  15% {
-    opacity: 0.65;
+  20% {
+    opacity: 0.28;
   }
-  85% {
-    opacity: 0.5;
+  80% {
+    opacity: 0.22;
   }
   100% {
-    transform: translateY(calc(-100vh - 60px)) translateX(var(--drift-x, 25px)) rotate(var(--rot, 45deg)) scale(1.15);
+    transform: translateY(calc(-100vh - 60px)) translateX(var(--drift-x, 20px)) rotate(var(--rot, 35deg)) scale(1.02);
     opacity: 0;
   }
 }

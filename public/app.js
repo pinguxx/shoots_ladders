@@ -341,14 +341,14 @@
     layer.innerHTML = "";
 
     let icons = ["🎉", "✨", "🪅", "🎊", "🇲🇽", "🌮", "🌶️"];
-    let count = 12;
+    let count = 4;
 
     if (themeName === "muertos") {
       icons = ["💀", "🌼", "🏵️", "🕯️", "💀", "🌼", "🏵️"];
-      count = 14;
+      count = 4;
     } else if (themeName === "selva") {
       icons = ["🌿", "🦜", "🍃", "🐆", "☀️", "🌺"];
-      count = 12;
+      count = 4;
     }
 
     for (let i = 0; i < count; i++) {
@@ -358,9 +358,9 @@
       p.textContent = icon;
 
       const left = (i * (94 / count) + Math.random() * (90 / count)).toFixed(1);
-      const duration = (10 + Math.random() * 8).toFixed(1);
-      const delay = (Math.random() * 7).toFixed(1);
-      const size = (0.95 + Math.random() * 0.75).toFixed(2);
+      const duration = (15 + Math.random() * 8).toFixed(1);
+      const delay = (Math.random() * 8).toFixed(1);
+      const size = (0.85 + Math.random() * 0.35).toFixed(2);
       const driftX = (Math.random() * 90 - 45).toFixed(0) + "px";
       const rot = (Math.random() * 140 - 70).toFixed(0) + "deg";
 
