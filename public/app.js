@@ -233,7 +233,9 @@
       if (texts[key]) node.setAttribute("placeholder", texts[key]);
     });
 
-    el.btnToggleLang.textContent = currentLang === "es" ? "🌐 Español" : "🌐 English";
+    el.btnToggleLang.innerHTML = currentLang === "es"
+      ? '<span class="lang-icon">🌐</span> <span class="lang-text-long">Español</span><span class="lang-text-short">ES</span>'
+      : '<span class="lang-icon">🌐</span> <span class="lang-text-long">English</span><span class="lang-text-short">EN</span>';
     if (window.serpientesAudio) {
       window.serpientesAudio.currentLang = currentLang;
     }

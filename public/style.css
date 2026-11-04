@@ -252,6 +252,10 @@ body {
   font-size: 0.75rem;
   font-weight: 800;
   color: #fef08a;
+  white-space: nowrap;
+}
+.lang-text-short {
+  display: none;
 }
 
 /* Main Container */
@@ -259,19 +263,28 @@ body {
   flex: 1;
   max-width: 1080px;
   width: 100%;
+  min-width: 0;
   margin: 0 auto;
-  padding: clamp(8px, 2vw, 16px);
+  padding: clamp(6px, 1.8vw, 16px);
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .screen {
   display: none;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .screen.active {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   animation: fadeIn 0.25s ease;
 }
 
@@ -683,9 +696,11 @@ body {
 /* GAME BOARD SCREEN */
 .game-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 12px;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   align-items: start;
 }
 
@@ -774,6 +789,9 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .board-wrapper {
@@ -788,6 +806,7 @@ body {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65), inset 0 0 10px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   flex-shrink: 0;
+  margin: 0 auto;
 }
 
 .board-grid {
@@ -925,6 +944,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
 }
 
 .action-panel {
@@ -932,12 +953,20 @@ body {
   flex-direction: column;
   gap: 12px;
   padding: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .dice-and-action-row {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* 3D Dice Stage */
@@ -1087,10 +1116,13 @@ body {
   display: flex;
   gap: 5px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 3px 0;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 .cotorreo-bar::-webkit-scrollbar {
   display: none;
@@ -1307,21 +1339,54 @@ body {
 /* ======================================================== */
 @media (max-width: 768px) {
   .game-layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     gap: 6px;
+    margin: 0 auto;
   }
 
   .app-header {
     padding: 6px 10px;
   }
   .logo-title {
-    font-size: 0.95rem;
+    font-size: clamp(0.82rem, 3.2vw, 0.95rem);
+    letter-spacing: 0;
+  }
+  .logo-badge {
+    font-size: 1.35rem;
   }
   .logo-subtitle {
     display: none;
   }
+  .header-actions {
+    gap: 5px;
+  }
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  .btn-lang {
+    padding: 0 6px;
+  }
+  .lang-text-long {
+    display: none;
+  }
+  .lang-text-short {
+    display: inline;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
 
   .turn-banner {
+    width: 100%;
+    max-width: 480px;
+    min-width: 0;
+    box-sizing: border-box;
     padding: 6px 10px;
   }
   .turn-avatar {
@@ -1331,11 +1396,11 @@ body {
   }
   .turn-player {
     font-size: 0.95rem;
-    max-width: 130px;
+    max-width: clamp(100px, 32vw, 150px);
   }
   .turn-timer {
-    font-size: 0.92rem;
-    padding: 3px 8px;
+    font-size: 0.88rem;
+    padding: 3px 6px;
   }
 
   .mobile-feed-toggle {
@@ -1345,52 +1410,103 @@ body {
     font-size: 0.9rem;
   }
 
+  .board-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
   .board-wrapper {
-    /* Exact formula to fit perfectly in 393px width and 842px height screens */
-    width: min(96vw, calc(100dvh - 215px), 480px);
-    border-width: 4px;
+    /* Responsive sizing fitting 360px-440px phones within 100dvh without overflow */
+    width: min(94vw, calc(100dvh - 245px), 440px);
+    max-width: 440px;
+    border-width: 3.5px;
     border-radius: 12px;
+    margin: 0 auto;
+  }
+
+  .game-dashboard {
+    width: 100%;
+    max-width: 480px;
+    min-width: 0;
+    margin: 0 auto;
   }
 
   .action-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding: 6px 8px;
     gap: 6px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .dice-and-action-row {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    gap: 8px;
   }
 
   .cube-die {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
   }
   .cube-face {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 8px;
-    padding: 5px;
+    padding: 4px;
   }
-  .face-1 { transform: translateZ(22px); }
-  .face-2 { transform: rotateY(180deg) translateZ(22px); }
-  .face-3 { transform: rotateY(-90deg) translateZ(22px); }
-  .face-4 { transform: rotateY(90deg) translateZ(22px); }
-  .face-5 { transform: rotateX(90deg) translateZ(22px); }
-  .face-6 { transform: rotateX(-90deg) translateZ(22px); }
+  .face-1 { transform: translateZ(21px); }
+  .face-2 { transform: rotateY(180deg) translateZ(21px); }
+  .face-3 { transform: rotateY(-90deg) translateZ(21px); }
+  .face-4 { transform: rotateY(90deg) translateZ(21px); }
+  .face-5 { transform: rotateX(90deg) translateZ(21px); }
+  .face-6 { transform: rotateX(-90deg) translateZ(21px); }
   .pip {
-    width: 8px;
-    height: 8px;
+    width: 7.5px;
+    height: 7.5px;
   }
 
   .btn-roll {
-    font-size: 0.95rem;
-    padding: 10px 12px;
-    min-height: 44px;
+    font-size: 0.92rem;
+    padding: 8px 10px;
+    min-height: 42px;
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .reactions-bar {
-    padding: 4px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 3px;
+    justify-content: space-around;
   }
   .btn-react {
     font-size: 1.25rem;
     min-width: 28px;
     min-height: 28px;
+    padding: 2px;
+  }
+
+  .cotorreo-bar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 0;
+  }
+  .btn-cotorreo {
+    font-size: 0.7rem;
+    padding: 3px 7px;
   }
 
   /* Activity Feed slide-up drawer on mobile */
