@@ -61,7 +61,8 @@
       btnResume: "▶️ Reanudar",
       reconnectingText: "Reconectando a la partida...",
       toastReconnected: "¡Reconectado a la partida!",
-      toastGameEnded: "La partida anterior ha finalizado."
+      toastGameEnded: "La partida anterior ha finalizado.",
+      cotorreoTitle: "🗣️ ¡Cotorreo de Feria!"
     },
     en: {
       appTitle: "SNAKES & LADDERS",
@@ -116,7 +117,8 @@
       btnResume: "▶️ Resume",
       reconnectingText: "Reconnecting to game...",
       toastReconnected: "Reconnected to game!",
-      toastGameEnded: "The previous game has ended."
+      toastGameEnded: "The previous game has ended.",
+      cotorreoTitle: "🗣️ Fairground Banter!"
     }
   };
 
@@ -1563,6 +1565,70 @@
           }));
         }
       });
+    }
+
+    // Enable smooth mouse drag-to-scroll & mouse wheel for reaction / cotorreo strips
+    function enableDragScroll(container) {
+      if (!container) return;
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      let hasDragged = false;
+
+      container.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        isDown = true;
+        hasDragged = false;
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        const x = e.pageX - container.offsetLeft;
+        const walk = x - startX;
+        if (Math.abs(walk) > 5) {
+          hasDragged = true;
+          container.style.cursor = "grabbing";
+          container.style.userSelect = "none";
+        }
+        if (hasDragged) {
+          container.scrollLeft = scrollLeft - walk;
+        }
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (isDown) {
+          isDown = false;
+          container.style.cursor = "";
+          container.style.removeProperty("user-select");
+        }
+      });
+
+      // Suppress button click if dragging occurred
+      container.addEventListener("click", (e) => {
+        if (hasDragged) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          hasDragged = false;
+        }
+      }, true);
+
+      // Mouse wheel vertical to horizontal scroll translation
+      container.addEventListener("wheel", (e) => {
+        if (e.deltaY !== 0 && !e.shiftKey) {
+          const maxScroll = container.scrollWidth - container.clientWidth;
+          if (maxScroll > 0) {
+            container.scrollLeft += e.deltaY;
+            e.preventDefault();
+          }
+        }
+      }, { passive: false });
+    }
+
+    enableDragScroll(el.reactionsBar);
+    if (cotorreoBar) {
+      enableDragScroll(cotorreoBar);
     }
 
     // Play Again

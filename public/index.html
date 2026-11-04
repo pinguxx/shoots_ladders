@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#b45309">
-  <link rel="stylesheet" href="style.css?v=3.5">
+  <link rel="stylesheet" href="style.css?v=3.6">
 </head>
 <body>
 
@@ -255,8 +255,10 @@
                 🎲 ¡TIRAR DADO!
               </button>
             </div>
+          </div>
 
-            <!-- Quick Reaction Emotes Strip -->
+          <!-- Floating Emoji Reactions (At bottom of panel, like in loteria) -->
+          <div class="reactions-section">
             <div id="reactions-bar" class="reactions-bar" aria-label="Reacciones en vivo">
               <button class="btn-react" data-emoji="🎉" title="Celebrar">🎉</button>
               <button class="btn-react" data-emoji="🐍" title="Serpiente">🐍</button>
@@ -268,8 +270,11 @@
               <button class="btn-react" data-emoji="🌶️" title="Picante">🌶️</button>
               <button class="btn-react" data-emoji="💀" title="Calavera">💀</button>
             </div>
+          </div>
 
-            <!-- Gritos y Frases de Feria ("El Cotorreo") -->
+          <!-- Gritos y Frases de Feria ("El Cotorreo") -->
+          <div class="cotorreo-section">
+            <div class="cotorreo-title" data-i18n="cotorreoTitle">🗣️ ¡Cotorreo de Feria!</div>
             <div id="cotorreo-bar" class="cotorreo-bar" aria-label="Frases y gritos tradicionales">
               <button class="btn-cotorreo" data-shout="¡Aguas con la víbora! 🐍">¡Aguas con la víbora! 🐍</button>
               <button class="btn-cotorreo" data-shout="¡Sube, compadre! 🪜">¡Sube, compadre! 🪜</button>
@@ -339,10 +344,10 @@
   <!-- Confetti Canvas Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <!-- Standalone QR Code Generator -->
-  <script src="qrcode.min.js?v=3.5"></script>
+  <script src="qrcode.min.js?v=3.6"></script>
   <!-- Web Audio Synthesizer -->
-  <script src="audio.js?v=3.5"></script>
+  <script src="audio.js?v=3.6"></script>
   <!-- Main App Script -->
-  <script src="app.js?v=3.5"></script>
+  <script src="app.js?v=3.6"></script>
 </body>
 </html>
