@@ -501,46 +501,82 @@
 
     el.boardSvgOverlay.appendChild(defs);
 
+    // Helper to draw a rich 3D wooden cylinder (works at any angle without SVG bounding-box collapse)
+    function createWoodSegment(x1, y1, x2, y2, outerWidth, midWidth, highlightWidth) {
+      const segGroup = document.createElementNS(svgNS, "g");
+
+      // 1. Dark Bark / Hardwood Outermost Layer
+      const outer = document.createElementNS(svgNS, "line");
+      outer.setAttribute("x1", String(x1));
+      outer.setAttribute("y1", String(y1));
+      outer.setAttribute("x2", String(x2));
+      outer.setAttribute("y2", String(y2));
+      outer.setAttribute("stroke", "#451a03");
+      outer.setAttribute("stroke-width", String(outerWidth));
+      outer.setAttribute("stroke-linecap", "round");
+      segGroup.appendChild(outer);
+
+      // 2. Warm Amber Cedar Core
+      const mid = document.createElementNS(svgNS, "line");
+      mid.setAttribute("x1", String(x1));
+      mid.setAttribute("y1", String(y1));
+      mid.setAttribute("x2", String(x2));
+      mid.setAttribute("y2", String(y2));
+      mid.setAttribute("stroke", "#b45309");
+      mid.setAttribute("stroke-width", String(midWidth));
+      mid.setAttribute("stroke-linecap", "round");
+      segGroup.appendChild(mid);
+
+      // 3. Specular Golden Grain Ridge
+      if (highlightWidth > 0) {
+        const hi = document.createElementNS(svgNS, "line");
+        hi.setAttribute("x1", String(x1 - 1));
+        hi.setAttribute("y1", String(y1 - 1));
+        hi.setAttribute("x2", String(x2 - 1));
+        hi.setAttribute("y2", String(y2 - 1));
+        hi.setAttribute("stroke", "#fef3c7");
+        hi.setAttribute("stroke-width", String(highlightWidth));
+        hi.setAttribute("stroke-linecap", "round");
+        hi.setAttribute("opacity", "0.75");
+        segGroup.appendChild(hi);
+      }
+
+      return segGroup;
+    }
+
     // 1. Draw 3D Authentic Wooden Ladders
     board.ladders.forEach(l => {
-      const p1 = getTileCoords(l.from); // Base
-      const p2 = getTileCoords(l.to);   // Top
+      let p1 = getTileCoords(l.from); // Base
+      let p2 = getTileCoords(l.to);   // Top
+
+      // Add a natural, subtle physical lean for vertical ladders (e.g. 71 -> 91 along the board border)
+      // This prevents visual clipping against tile numbers or border frames
+      if (Math.abs(p2.x - p1.x) < 2) {
+        p1 = { ...p1, x: p1.x - 7, y: p1.y + 6 };
+        p2 = { ...p2, x: p2.x + 7, y: p2.y - 6 };
+      }
 
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
       const len = Math.sqrt(dx * dx + dy * dy);
       const ux = dx / len;
       const uy = dy / len;
-      // Perpendicular rail offset
-      const nx = -uy * 14;
-      const ny = ux * 14;
+      // Perpendicular rail offset (rail spacing: 26px total)
+      const nx = -uy * 13;
+      const ny = ux * 13;
 
       const group = document.createElementNS(svgNS, "g");
       group.setAttribute("filter", "url(#ladderDropShadow)");
 
-      // Left & Right Wooden Rails (Cylindrical with round caps)
-      const rail1 = document.createElementNS(svgNS, "line");
-      rail1.setAttribute("x1", String(p1.x + nx));
-      rail1.setAttribute("y1", String(p1.y + ny));
-      rail1.setAttribute("x2", String(p2.x + nx));
-      rail1.setAttribute("y2", String(p2.y + ny));
-      rail1.setAttribute("stroke", "url(#ladderWood3D)");
-      rail1.setAttribute("stroke-width", "8");
-      rail1.setAttribute("stroke-linecap", "round");
+      // Left & Right Wooden Rails (3D Layered Cylinders)
+      const rail1 = createWoodSegment(p1.x + nx, p1.y + ny, p2.x + nx, p2.y + ny, 8.5, 5.5, 1.8);
       group.appendChild(rail1);
 
-      const rail2 = document.createElementNS(svgNS, "line");
-      rail2.setAttribute("x1", String(p1.x - nx));
-      rail2.setAttribute("y1", String(p1.y - ny));
-      rail2.setAttribute("x2", String(p2.x - nx));
-      rail2.setAttribute("y2", String(p2.y - ny));
-      rail2.setAttribute("stroke", "url(#ladderWood3D)");
-      rail2.setAttribute("stroke-width", "8");
-      rail2.setAttribute("stroke-linecap", "round");
+      const rail2 = createWoodSegment(p1.x - nx, p1.y - ny, p2.x - nx, p2.y - ny, 8.5, 5.5, 1.8);
       group.appendChild(rail2);
 
-      // Wooden Rungs with drop-shadow
-      const rungsCount = Math.floor(len / 34);
+      // Wooden Rungs with realistic joints and drop-shadows
+      const rungsCount = Math.floor(len / 32);
       for (let i = 1; i <= rungsCount; i++) {
         const frac = i / (rungsCount + 1);
         const rx = p1.x + dx * frac;
@@ -549,24 +585,36 @@
         // Shadow under rung
         const rungShadow = document.createElementNS(svgNS, "line");
         rungShadow.setAttribute("x1", String(rx + nx));
-        rungShadow.setAttribute("y1", String(ry + ny + 2));
+        rungShadow.setAttribute("y1", String(ry + ny + 2.5));
         rungShadow.setAttribute("x2", String(rx - nx));
-        rungShadow.setAttribute("y2", String(ry - ny + 2));
-        rungShadow.setAttribute("stroke", "rgba(0,0,0,0.35)");
+        rungShadow.setAttribute("y2", String(ry - ny + 2.5));
+        rungShadow.setAttribute("stroke", "rgba(0,0,0,0.4)");
         rungShadow.setAttribute("stroke-width", "5.5");
         rungShadow.setAttribute("stroke-linecap", "round");
         group.appendChild(rungShadow);
 
-        // Actual wooden rung
-        const rung = document.createElementNS(svgNS, "line");
-        rung.setAttribute("x1", String(rx + nx));
-        rung.setAttribute("y1", String(ry + ny));
-        rung.setAttribute("x2", String(rx - nx));
-        rung.setAttribute("y2", String(ry - ny));
-        rung.setAttribute("stroke", "url(#ladderWood3D)");
-        rung.setAttribute("stroke-width", "5.5");
-        rung.setAttribute("stroke-linecap", "round");
+        // 3D Wooden Rung
+        const rung = createWoodSegment(rx + nx, ry + ny, rx - nx, ry - ny, 6, 4, 1.2);
         group.appendChild(rung);
+
+        // Wooden Pegs / Dowel Pins at rail-rung intersections
+        const peg1 = document.createElementNS(svgNS, "circle");
+        peg1.setAttribute("cx", String(rx + nx));
+        peg1.setAttribute("cy", String(ry + ny));
+        peg1.setAttribute("r", "2.6");
+        peg1.setAttribute("fill", "#290e02");
+        peg1.setAttribute("stroke", "#d97706");
+        peg1.setAttribute("stroke-width", "0.7");
+        group.appendChild(peg1);
+
+        const peg2 = document.createElementNS(svgNS, "circle");
+        peg2.setAttribute("cx", String(rx - nx));
+        peg2.setAttribute("cy", String(ry - ny));
+        peg2.setAttribute("r", "2.6");
+        peg2.setAttribute("fill", "#290e02");
+        peg2.setAttribute("stroke", "#d97706");
+        peg2.setAttribute("stroke-width", "0.7");
+        group.appendChild(peg2);
       }
 
       el.boardSvgOverlay.appendChild(group);
