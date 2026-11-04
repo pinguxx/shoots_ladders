@@ -4,7 +4,7 @@
 # ========================================================
 
 # 1. Builder Stage
-FROM rust:1.83-slim-bookworm AS builder
+FROM rust:1-slim-bookworm AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends pkg-config && rm -rf /var/lib/apt/lists/*
