@@ -1281,7 +1281,7 @@ mod tests {
             }
         });
         client1
-            .send(WsMsg::Text(create_msg.to_string()))
+            .send(WsMsg::Text(create_msg.to_string().into()))
             .await
             .unwrap();
 
@@ -1303,7 +1303,7 @@ mod tests {
             "playerName": "PanchoVilla"
         });
         client1
-            .send(WsMsg::Text(update_prof.to_string()))
+            .send(WsMsg::Text(update_prof.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1322,7 +1322,7 @@ mod tests {
             }
         });
         client1
-            .send(WsMsg::Text(update_sett.to_string()))
+            .send(WsMsg::Text(update_sett.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1333,7 +1333,7 @@ mod tests {
             "roomCode": room_code
         });
         client1
-            .send(WsMsg::Text(toggle_timer.to_string()))
+            .send(WsMsg::Text(toggle_timer.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1344,7 +1344,7 @@ mod tests {
             "roomCode": room_code
         });
         client1
-            .send(WsMsg::Text(add_bot_msg.to_string()))
+            .send(WsMsg::Text(add_bot_msg.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1356,7 +1356,7 @@ mod tests {
             "botId": null
         });
         client1
-            .send(WsMsg::Text(remove_bot_msg.to_string()))
+            .send(WsMsg::Text(remove_bot_msg.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1371,7 +1371,7 @@ mod tests {
             "color": "#ef4444"
         });
         client2
-            .send(WsMsg::Text(join_msg.to_string()))
+            .send(WsMsg::Text(join_msg.to_string().into()))
             .await
             .unwrap();
 
@@ -1390,7 +1390,7 @@ mod tests {
             "roomCode": room_code
         });
         client1
-            .send(WsMsg::Text(start_msg.to_string()))
+            .send(WsMsg::Text(start_msg.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1402,7 +1402,7 @@ mod tests {
             "roomCode": room_code
         });
         client1
-            .send(WsMsg::Text(roll_msg.to_string()))
+            .send(WsMsg::Text(roll_msg.to_string().into()))
             .await
             .unwrap();
         // Receives player_moved and room_state on client1
@@ -1419,7 +1419,7 @@ mod tests {
             "emoji": "Watch out for snakes! 🐍"
         });
         client2
-            .send(WsMsg::Text(reaction_msg.to_string()))
+            .send(WsMsg::Text(reaction_msg.to_string().into()))
             .await
             .unwrap();
         let rx1 = client1.next().await.unwrap().unwrap();
@@ -1430,7 +1430,7 @@ mod tests {
 
         // 6. Ping / Pong
         client1
-            .send(WsMsg::Text(json!({"type": "ping"}).to_string()))
+            .send(WsMsg::Text(json!({"type": "ping"}).to_string().into()))
             .await
             .unwrap();
         let pong = client1.next().await.unwrap().unwrap();
@@ -1443,7 +1443,7 @@ mod tests {
             "roomCode": room_code
         });
         client1
-            .send(WsMsg::Text(restart_msg.to_string()))
+            .send(WsMsg::Text(restart_msg.to_string().into()))
             .await
             .unwrap();
         let _ = client1.next().await.unwrap().unwrap();
@@ -1455,7 +1455,7 @@ mod tests {
             "roomCode": room_code
         });
         client1
-            .send(WsMsg::Text(leave_msg.to_string()))
+            .send(WsMsg::Text(leave_msg.to_string().into()))
             .await
             .unwrap();
 
@@ -1491,7 +1491,7 @@ mod tests {
             "playerId": host_id
         });
         client3
-            .send(WsMsg::Text(rejoin_msg.to_string()))
+            .send(WsMsg::Text(rejoin_msg.to_string().into()))
             .await
             .unwrap();
         let rejoin_resp = client3.next().await.unwrap().unwrap();
@@ -1503,14 +1503,14 @@ mod tests {
 
         // Client 2 leaves
         client2
-            .send(WsMsg::Text(leave_msg.to_string()))
+            .send(WsMsg::Text(leave_msg.to_string().into()))
             .await
             .unwrap();
         let _ = client3.next().await.unwrap().unwrap();
 
         // Client 3 leaves (room now empty -> cleaned up)
         client3
-            .send(WsMsg::Text(leave_msg.to_string()))
+            .send(WsMsg::Text(leave_msg.to_string().into()))
             .await
             .unwrap();
 
