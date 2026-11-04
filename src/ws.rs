@@ -130,6 +130,11 @@ pub enum ClientMessage {
         #[serde(rename = "roomCode")]
         room_code: String,
     },
+    #[serde(rename = "toggle_timer")]
+    ToggleTimer {
+        #[serde(rename = "roomCode")]
+        room_code: String,
+    },
     #[serde(rename = "send_reaction")]
     SendReaction {
         #[serde(rename = "roomCode")]
@@ -434,8 +439,49 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         .find(|p| &p.id == pid)
                                         .map(|p| p.is_host)
                                         .unwrap_or(false);
-                                    if is_host && room.state == RoomState::Lobby {
-                                        room.settings = settings;
+                                    if is_host {
+                                        if room.state == RoomState::Lobby {
+                                            room.settings = settings;
+                                        } else if room.state == RoomState::Playing {
+                                            room.settings.turn_timer_seconds = settings.turn_timer_seconds;
+                                        }
+                                    }
+                                }
+                            }
+                            drop(rooms);
+                            broadcast_room_state(&room_code, &state).await;
+                        }
+
+                        ClientMessage::ToggleTimer { room_code } => {
+                            let mut rooms = state.rooms.write().await;
+                            if let Some(room) = rooms.get_mut(&room_code) {
+                                room.touch_activity();
+                                if let Some(ref pid) = current_player_id {
+                                    let is_host = room
+                                        .players
+                                        .iter()
+                                        .find(|p| &p.id == pid)
+                                        .map(|p| p.is_host)
+                                        .unwrap_or(false);
+                                    if is_host {
+                                        if room.settings.turn_timer_seconds > 0 {
+                                            room.settings.turn_timer_seconds = 0;
+                                            room.add_log(
+                                                "timer_off",
+                                                "⏸️ Temporizador desactivado (Sin límite / Manual).",
+                                                "⏸️ Turn timer disabled (No limit / Manual).",
+                                                None,
+                                            );
+                                        } else {
+                                            room.settings.turn_timer_seconds = 25;
+                                            room.turn_started_at_secs = crate::game::current_epoch_secs();
+                                            room.add_log(
+                                                "timer_on",
+                                                "⏱️ Temporizador activado (25s por turno).",
+                                                "⏱️ Turn timer activated (25s per turn).",
+                                                None,
+                                            );
+                                        }
                                     }
                                 }
                             }

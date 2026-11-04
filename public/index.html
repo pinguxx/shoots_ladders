@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#b45309">
-  <link rel="stylesheet" href="style.css?v=3.4">
+  <link rel="stylesheet" href="style.css?v=3.5">
 </head>
 <body>
 
@@ -139,9 +139,9 @@
               <div class="setting-row">
                 <span data-i18n="labelTimer">Tiempo por turno:</span>
                 <select id="setting-turn-timer">
-                  <option value="0" data-i18n="timerNone">Sin límite</option>
+                  <option value="0" selected data-i18n="timerNone">Sin límite (Manual)</option>
                   <option value="15" data-i18n="timer15">15 segundos</option>
-                  <option value="25" selected data-i18n="timer25">25 segundos</option>
+                  <option value="25" data-i18n="timer25">25 segundos</option>
                   <option value="40" data-i18n="timer40">40 segundos</option>
                 </select>
               </div>
@@ -205,7 +205,7 @@
             </div>
           </div>
           <div class="turn-timer-wrap">
-            <div id="turn-timer" class="turn-timer">⏱️ 25s</div>
+            <button id="turn-timer" class="turn-timer" title="Alternar temporizador / Autojuego">♾️ Sin límite</button>
             <button id="btn-toggle-feed-mobile" class="btn-icon mobile-feed-toggle" title="Ver Crónica">📜</button>
           </div>
         </div>
@@ -339,10 +339,10 @@
   <!-- Confetti Canvas Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <!-- Standalone QR Code Generator -->
-  <script src="qrcode.min.js?v=3.4"></script>
+  <script src="qrcode.min.js?v=3.5"></script>
   <!-- Web Audio Synthesizer -->
-  <script src="audio.js?v=3.4"></script>
+  <script src="audio.js?v=3.5"></script>
   <!-- Main App Script -->
-  <script src="app.js?v=3.4"></script>
+  <script src="app.js?v=3.5"></script>
 </body>
 </html>

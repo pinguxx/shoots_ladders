@@ -33,7 +33,7 @@ fn default_three_sixes() -> bool {
     false
 }
 fn default_turn_timer() -> u64 {
-    25
+    0 // 0 = Sin límite / Manual (no autoplay)
 }
 fn default_board_theme() -> String {
     "fiesta".to_string()

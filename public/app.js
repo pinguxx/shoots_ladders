@@ -1002,6 +1002,51 @@
     setTimeout(() => span.remove(), 2800);
   }
 
+  let turnTimerTicker = null;
+
+  function updateTurnTimerDisplay(room) {
+    if (!el.turnTimer) return;
+
+    if (turnTimerTicker) {
+      clearInterval(turnTimerTicker);
+      turnTimerTicker = null;
+    }
+
+    const timerSecs = (room.settings && typeof room.settings.turn_timer_seconds === "number")
+      ? room.settings.turn_timer_seconds
+      : 0;
+
+    if (timerSecs <= 0) {
+      el.turnTimer.textContent = "♾️ " + (currentLang === "es" ? "Sin límite" : "No limit");
+      el.turnTimer.title = isHost
+        ? (currentLang === "es" ? "Partida manual (Sin límite). Clic para activar temporizador de 25s." : "Manual mode (No limit). Click to enable 25s timer.")
+        : (currentLang === "es" ? "Partida manual (Sin límite de tiempo)" : "Manual mode (No time limit)");
+      el.turnTimer.classList.remove("timer-warning");
+      return;
+    }
+
+    const startEpoch = room.turn_started_at_secs || Math.floor(Date.now() / 1000);
+
+    const tick = () => {
+      const nowEpoch = Math.floor(Date.now() / 1000);
+      const elapsed = Math.max(0, nowEpoch - startEpoch);
+      const remaining = Math.max(0, timerSecs - elapsed);
+      el.turnTimer.textContent = `⏱️ ${remaining}s`;
+      el.turnTimer.title = isHost
+        ? (currentLang === "es" ? "Temporizador activo (25s). Clic para pausar / quitar límite." : "Timer active (25s). Click to pause / remove limit.")
+        : "";
+
+      if (remaining <= 5 && remaining > 0) {
+        el.turnTimer.classList.add("timer-warning");
+      } else {
+        el.turnTimer.classList.remove("timer-warning");
+      }
+    };
+
+    tick();
+    turnTimerTicker = setInterval(tick, 1000);
+  }
+
   // -------------------------------------------------------------
   // 8. Room State Synchronization (Safe DOM construction)
   // -------------------------------------------------------------
@@ -1091,6 +1136,9 @@
         }
       }
 
+      // Update Timer & Autoplay Control
+      updateTurnTimerDisplay(room);
+
       renderActivityFeed(room.logs);
 
       if (room.settings.dice_count > 1) {
@@ -1101,6 +1149,9 @@
     } else if (room.state === "finished") {
       showScreen("screen-game");
       renderTokens(room.players);
+      // Update Timer & Autoplay Control
+      updateTurnTimerDisplay(room);
+
       renderActivityFeed(room.logs);
 
       if (room.winner) {
@@ -1302,6 +1353,24 @@
       el.drawerActivityLog.classList.remove("drawer-open");
     });
 
+    // In-game Timer / Autoplay Toggle (Host controls)
+    if (el.turnTimer) {
+      el.turnTimer.addEventListener("click", () => {
+        if (!roomCode) return;
+        if (!isHost) {
+          showToast(currentLang === "es" ? "ℹ️ Solo el anfitrión puede cambiar el temporizador." : "ℹ️ Only the host can toggle the timer.");
+          return;
+        }
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          if (window.serpientesAudio) window.serpientesAudio.playClick();
+          ws.send(JSON.stringify({
+            type: "toggle_timer",
+            roomCode
+          }));
+        }
+      });
+    }
+
     // Welcome Tabs
     el.tabCreate.addEventListener("click", () => {
       el.tabCreate.classList.add("active");
@@ -1358,12 +1427,15 @@
         return;
       }
 
+      const timerVal = parseInt(el.settingTurnTimer.value, 10);
+      const turnTimerSecs = isNaN(timerVal) ? 0 : timerVal;
+
       const settings = {
         dice_count: parseInt(el.settingDiceCount.value, 10) || 1,
         exact_win: el.settingExactWin.value === "true",
         bonus_on_six: el.settingBonusSix.checked,
         three_sixes_penalty: el.settingThreeSixes.checked,
-        turn_timer_seconds: parseInt(el.settingTurnTimer.value, 10) || 25,
+        turn_timer_seconds: turnTimerSecs,
         board_theme: THEMES[currentThemeIdx]
       };
 
