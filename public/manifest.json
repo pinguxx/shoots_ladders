@@ -1,11 +1,11 @@
 {
-  "name": "Calabozos y Dragones Online",
-  "short_name": "Calabozos",
-  "description": "Juego de Mazmorras y Dragones en tiempo real con Rust y WebSockets",
+  "name": "Serpientes y Escaleras Online",
+  "short_name": "Serpientes",
+  "description": "Multiplayer Serpientes y Escaleras (Snakes and Ladders) in real-time with Rust and WebSockets",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#d97706",
+  "background_color": "#2d1810",
+  "theme_color": "#b45309",
   "orientation": "portrait-primary",
   "icons": [
     {
