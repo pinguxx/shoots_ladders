@@ -18,7 +18,7 @@ A high-performance, real-time multiplayer web game of the classic **Serpientes y
    - Private game rooms with quick 6-character room codes (e.g. `SERP72`, `ESCA15`).
    - One-click shareable invite links (`?room=CODE`) with automatic session resume on reconnect.
    - Automatic host migration if the original host disconnects.
-   - Up to 8 simultaneous players with custom avatars (🤠, 💀, 🪅, 🌵, 🤼, 🎸, 🌶️, 🐆, ☀️, 🦅) and player colors.
+   - Up to 10 simultaneous players with custom avatars (🤠, 💀, 🪅, 🌵, 🤼, 🎸, 🌶️, 🐆, ☀️, 🦅) and player colors.
 
 3. **Mobile-First Responsive Design (Single-Screen Experience)**:
    - Dynamic `dvh` scaling (`min(96vw, calc(100dvh - 215px), 480px)`) ensuring the header, board, dice roller, and banter buttons fit on any screen without vertical scrolling.
@@ -117,7 +117,7 @@ Access the game:
    - Creación de salas privadas con códigos rápidos (ej. `SERP72`, `ESCA15`).
    - Enlace directo compartible (`?room=CODIGO`) con reconexión automática de sesión.
    - Traspaso automático de anfitrión si el creador abandona la sala.
-   - Hasta 8 jugadores simultáneos con fichas tradicionales (🤠, 💀, 🪅, 🌵, 🤼, 🎸, 🌶️, 🐆, ☀️, 🦅) y colores personalizados.
+   - Hasta 10 jugadores simultáneos con fichas tradicionales (🤠, 💀, 🪅, 🌵, 🤼, 🎸, 🌶️, 🐆, ☀️, 🦅) y colores personalizados.
 
 3. **Optimizado para Celulares y Pantallas Pequeñas (Mobile First)**:
    - Escalado dinámico con `dvh` (`min(96vw, calc(100dvh - 215px), 480px)`) para encajar perfectamente en la pantalla sin scroll vertical.

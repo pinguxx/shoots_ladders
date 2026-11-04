@@ -192,7 +192,8 @@
   const AVATARS = ["🤠", "💀", "🪅", "🌵", "🤼", "🎸", "🌶️", "🐆", "☀️", "🦅"];
   const COLORS = [
     "#ef4444", "#f59e0b", "#10b981", "#3b82f6",
-    "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"
+    "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
+    "#14b8a6", "#eab308"
   ];
   const THEMES = ["fiesta", "muertos", "selva"];
 
@@ -487,7 +488,8 @@
     const rowHeight = 1000 / totalRows;
 
     if (tile <= 0) {
-      return { x: 50, y: 1040, row: 0, col: 0 };
+      const y = (totalRows - 1 + 0.5) * rowHeight;
+      return { x: 50, y, row: 0, col: 0 };
     }
     const clamped = Math.min(totalTiles, Math.max(1, tile));
     const row = Math.floor((clamped - 1) / 10);
@@ -914,8 +916,9 @@
         let offsetY = 0;
         if (group.length > 1) {
           const angle = (idx / group.length) * (2 * Math.PI);
-          offsetX = Math.cos(angle) * 1.8;
-          offsetY = Math.sin(angle) * 1.8;
+          const radius = group.length > 5 ? 2.4 : 1.8;
+          offsetX = Math.cos(angle) * radius;
+          offsetY = Math.sin(angle) * radius;
         }
 
         const pctX = (coords.x / 10) + offsetX;
@@ -1280,7 +1283,7 @@
       if (el.lobbyBotControls) {
         if (isHost) {
           el.lobbyBotControls.style.display = "flex";
-          if (el.btnAddBot) el.btnAddBot.disabled = room.players.length >= 8;
+          if (el.btnAddBot) el.btnAddBot.disabled = room.players.length >= 10;
           if (el.btnRemoveBot) el.btnRemoveBot.disabled = !room.players.some(p => p.is_bot);
         } else {
           el.lobbyBotControls.style.display = "none";

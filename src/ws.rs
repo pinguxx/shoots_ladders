@@ -317,11 +317,11 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                 }
 
                                 if !is_reconnect {
-                                    if room.players.len() >= 8 {
+                                    if room.players.len() >= 10 {
                                         let _ = tx.send(Message::Text(
                                             json!({
                                                 "type": "error",
-                                                "message": "Room is full (max 8 players)"
+                                                "message": "Room is full (max 10 players)"
                                             })
                                             .to_string(),
                                         ));
@@ -337,9 +337,10 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                     let default_colors = [
                                         "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6",
                                         "#ec4899", "#06b6d4", "#f97316", "#14b8a6",
+                                        "#eab308", "#f43f5e",
                                     ];
                                     let default_avatars = [
-                                        "💀", "🪅", "🌵", "🤼", "🎸", "🌶️", "🐆", "☀️",
+                                        "💀", "🪅", "🌵", "🤼", "🎸", "🌶️", "🐆", "☀️", "🦅", "🦎",
                                     ];
 
                                     let p_idx = room.players.len();

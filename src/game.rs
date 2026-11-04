@@ -396,16 +396,20 @@ impl Room {
     }
 
     pub fn add_bot(&mut self) -> Result<Player, String> {
-        if self.players.len() >= 8 {
-            return Err("Room is full (max 8 players)".to_string());
+        if self.players.len() >= 10 {
+            return Err("Room is full (max 10 players)".to_string());
         }
-        const BOT_PROFILES: [(&str, &str, &str); 6] = [
+        const BOT_PROFILES: [(&str, &str, &str); 10] = [
             ("🤖 Bot Pancho", "🤠", "#10b981"),
             ("🤖 Bot Lupita", "🪅", "#ec4899"),
             ("🤖 Bot Chuy", "🌮", "#f59e0b"),
             ("🤖 Bot Frida", "🎨", "#8b5cf6"),
             ("🤖 Bot El Santo", "🤼", "#3b82f6"),
             ("🤖 Bot Alebrije", "🐆", "#06b6d4"),
+            ("🤖 Bot Cantinflas", "🎭", "#eab308"),
+            ("🤖 Bot Mariachi", "🎺", "#f43f5e"),
+            ("🤖 Bot Sor Juana", "📜", "#14b8a6"),
+            ("🤖 Bot Axolotl", "🦎", "#a855f7"),
         ];
         let bot_count = self.players.iter().filter(|p| p.is_bot).count();
         let (name, avatar, color) = BOT_PROFILES[bot_count % BOT_PROFILES.len()];
@@ -1178,6 +1182,23 @@ mod tests {
         let (step, _shout) = bot_move.unwrap();
         assert_eq!(step.player_id, bot1.id);
         assert!(step.final_tile > 0);
+    }
+
+    #[test]
+    fn test_max_10_players_and_bots() {
+        let settings = GameSettings::default();
+        let mut room = Room::new("MAX10A".to_string(), settings);
+        room.players.push(create_test_player("p1", "Host Player", true));
+
+        // Add 9 bots so total is 10
+        for _ in 0..9 {
+            assert!(room.add_bot().is_ok());
+        }
+        assert_eq!(room.players.len(), 10);
+
+        // 11th bot must fail with Room is full
+        let err = room.add_bot().unwrap_err();
+        assert_eq!(err, "Room is full (max 10 players)");
     }
 
     #[test]
