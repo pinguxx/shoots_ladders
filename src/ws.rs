@@ -146,6 +146,18 @@ pub enum ClientMessage {
         #[serde(rename = "roomCode")]
         room_code: String,
     },
+    #[serde(rename = "add_bot")]
+    AddBot {
+        #[serde(rename = "roomCode")]
+        room_code: String,
+    },
+    #[serde(rename = "remove_bot")]
+    RemoveBot {
+        #[serde(rename = "roomCode")]
+        room_code: String,
+        #[serde(rename = "botId")]
+        bot_id: Option<String>,
+    },
     #[serde(rename = "ping")]
     Ping,
 }
@@ -232,6 +244,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                 is_host: true,
                                 conn_id: conn_id.clone(),
                                 stats: PlayerStats::default(),
+                                is_bot: false,
+                                skipped_turns: 0,
                             };
 
                             let mut room = Room::new(code.clone(), settings.unwrap_or_default());
@@ -346,6 +360,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         is_host: is_first,
                                         conn_id: conn_id.clone(),
                                         stats: PlayerStats::default(),
+                                        is_bot: false,
+                                        skipped_turns: 0,
                                     };
 
                                     room.players.push(new_player);
@@ -441,6 +457,11 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         .unwrap_or(false);
                                     if is_host {
                                         if room.state == RoomState::Lobby {
+                                            room.board = if settings.board_size == 50 {
+                                                crate::board::BoardDefinition::express().with_mystery_tiles(settings.mystery_tiles)
+                                            } else {
+                                                crate::board::BoardDefinition::classic().with_mystery_tiles(settings.mystery_tiles)
+                                            };
                                             room.settings = settings;
                                         } else if room.state == RoomState::Playing {
                                             room.settings.turn_timer_seconds = settings.turn_timer_seconds;
@@ -687,6 +708,46 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                             }
                         }
 
+                        ClientMessage::AddBot { room_code } => {
+                            let mut rooms = state.rooms.write().await;
+                            if let Some(room) = rooms.get_mut(&room_code) {
+                                room.touch_activity();
+                                if let Some(ref pid) = current_player_id {
+                                    let is_host = room
+                                        .players
+                                        .iter()
+                                        .find(|p| &p.id == pid)
+                                        .map(|p| p.is_host)
+                                        .unwrap_or(false);
+                                    if is_host && room.state == RoomState::Lobby {
+                                        let _ = room.add_bot();
+                                    }
+                                }
+                            }
+                            drop(rooms);
+                            broadcast_room_state(&room_code, &state).await;
+                        }
+
+                        ClientMessage::RemoveBot { room_code, bot_id } => {
+                            let mut rooms = state.rooms.write().await;
+                            if let Some(room) = rooms.get_mut(&room_code) {
+                                room.touch_activity();
+                                if let Some(ref pid) = current_player_id {
+                                    let is_host = room
+                                        .players
+                                        .iter()
+                                        .find(|p| &p.id == pid)
+                                        .map(|p| p.is_host)
+                                        .unwrap_or(false);
+                                    if is_host && room.state == RoomState::Lobby {
+                                        let _ = room.remove_bot(bot_id.as_deref());
+                                    }
+                                }
+                            }
+                            drop(rooms);
+                            broadcast_room_state(&room_code, &state).await;
+                        }
+
                         ClientMessage::Ping => {
                             let _ = tx.send(Message::Text(json!({ "type": "pong" }).to_string()));
                         }
@@ -726,15 +787,16 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
     forward_task.abort();
 }
 
-/// Background routine to reap abandoned rooms and handle turn timeouts for AFK players
+/// Background routine to reap abandoned rooms, handle bot turns, and AFK turn timeouts
 pub async fn start_background_maintenance(state: AppState) {
-    let mut ticker = tokio::time::interval(tokio::time::Duration::from_secs(3));
+    let mut ticker = tokio::time::interval(tokio::time::Duration::from_millis(800));
     loop {
         ticker.tick().await;
 
         let now = current_epoch_secs();
         let mut rooms_to_reap = Vec::new();
-        let mut turn_timeouts = Vec::new();
+        let mut turn_moves = Vec::new();
+        let mut bot_reactions = Vec::new();
 
         {
             let mut rooms = state.rooms.write().await;
@@ -750,9 +812,26 @@ pub async fn start_background_maintenance(state: AppState) {
                     continue;
                 }
 
-                // 2. Check for turn timeout in active games
+                // 2. Check for bot turns
+                if let Some((step, shout)) = room.check_bot_turn() {
+                    if let Some(bot_info) = room.players.iter().find(|p| p.id == step.player_id) {
+                        if let Some(shout_txt) = shout {
+                            bot_reactions.push((
+                                code.clone(),
+                                bot_info.id.clone(),
+                                bot_info.name.clone(),
+                                bot_info.avatar.clone(),
+                                shout_txt,
+                            ));
+                        }
+                    }
+                    turn_moves.push((code.clone(), step));
+                    continue;
+                }
+
+                // 3. Check for AFK turn timeout in active games
                 if let Some(step) = room.check_turn_timeout() {
-                    turn_timeouts.push((code.clone(), step));
+                    turn_moves.push((code.clone(), step));
                 }
             }
 
@@ -770,8 +849,24 @@ pub async fn start_background_maintenance(state: AppState) {
             }
         }
 
-        // Broadcast turn timeouts if any occurred
-        for (code, step) in turn_timeouts {
+        // Broadcast reactions from bots
+        for (code, pid, pname, pavatar, shout) in bot_reactions {
+            broadcast_to_room(
+                &code,
+                json!({
+                    "type": "reaction",
+                    "playerId": pid,
+                    "playerName": pname,
+                    "avatar": pavatar,
+                    "emoji": shout
+                }),
+                &state,
+            )
+            .await;
+        }
+
+        // Broadcast turn moves if any occurred
+        for (code, step) in turn_moves {
             broadcast_to_room(
                 &code,
                 json!({
@@ -1091,6 +1186,23 @@ mod tests {
             "roomCode": room_code
         });
         client1.send(WsMsg::Text(toggle_timer.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+
+        // Send add_bot
+        let add_bot_msg = json!({
+            "type": "add_bot",
+            "roomCode": room_code
+        });
+        client1.send(WsMsg::Text(add_bot_msg.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+
+        // Send remove_bot
+        let remove_bot_msg = json!({
+            "type": "remove_bot",
+            "roomCode": room_code,
+            "botId": null
+        });
+        client1.send(WsMsg::Text(remove_bot_msg.to_string())).await.unwrap();
         let _ = client1.next().await.unwrap().unwrap();
 
         // 2. Client 2 connects (Guest)

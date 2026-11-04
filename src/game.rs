@@ -2,7 +2,7 @@ use rand::seq::SliceRandom;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::board::{BoardDefinition, Portal};
+use crate::board::{BoardDefinition, MysteryKind, MysteryTile, Portal};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameSettings {
@@ -18,6 +18,10 @@ pub struct GameSettings {
     pub turn_timer_seconds: u64, // 0 for infinite, or 15, 25, 40
     #[serde(default = "default_board_theme")]
     pub board_theme: String, // "fiesta", "muertos", "selva", "clasico"
+    #[serde(default = "default_board_size")]
+    pub board_size: u8, // 100 or 50
+    #[serde(default = "default_mystery_tiles")]
+    pub mystery_tiles: bool, // true or false
 }
 
 fn default_dice_count() -> u8 {
@@ -38,6 +42,12 @@ fn default_turn_timer() -> u64 {
 fn default_board_theme() -> String {
     "fiesta".to_string()
 }
+fn default_board_size() -> u8 {
+    100
+}
+fn default_mystery_tiles() -> bool {
+    false
+}
 
 impl Default for GameSettings {
     fn default() -> Self {
@@ -48,6 +58,8 @@ impl Default for GameSettings {
             three_sixes_penalty: default_three_sixes(),
             turn_timer_seconds: default_turn_timer(),
             board_theme: default_board_theme(),
+            board_size: default_board_size(),
+            mystery_tiles: default_mystery_tiles(),
         }
     }
 }
@@ -61,18 +73,35 @@ pub struct PlayerStats {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Award {
+    pub key: String,
+    pub badge: String,
+    pub title_es: String,
+    pub title_en: String,
+    pub player_name: String,
+    pub avatar: String,
+    pub color: String,
+    pub detail_es: String,
+    pub detail_en: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
     pub id: String,
     pub name: String,
     pub color: String,
     pub avatar: String,
-    pub position: u8, // 0 = start dock, 1..=100
+    pub position: u8, // 0 = start dock, 1..=total_tiles
     pub connected: bool,
     pub is_host: bool,
     #[serde(default)]
     pub conn_id: String,
     #[serde(default)]
     pub stats: PlayerStats,
+    #[serde(default)]
+    pub is_bot: bool,
+    #[serde(default)]
+    pub skipped_turns: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -98,6 +127,12 @@ pub struct MoveStep {
     pub path: Vec<u8>,
     pub landed_tile: u8,
     pub portal_applied: Option<Portal>,
+    #[serde(default)]
+    pub mystery_applied: Option<MysteryTile>,
+    #[serde(default)]
+    pub mystery_message_es: Option<String>,
+    #[serde(default)]
+    pub mystery_message_en: Option<String>,
     pub final_tile: u8,
     pub won: bool,
     pub extra_turn: bool,
@@ -114,6 +149,8 @@ pub struct WinnerInfo {
     pub total_rolls: u32,
     pub ladders_climbed: u32,
     pub snakes_hit: u32,
+    #[serde(default)]
+    pub awards: Vec<Award>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -158,13 +195,90 @@ pub fn current_epoch_secs() -> u64 {
         .as_secs()
 }
 
+pub fn calculate_awards(players: &[Player], winner_id: &str, total_tiles: u8) -> Vec<Award> {
+    let mut awards = Vec::new();
+
+    // 1. 🪜 El Trepador / The Climber (most ladders climbed, if > 0)
+    if let Some(climber) = players.iter().max_by_key(|p| p.stats.ladders_climbed) {
+        if climber.stats.ladders_climbed > 0 {
+            awards.push(Award {
+                key: "climber".to_string(),
+                badge: "🪜".to_string(),
+                title_es: "El Trepador".to_string(),
+                title_en: "The Climber".to_string(),
+                player_name: climber.name.clone(),
+                avatar: climber.avatar.clone(),
+                color: climber.color.clone(),
+                detail_es: format!("Subió {} escaleras hacia la gloria.", climber.stats.ladders_climbed),
+                detail_en: format!("Climbed {} ladders towards glory.", climber.stats.ladders_climbed),
+            });
+        }
+    }
+
+    // 2. 🐍 El Más Salado / The Snake Magnet (most snakes hit, if > 0)
+    if let Some(snake_victim) = players.iter().max_by_key(|p| p.stats.snakes_hit) {
+        if snake_victim.stats.snakes_hit > 0 {
+            awards.push(Award {
+                key: "snake_magnet".to_string(),
+                badge: "🐍".to_string(),
+                title_es: "El Más Salado".to_string(),
+                title_en: "The Snake Magnet".to_string(),
+                player_name: snake_victim.name.clone(),
+                avatar: snake_victim.avatar.clone(),
+                color: snake_victim.color.clone(),
+                detail_es: format!("Fue mordido por {} serpientes traicioneras.", snake_victim.stats.snakes_hit),
+                detail_en: format!("Bitten by {} sneaky snakes.", snake_victim.stats.snakes_hit),
+            });
+        }
+    }
+
+    // 3. 🎲 Mano Bendita / Golden Touch (the winner)
+    if let Some(winner) = players.iter().find(|p| p.id == winner_id) {
+        awards.push(Award {
+            key: "golden_touch".to_string(),
+            badge: "🎲".to_string(),
+            title_es: "Mano Bendita".to_string(),
+            title_en: "Golden Touch".to_string(),
+            player_name: winner.name.clone(),
+            avatar: winner.avatar.clone(),
+            color: winner.color.clone(),
+            detail_es: format!("Llegó a la meta en solo {} tiros.", winner.stats.rolls_count),
+            detail_en: format!("Reached the goal in only {} rolls.", winner.stats.rolls_count),
+        });
+    }
+
+    // 4. ⚡ Rayo Veloz / Speedy Runner (runner up or player with highest position)
+    let mut other_players: Vec<&Player> = players.iter().filter(|p| p.id != winner_id).collect();
+    other_players.sort_by_key(|p| std::cmp::Reverse(p.position));
+    if let Some(runner_up) = other_players.first() {
+        awards.push(Award {
+            key: "speedy_runner".to_string(),
+            badge: "⚡".to_string(),
+            title_es: "Rayo Veloz".to_string(),
+            title_en: "Speedy Runner".to_string(),
+            player_name: runner_up.name.clone(),
+            avatar: runner_up.avatar.clone(),
+            color: runner_up.color.clone(),
+            detail_es: format!("Subcampeón en la casilla {} de {}.", runner_up.position, total_tiles),
+            detail_en: format!("Runner-up at tile {} of {}.", runner_up.position, total_tiles),
+        });
+    }
+
+    awards
+}
+
 impl Room {
     pub fn new(code: String, settings: GameSettings) -> Self {
         let now = current_epoch_secs();
+        let board = if settings.board_size == 50 {
+            BoardDefinition::express().with_mystery_tiles(settings.mystery_tiles)
+        } else {
+            BoardDefinition::classic().with_mystery_tiles(settings.mystery_tiles)
+        };
         Self {
             code,
             state: RoomState::Lobby,
-            board: BoardDefinition::classic(),
+            board,
             settings,
             players: Vec::new(),
             turn_index: 0,
@@ -240,10 +354,11 @@ impl Room {
         self.last_move = None;
         self.round = 1;
 
-        // Reset player positions and stats
+        // Reset player positions, stats, and traps
         for p in &mut self.players {
             p.position = 0;
             p.stats = PlayerStats::default();
+            p.skipped_turns = 0;
         }
 
         self.add_log(
@@ -269,6 +384,7 @@ impl Room {
         for p in &mut self.players {
             p.position = 0;
             p.stats = PlayerStats::default();
+            p.skipped_turns = 0;
         }
 
         self.add_log(
@@ -277,6 +393,100 @@ impl Room {
             "🔄 New game ready in the lobby.",
             None,
         );
+    }
+
+    pub fn add_bot(&mut self) -> Result<Player, String> {
+        if self.players.len() >= 8 {
+            return Err("Room is full (max 8 players)".to_string());
+        }
+        const BOT_PROFILES: [(&str, &str, &str); 6] = [
+            ("🤖 Bot Pancho", "🤠", "#10b981"),
+            ("🤖 Bot Lupita", "🪅", "#ec4899"),
+            ("🤖 Bot Chuy", "🌮", "#f59e0b"),
+            ("🤖 Bot Frida", "🎨", "#8b5cf6"),
+            ("🤖 Bot El Santo", "🤼", "#3b82f6"),
+            ("🤖 Bot Alebrije", "🐆", "#06b6d4"),
+        ];
+        let bot_count = self.players.iter().filter(|p| p.is_bot).count();
+        let (name, avatar, color) = BOT_PROFILES[bot_count % BOT_PROFILES.len()];
+        let bot_id = format!("bot_{:x}", rand::random::<u32>());
+        let bot_player = Player {
+            id: bot_id.clone(),
+            name: name.to_string(),
+            color: color.to_string(),
+            avatar: avatar.to_string(),
+            position: 0,
+            connected: true,
+            is_host: false,
+            conn_id: format!("conn_{}", bot_id),
+            stats: PlayerStats::default(),
+            is_bot: true,
+            skipped_turns: 0,
+        };
+        self.players.push(bot_player.clone());
+        self.add_log(
+            "join",
+            &format!("🤖 {} se unió a la partida.", name),
+            &format!("🤖 {} joined the game.", name),
+            Some(bot_id),
+        );
+        Ok(bot_player)
+    }
+
+    pub fn remove_bot(&mut self, bot_id: Option<&str>) -> Result<String, String> {
+        let pos = if let Some(id) = bot_id {
+            self.players.iter().position(|p| p.id == id && p.is_bot)
+        } else {
+            self.players.iter().rposition(|p| p.is_bot)
+        };
+
+        if let Some(idx) = pos {
+            let bot = self.players.remove(idx);
+            self.add_log(
+                "leave",
+                &format!("🤖 {} salió de la partida.", bot.name),
+                &format!("🤖 {} left the game.", bot.name),
+                Some(bot.id.clone()),
+            );
+            if self.players.is_empty() {
+                self.turn_index = 0;
+            } else {
+                self.turn_index %= self.players.len();
+            }
+            Ok(bot.id)
+        } else {
+            Err("No bots in this room".to_string())
+        }
+    }
+
+    pub fn check_bot_turn(&mut self) -> Option<(MoveStep, Option<String>)> {
+        if self.state != RoomState::Playing {
+            return None;
+        }
+        if let Some(player) = self.current_player() {
+            if player.is_bot {
+                let now = current_epoch_secs();
+                if now > self.turn_started_at_secs {
+                    let bot_id = player.id.clone();
+                    if let Ok(step) = self.roll_and_move(&bot_id) {
+                        let mut bot_shout = None;
+                        if rand::random::<f32>() < 0.45 {
+                            let shouts = [
+                                "¡Ándale! 🎲",
+                                "¡Con todo menos con miedo! 🌮",
+                                "¡Fierro pariente! 🤠",
+                                "¡Pura suerte! 🍀",
+                                "¡Aguas con la víbora! 🐍",
+                                "¡Sube, compadre! 🪜",
+                            ];
+                            bot_shout = Some(shouts.choose(&mut rand::thread_rng()).unwrap().to_string());
+                        }
+                        return Some((step, bot_shout));
+                    }
+                }
+            }
+        }
+        None
     }
 
     /// Check if current active turn has timed out (for AFK auto-play)
@@ -308,6 +518,46 @@ impl Room {
         }
 
         self.touch_activity();
+
+        // Check if player is trapped by Nopal
+        let p_idx = self.turn_index % self.players.len();
+        if self.players[p_idx].skipped_turns > 0 {
+            self.players[p_idx].skipped_turns -= 1;
+            let player_name = self.players[p_idx].name.clone();
+            let cur_pos = self.players[p_idx].position;
+
+            self.add_log(
+                "trap",
+                &format!("🌵 ¡{} está quitándose las espinas del nopal y pierde su turno!", player_name),
+                &format!("🌵 {} is trapped by the prickly cactus and skips their turn!", player_name),
+                Some(player_id.to_string()),
+            );
+
+            let step = MoveStep {
+                player_id: player_id.to_string(),
+                player_name,
+                from_tile: cur_pos,
+                path: Vec::new(),
+                landed_tile: cur_pos,
+                portal_applied: None,
+                mystery_applied: None,
+                mystery_message_es: Some("🌵 ¡Atrapado en el nopal! Turno perdido.".to_string()),
+                mystery_message_en: Some("🌵 Trapped in cactus! Turn skipped.".to_string()),
+                final_tile: cur_pos,
+                won: false,
+                extra_turn: false,
+                penalty_applied: false,
+                roll: DiceRoll {
+                    dice: vec![0],
+                    total: 0,
+                    is_bonus: false,
+                },
+            };
+            self.last_move = Some(step.clone());
+            self.advance_turn();
+            return Ok(step);
+        }
+
         let mut rng = rand::thread_rng();
 
         // 1. Roll dice
@@ -341,6 +591,7 @@ impl Room {
         let three_sixes_rule = self.settings.three_sixes_penalty;
         let exact_win_rule = self.settings.exact_win;
         let bonus_on_six_rule = self.settings.bonus_on_six;
+        let total_tiles = self.board.total_tiles;
 
         // 2. Check 3-sixes penalty rule
         if three_sixes_rule && is_bonus {
@@ -366,6 +617,9 @@ impl Room {
                     path: vec![1],
                     landed_tile: 1,
                     portal_applied: None,
+                    mystery_applied: None,
+                    mystery_message_es: None,
+                    mystery_message_en: None,
                     final_tile: 1,
                     won: false,
                     extra_turn: false,
@@ -382,43 +636,116 @@ impl Room {
 
         // 3. Compute step-by-step path
         let mut path = Vec::new();
-        let landed_tile: u8 = if from_tile + total_roll <= 100 {
+        let landed_tile: u8 = if from_tile + total_roll <= total_tiles {
             for t in (from_tile + 1)..=(from_tile + total_roll) {
                 path.push(t);
             }
             from_tile + total_roll
         } else if exact_win_rule {
             // Bounce back if overshoot
-            let overshoot = (from_tile + total_roll) - 100;
-            for t in (from_tile + 1)..=100 {
+            let overshoot = (from_tile + total_roll) - total_tiles;
+            for t in (from_tile + 1)..=total_tiles {
                 path.push(t);
             }
             for bounce_step in 1..=overshoot {
-                path.push(100 - bounce_step);
+                path.push(total_tiles - bounce_step);
             }
-            100 - overshoot
+            total_tiles - overshoot
         } else {
-            // Any roll >= 100 wins immediately
-            for t in (from_tile + 1)..=100 {
+            // Any roll >= total_tiles wins immediately
+            for t in (from_tile + 1)..=total_tiles {
                 path.push(t);
             }
-            100
+            total_tiles
         };
 
         // 4. Check portals (Escaleras & Serpientes)
-        let portal = if landed_tile < 100 {
+        let portal = if landed_tile < total_tiles {
             self.board.get_portal(landed_tile)
         } else {
             None
         };
 
-        let final_tile = if let Some(ref p) = portal {
+        let tile_after_portal = if let Some(ref p) = portal {
             p.to
         } else {
             landed_tile
         };
 
-        let won = final_tile == 100;
+        // 5. Check mystery tiles
+        let mut mystery_applied = None;
+        let mut mystery_message_es = None;
+        let mut mystery_message_en = None;
+        let mut pinata_bonus = false;
+
+        let final_tile = if tile_after_portal < total_tiles {
+            if let Some(m) = self.board.get_mystery_tile(tile_after_portal) {
+                mystery_applied = Some(m.clone());
+                match m.kind {
+                    MysteryKind::Taco => {
+                        let boosted = (tile_after_portal + 3).min(total_tiles);
+                        for step in (tile_after_portal + 1)..=boosted {
+                            path.push(step);
+                        }
+                        mystery_message_es = Some("🌮 ¡Taquitos al pastor! Avanzas 3 casillas extra.".to_string());
+                        mystery_message_en = Some("🌮 Taco boost! Dash 3 extra tiles forward.".to_string());
+                        self.add_log(
+                            "mystery_taco",
+                            &format!("🌮 ¡TACO POWER! {} comió tacos en la casilla {} y avanzó a la {}.", player_name, m.tile, boosted),
+                            &format!("🌮 TACO POWER! {} ate tacos at tile {} and boosted to {}.", player_name, m.tile, boosted),
+                            Some(player_id.to_string()),
+                        );
+                        boosted
+                    }
+                    MysteryKind::Chile => {
+                        let boosted = (tile_after_portal + 5).min(total_tiles);
+                        for step in (tile_after_portal + 1)..=boosted {
+                            path.push(step);
+                        }
+                        mystery_message_es = Some("🌶️ ¡Chile picante! Corres 5 casillas hacia adelante.".to_string());
+                        mystery_message_en = Some("🌶️ Spicy chili! Dash 5 extra tiles forward.".to_string());
+                        self.add_log(
+                            "mystery_chile",
+                            &format!("🌶️ ¡ENCHILADO! {} probó chile picante en la casilla {} y corrió a la {}.", player_name, m.tile, boosted),
+                            &format!("🌶️ SPICY CHILI! {} tasted hot chili at tile {} and dashed to {}.", player_name, m.tile, boosted),
+                            Some(player_id.to_string()),
+                        );
+                        boosted
+                    }
+                    MysteryKind::Pinata => {
+                        pinata_bonus = true;
+                        mystery_message_es = Some("🪅 ¡Rompiste la piñata! ¡Tienes otro tiro!".to_string());
+                        mystery_message_en = Some("🪅 Smashed the piñata! Extra roll granted!".to_string());
+                        self.add_log(
+                            "mystery_pinata",
+                            &format!("🪅 ¡DALE DALE DALE! {} rompió la piñata en la casilla {} y gana otro tiro.", player_name, m.tile),
+                            &format!("🪅 PIÑATA PARTY! {} smashed the piñata at tile {} and gets another roll.", player_name, m.tile),
+                            Some(player_id.to_string()),
+                        );
+                        tile_after_portal
+                    }
+                    MysteryKind::Nopal => {
+                        let p_idx = self.turn_index % self.players.len();
+                        self.players[p_idx].skipped_turns = 1;
+                        mystery_message_es = Some("🌵 ¡Te espinaste con el nopal! Quedas atrapado 1 turno.".to_string());
+                        mystery_message_en = Some("🌵 Prickly cactus! Trapped for 1 turn.".to_string());
+                        self.add_log(
+                            "mystery_nopal",
+                            &format!("🌵 ¡AY NOPAL! {} se espinó en la casilla {} y perderá su próximo turno.", player_name, m.tile),
+                            &format!("🌵 PRICKLY CACTUS! {} got stuck at tile {} and misses next turn.", player_name, m.tile),
+                            Some(player_id.to_string()),
+                        );
+                        tile_after_portal
+                    }
+                }
+            } else {
+                tile_after_portal
+            }
+        } else {
+            tile_after_portal
+        };
+
+        let won = final_tile == total_tiles;
 
         // Update player stats
         let p_idx = self.turn_index % self.players.len();
@@ -465,8 +792,8 @@ impl Room {
             }
         }
 
-        let extra_turn = bonus_on_six_rule && is_bonus && !won;
-        if extra_turn {
+        let extra_turn = (bonus_on_six_rule && is_bonus && !won) || (pinata_bonus && !won);
+        if extra_turn && !pinata_bonus {
             self.turn_started_at_secs = current_epoch_secs(); // Reset turn timer for bonus roll
             self.add_log(
                 "extra_turn",
@@ -474,11 +801,14 @@ impl Room {
                 &format!("✨ Extra roll! {} rolled a six and gets another turn.", player_name),
                 Some(player_id.to_string()),
             );
+        } else if extra_turn && pinata_bonus {
+            self.turn_started_at_secs = current_epoch_secs();
         }
 
         if won {
             self.state = RoomState::Finished;
             let p_ref = &self.players[p_idx];
+            let awards = calculate_awards(&self.players, player_id, total_tiles);
             let winner_info = WinnerInfo {
                 player_id: player_id.to_string(),
                 player_name: player_name.clone(),
@@ -487,13 +817,14 @@ impl Room {
                 total_rolls: p_ref.stats.rolls_count,
                 ladders_climbed: p_ref.stats.ladders_climbed,
                 snakes_hit: p_ref.stats.snakes_hit,
+                awards,
             };
             self.winner = Some(winner_info);
 
             self.add_log(
                 "win",
-                &format!("🏆 ¡VICTORIA! ¡{} llegó a la meta (100) y es el Gran Campeón!", player_name),
-                &format!("🏆 VICTORY! {} reached tile 100 and won the game!", player_name),
+                &format!("🏆 ¡VICTORIA! ¡{} llegó a la meta ({}) y es el Gran Campeón!", player_name, total_tiles),
+                &format!("🏆 VICTORY! {} reached tile {} and won the game!", player_name, total_tiles),
                 Some(player_id.to_string()),
             );
         } else if !extra_turn {
@@ -507,6 +838,9 @@ impl Room {
             path,
             landed_tile,
             portal_applied: portal,
+            mystery_applied,
+            mystery_message_es,
+            mystery_message_en,
             final_tile,
             won,
             extra_turn,
@@ -534,6 +868,8 @@ mod tests {
             is_host: id == "p1",
             conn_id: format!("conn_{}", id),
             stats: PlayerStats::default(),
+            is_bot: false,
+            skipped_turns: 0,
         }
     }
 
@@ -644,8 +980,10 @@ mod tests {
 
     #[test]
     fn test_turn_timeout_autoplay() {
-        let mut settings = GameSettings::default();
-        settings.turn_timer_seconds = 15;
+        let settings = GameSettings {
+            turn_timer_seconds: 15,
+            ..Default::default()
+        };
         let mut room = Room::new("TEST04".to_string(), settings);
         room.players.push(create_test_player("p1", "Player 1", true));
         room.start_game().unwrap();
@@ -705,8 +1043,10 @@ mod tests {
 
     #[test]
     fn test_exact_win_bounce_mechanics() {
-        let mut settings = GameSettings::default();
-        settings.exact_win = true;
+        let settings = GameSettings {
+            exact_win: true,
+            ..Default::default()
+        };
         let mut room = Room::new("TEST07".to_string(), settings);
         room.players.push(create_test_player("p1", "Player 1", true));
         room.start_game().unwrap();
@@ -730,8 +1070,10 @@ mod tests {
         assert_eq!(path, vec![99, 100, 99, 98, 97]);
 
         // Non exact-win mode: roll 5 from 98 goes straight to 100
-        let mut settings_no_bounce = GameSettings::default();
-        settings_no_bounce.exact_win = false;
+        let settings_no_bounce = GameSettings {
+            exact_win: false,
+            ..Default::default()
+        };
         let mut room_no_bounce = Room::new("TEST08".to_string(), settings_no_bounce);
         room_no_bounce.players.push(create_test_player("p1", "Player 1", true));
         room_no_bounce.start_game().unwrap();
@@ -762,6 +1104,7 @@ mod tests {
             total_rolls: 12,
             ladders_climbed: 3,
             snakes_hit: 1,
+            awards: Vec::new(),
         };
         room.winner = Some(winner_info);
         room.state = RoomState::Finished;
@@ -776,8 +1119,10 @@ mod tests {
 
     #[test]
     fn test_two_dice_mode() {
-        let mut settings = GameSettings::default();
-        settings.dice_count = 2;
+        let settings = GameSettings {
+            dice_count: 2,
+            ..Default::default()
+        };
         let mut room = Room::new("TEST10".to_string(), settings);
         room.players.push(create_test_player("p1", "Fast Roller", true));
         room.start_game().unwrap();
@@ -786,5 +1131,90 @@ mod tests {
         assert_eq!(step.roll.dice.len(), 2);
         assert_eq!(step.roll.total, step.roll.dice[0] + step.roll.dice[1]);
         assert!(step.roll.total >= 2 && step.roll.total <= 12);
+    }
+
+    #[test]
+    fn test_bot_management_and_turns() {
+        let settings = GameSettings {
+            bonus_on_six: false,
+            ..Default::default()
+        };
+        let mut room = Room::new("BOTS01".to_string(), settings);
+        room.players.push(create_test_player("p1", "Host Player", true));
+
+        // Add 2 bots
+        let bot1 = room.add_bot().unwrap();
+        assert!(bot1.is_bot);
+        assert_eq!(bot1.name, "🤖 Bot Pancho");
+
+        let bot2 = room.add_bot().unwrap();
+        assert!(bot2.is_bot);
+        assert_eq!(bot2.name, "🤖 Bot Lupita");
+        assert_eq!(room.players.len(), 3);
+
+        // Remove 1 bot
+        let removed_id = room.remove_bot(Some(&bot2.id)).unwrap();
+        assert_eq!(removed_id, bot2.id);
+        assert_eq!(room.players.len(), 2);
+
+        // Start game with bot
+        room.start_game().unwrap();
+
+        // Host turn (index 0)
+        assert_eq!(room.current_player().unwrap().id, "p1");
+        assert!(room.check_bot_turn().is_none()); // Not bot's turn
+
+        // Host rolls
+        let _ = room.roll_and_move("p1").unwrap();
+
+        // Now it's bot's turn (index 1)
+        assert_eq!(room.current_player().unwrap().id, bot1.id);
+        assert!(room.current_player().unwrap().is_bot);
+
+        // Simulate 2 seconds passing
+        room.turn_started_at_secs = current_epoch_secs() - 2;
+        let bot_move = room.check_bot_turn();
+        assert!(bot_move.is_some());
+        let (step, _shout) = bot_move.unwrap();
+        assert_eq!(step.player_id, bot1.id);
+        assert!(step.final_tile > 0);
+    }
+
+    #[test]
+    fn test_express_board_and_mystery_tiles() {
+        let settings = GameSettings {
+            board_size: 50,
+            mystery_tiles: true,
+            ..Default::default()
+        };
+        let mut room = Room::new("EXPR01".to_string(), settings);
+        assert_eq!(room.board.total_tiles, 50);
+        assert_eq!(room.board.mystery_tiles.len(), 4);
+
+        room.players.push(create_test_player("p1", "Speedy", true));
+        room.start_game().unwrap();
+
+        // Test Nopal trap skip turn
+        room.players[0].skipped_turns = 1;
+        let skip_step = room.roll_and_move("p1").unwrap();
+        assert_eq!(room.players[0].skipped_turns, 0);
+        assert!(skip_step.mystery_message_es.unwrap().contains("Atrapado"));
+
+        // Awards calculation test
+        let mut p1 = create_test_player("p1", "Champion", true);
+        p1.stats.rolls_count = 8;
+        p1.stats.ladders_climbed = 4;
+        p1.position = 50;
+
+        let mut p2 = create_test_player("p2", "Salado", true);
+        p2.stats.rolls_count = 10;
+        p2.stats.snakes_hit = 5;
+        p2.position = 35;
+
+        let awards = calculate_awards(&[p1, p2], "p1", 50);
+        assert!(awards.iter().any(|a| a.key == "climber"));
+        assert!(awards.iter().any(|a| a.key == "snake_magnet"));
+        assert!(awards.iter().any(|a| a.key == "golden_touch"));
+        assert!(awards.iter().any(|a| a.key == "speedy_runner"));
     }
 }

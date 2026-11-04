@@ -71,7 +71,19 @@
       shoutFaith: "¡Tírale con fe! 🎲",
       shoutUnlucky: "¡Salado me quedé! 🧂",
       shoutYourTurn: "¡Ándale, te toca! ⏰",
-      shoutLucky: "¡Pura suerte! 🍀"
+      shoutLucky: "¡Pura suerte! 🍀",
+      labelBoardSize: "Modo de Tablero",
+      board100: "Clásico (100 Casillas - 10x10)",
+      board50: "Express (50 Casillas - 5x10)",
+      labelMysteryTiles: "Casillas de Fiesta (🌮, 🌶️, 🪅, 🌵)",
+      btnAddBot: "🤖 + Agregar Bot",
+      btnRemoveBot: "🤖 - Quitar Bot",
+      btnShareVictory: "📸 Compartir Victoria",
+      podiumTitle: "🏆 Podio de Honor",
+      awardsTitle: "🎖️ Medallas de la Feria",
+      cardDownloaded: "¡Tarjeta de victoria guardada!",
+      cardShared: "¡Victoria compartida!",
+      installApp: "Instalar App"
     },
     en: {
       appTitle: "SNAKES & LADDERS",
@@ -136,7 +148,19 @@
       shoutFaith: "Roll with faith! 🎲",
       shoutUnlucky: "Down I go! 🧂",
       shoutYourTurn: "Hurry up, your turn! ⏰",
-      shoutLucky: "Pure luck! 🍀"
+      shoutLucky: "Pure luck! 🍀",
+      labelBoardSize: "Board Mode",
+      board100: "Classic (100 Tiles - 10x10)",
+      board50: "Express (50 Tiles - 5x10)",
+      labelMysteryTiles: "Party Mystery Tiles (🌮, 🌶️, 🪅, 🌵)",
+      btnAddBot: "🤖 + Add Bot",
+      btnRemoveBot: "🤖 - Remove Bot",
+      btnShareVictory: "📸 Share Victory Card",
+      podiumTitle: "🏆 Victory Podium",
+      awardsTitle: "🎖️ Party Badges & Awards",
+      cardDownloaded: "Victory card saved!",
+      cardShared: "Victory shared!",
+      installApp: "Install App"
     }
   };
 
@@ -195,6 +219,7 @@
     btnToggleSound: document.getElementById("btn-toggle-sound"),
     btnToggleSpeech: document.getElementById("btn-toggle-speech"),
     btnHeaderLeave: document.getElementById("btn-header-leave"),
+    btnInstallPwa: document.getElementById("btn-install-pwa"),
 
     screenWelcome: document.getElementById("screen-welcome"),
     screenLobby: document.getElementById("screen-lobby"),
@@ -219,6 +244,8 @@
     avatarPicker: document.getElementById("avatar-picker"),
     colorPicker: document.getElementById("color-picker"),
 
+    settingBoardSize: document.getElementById("setting-board-size"),
+    settingMysteryTiles: document.getElementById("setting-mystery-tiles"),
     settingDiceCount: document.getElementById("setting-dice-count"),
     settingExactWin: document.getElementById("setting-exact-win"),
     settingBonusSix: document.getElementById("setting-bonus-six"),
@@ -226,6 +253,11 @@
     settingTurnTimer: document.getElementById("setting-turn-timer"),
 
     lobbyRoomCode: document.getElementById("lobby-room-code"),
+    lobbyPillBoard: document.getElementById("lobby-pill-board"),
+    lobbyPillMystery: document.getElementById("lobby-pill-mystery"),
+    lobbyBotControls: document.getElementById("lobby-bot-controls"),
+    btnAddBot: document.getElementById("btn-add-bot"),
+    btnRemoveBot: document.getElementById("btn-remove-bot"),
     lobbyPlayersList: document.getElementById("lobby-players-list"),
     btnCopyLink: document.getElementById("btn-copy-link"),
     btnShowQr: document.getElementById("btn-show-qr"),
@@ -260,6 +292,9 @@
     winnerStatRolls: document.getElementById("winner-stat-rolls"),
     winnerStatLadders: document.getElementById("winner-stat-ladders"),
     winnerStatSnakes: document.getElementById("winner-stat-snakes"),
+    winnerPodiumList: document.getElementById("winner-podium-list"),
+    winnerAwardsGrid: document.getElementById("winner-awards-grid"),
+    btnShareVictory: document.getElementById("btn-share-victory"),
     btnPlayAgain: document.getElementById("btn-play-again"),
     confettiCanvas: document.getElementById("confetti-canvas")
   };
@@ -447,24 +482,36 @@
   // 4. Board Geometry & SVG Renderer (High-Aesthetic Mexican Style)
   // -------------------------------------------------------------
   function getTileCoords(tile) {
+    const totalTiles = (currentRoom && currentRoom.board && currentRoom.board.total_tiles) || 100;
+    const totalRows = totalTiles / 10;
+    const rowHeight = 1000 / totalRows;
+
     if (tile <= 0) {
-      return { x: 50, y: 1040 };
+      return { x: 50, y: 1040, row: 0, col: 0 };
     }
-    const clamped = Math.min(100, Math.max(1, tile));
+    const clamped = Math.min(totalTiles, Math.max(1, tile));
     const row = Math.floor((clamped - 1) / 10);
     const col = (row % 2 === 0) ? ((clamped - 1) % 10) : (9 - ((clamped - 1) % 10));
 
     // In a 1000x1000 SVG viewBox
     const x = (col + 0.5) * 100;
-    const y = (9 - row + 0.5) * 100;
+    const y = (totalRows - 1 - row + 0.5) * rowHeight;
     return { x, y, row, col };
   }
 
   function buildBoardGrid(board) {
     el.boardGrid.innerHTML = "";
+    const totalTiles = (board && board.total_tiles) || 100;
+    const totalRows = totalTiles / 10;
 
-    // 10x10 grid: row 9 (top) down to row 0 (bottom)
-    for (let row = 9; row >= 0; row--) {
+    if (totalTiles === 50) {
+      el.boardGrid.classList.add("express");
+    } else {
+      el.boardGrid.classList.remove("express");
+    }
+
+    // Grid: top row down to row 0
+    for (let row = totalRows - 1; row >= 0; row--) {
       for (let col = 0; col < 10; col++) {
         const tileNum = (row % 2 === 0) ? (row * 10 + col + 1) : (row * 10 + (9 - col) + 1);
 
@@ -477,19 +524,37 @@
           tileDiv.classList.add("tile-alt");
         }
 
-        if (tileNum === 100) tileDiv.classList.add("tile-goal");
+        if (tileNum === totalTiles) tileDiv.classList.add("tile-goal");
         if (tileNum === 1) tileDiv.classList.add("tile-start");
 
         const numSpan = document.createElement("span");
         numSpan.className = "tile-number";
-        if (tileNum === 100) {
-          numSpan.textContent = "🏆 100";
+        if (tileNum === totalTiles) {
+          numSpan.textContent = `🏆 ${totalTiles}`;
         } else if (tileNum === 1) {
           numSpan.textContent = "🏁 1";
         } else {
           numSpan.textContent = String(tileNum);
         }
         tileDiv.appendChild(numSpan);
+
+        // Mystery Tile Badges
+        if (board && board.mystery_tiles) {
+          const mystery = board.mystery_tiles.find(m => m.tile === tileNum);
+          if (mystery) {
+            tileDiv.classList.add("tile-mystery");
+            const mSpan = document.createElement("span");
+            mSpan.className = "tile-mystery-icon";
+            const icons = {
+              taco: "🌮",
+              chile: "🌶️",
+              pinata: "🪅",
+              nopal: "🌵"
+            };
+            mSpan.textContent = icons[mystery.kind] || "✨";
+            tileDiv.appendChild(mSpan);
+          }
+        }
 
         // Subtle indicator if tile is a ladder start or snake mouth
         if (board && board.ladders) {
@@ -946,6 +1011,39 @@
       token.style.transition = "";
     }
 
+    // 3.5 Handle Mystery Tile
+    if (step.mystery_applied && token) {
+      await new Promise(r => setTimeout(r, 200));
+      const msg = currentLang === "es" ? step.mystery_message_es : step.mystery_message_en;
+      if (msg) showToast(msg);
+
+      if (window.serpientesAudio) {
+        if (step.mystery_applied.kind === "taco" || step.mystery_applied.kind === "chile") {
+          window.serpientesAudio.playLadder();
+        } else if (step.mystery_applied.kind === "pinata") {
+          window.serpientesAudio.playVictory();
+        } else if (step.mystery_applied.kind === "nopal") {
+          window.serpientesAudio.playSnake();
+        }
+      }
+
+      const finalCoords = getTileCoords(step.final_tile);
+      token.style.transition = "top 0.45s ease-out, left 0.45s ease-out";
+      token.style.left = `${finalCoords.x / 10}%`;
+      token.style.top = `${finalCoords.y / 10}%`;
+      await new Promise(r => setTimeout(r, 450));
+      token.style.transition = "";
+    }
+
+    // 3.6 Handle Nopal Trapped Turn Skip
+    if (!step.path || step.path.length === 0) {
+      if (step.mystery_message_es && step.roll.total === 0) {
+        const msg = currentLang === "es" ? step.mystery_message_es : step.mystery_message_en;
+        if (msg) showToast(msg);
+        if (window.serpientesAudio) window.serpientesAudio.playSnake();
+      }
+    }
+
     // 4. Handle Win Celebration
     if (step.won) {
       if (window.serpientesAudio) {
@@ -1151,6 +1249,8 @@
         const timerPill = document.getElementById("lobby-pill-timer");
         const dicePill = document.getElementById("lobby-pill-dice");
         const rulesPill = document.getElementById("lobby-pill-rules");
+        const boardPill = document.getElementById("lobby-pill-board");
+        const mysteryPill = document.getElementById("lobby-pill-mystery");
         if (timerPill) {
           const s = room.settings.turn_timer_seconds;
           timerPill.textContent = s > 0 ? `⏱️ ${s}s` : (currentLang === "es" ? "♾️ Sin límite" : "♾️ No limit");
@@ -1162,6 +1262,28 @@
           rulesPill.textContent = room.settings.exact_win
             ? (currentLang === "es" ? "🎯 Tiro exacto" : "🎯 Exact finish")
             : (currentLang === "es" ? "🏁 100 o más" : "🏁 100+ to win");
+        }
+        if (boardPill) {
+          const sz = (room.board && room.board.total_tiles) || (room.settings && room.settings.board_size) || 100;
+          boardPill.textContent = sz === 50
+            ? (currentLang === "es" ? "⚡ Express 50" : "⚡ Express 50")
+            : (currentLang === "es" ? "🗺️ Clásico 100" : "🗺️ Classic 100");
+        }
+        if (mysteryPill) {
+          const enabled = room.settings.mystery_tiles;
+          mysteryPill.style.display = enabled ? "inline-block" : "none";
+          mysteryPill.textContent = currentLang === "es" ? "🎉 Fiesta" : "🎉 Party";
+        }
+      }
+
+      // Lobby Bot Controls (Host only)
+      if (el.lobbyBotControls) {
+        if (isHost) {
+          el.lobbyBotControls.style.display = "flex";
+          if (el.btnAddBot) el.btnAddBot.disabled = room.players.length >= 8;
+          if (el.btnRemoveBot) el.btnRemoveBot.disabled = !room.players.some(p => p.is_bot);
+        } else {
+          el.lobbyBotControls.style.display = "none";
         }
       }
 
@@ -1185,6 +1307,12 @@
         const nameDiv = document.createElement("div");
         nameDiv.className = "lobby-player-name";
         nameDiv.textContent = p.name;
+        if (p.is_bot) {
+          const botTag = document.createElement("span");
+          botTag.className = "bot-tag";
+          botTag.textContent = "BOT";
+          nameDiv.appendChild(botTag);
+        }
         card.appendChild(nameDiv);
 
         const dot = document.createElement("div");
@@ -1258,6 +1386,49 @@
         el.winnerStatLadders.textContent = room.winner.ladders_climbed;
         el.winnerStatSnakes.textContent = room.winner.snakes_hit;
 
+        // Render Podium (1st, 2nd, 3rd)
+        if (el.winnerPodiumList) {
+          el.winnerPodiumList.innerHTML = "";
+          const ranked = [...room.players].sort((a, b) => {
+            if (a.id === room.winner.player_id) return -1;
+            if (b.id === room.winner.player_id) return 1;
+            return b.position - a.position;
+          }).slice(0, 3);
+
+          const badges = ["🥇", "🥈", "🥉"];
+          ranked.forEach((p, idx) => {
+            const pCard = document.createElement("div");
+            pCard.className = `podium-card rank-${idx + 1}`;
+            pCard.innerHTML = `
+              <div class="podium-rank-badge">${badges[idx]}</div>
+              <div class="podium-avatar">${p.avatar}</div>
+              <div class="podium-name">${p.name}</div>
+              <div class="podium-tile">${currentLang === "es" ? "Casilla" : "Tile"} ${p.position}</div>
+            `;
+            el.winnerPodiumList.appendChild(pCard);
+          });
+        }
+
+        // Render Awards Badges
+        if (el.winnerAwardsGrid && room.winner.awards) {
+          el.winnerAwardsGrid.innerHTML = "";
+          room.winner.awards.forEach(aw => {
+            const awCard = document.createElement("div");
+            awCard.className = "award-badge-card";
+            const title = currentLang === "es" ? aw.title_es : aw.title_en;
+            const detail = currentLang === "es" ? aw.detail_es : aw.detail_en;
+            awCard.innerHTML = `
+              <div class="award-badge-icon">${aw.badge}</div>
+              <div class="award-badge-info">
+                <div class="award-badge-title">${title}</div>
+                <div class="award-badge-player">${aw.avatar} ${aw.player_name}</div>
+                <div class="award-badge-detail">${detail}</div>
+              </div>
+            `;
+            el.winnerAwardsGrid.appendChild(awCard);
+          });
+        }
+
         el.btnPlayAgain.style.display = isHost ? "flex" : "none";
         el.modalWinner.classList.add("active");
 
@@ -1279,6 +1450,7 @@
     const url = `${proto}//${location.host}/ws`;
 
     ws = new WebSocket(url);
+    window.getAppWS = () => ws;
 
     ws.onopen = () => {
       console.log("WebSocket connected.");
@@ -1549,6 +1721,8 @@
       const turnTimerSecs = isNaN(timerVal) ? 0 : timerVal;
 
       const settings = {
+        board_size: el.settingBoardSize ? (parseInt(el.settingBoardSize.value, 10) || 100) : 100,
+        mystery_tiles: el.settingMysteryTiles ? el.settingMysteryTiles.checked : false,
         dice_count: parseInt(el.settingDiceCount.value, 10) || 1,
         exact_win: el.settingExactWin.value === "true",
         bonus_on_six: el.settingBonusSix.checked,
@@ -1565,6 +1739,18 @@
           color: selectedColor,
           settings
         }));
+      } else if (ws) {
+        const sendOnOpen = () => {
+          ws.send(JSON.stringify({
+            type: "create_room",
+            playerName: name,
+            avatar: selectedAvatar,
+            color: selectedColor,
+            settings
+          }));
+          ws.removeEventListener("open", sendOnOpen);
+        };
+        ws.addEventListener("open", sendOnOpen);
       }
     });
 
@@ -1758,10 +1944,233 @@
         }));
       }
     });
+
+    // Bot Controls in Lobby
+    if (el.btnAddBot) {
+      el.btnAddBot.addEventListener("click", () => {
+        if (ws && ws.readyState === WebSocket.OPEN && roomCode) {
+          ws.send(JSON.stringify({ type: "add_bot", roomCode }));
+        }
+      });
+    }
+    if (el.btnRemoveBot) {
+      el.btnRemoveBot.addEventListener("click", () => {
+        if (ws && ws.readyState === WebSocket.OPEN && roomCode) {
+          ws.send(JSON.stringify({ type: "remove_bot", roomCode, botId: null }));
+        }
+      });
+    }
+
+    // Share Victory Card
+    if (el.btnShareVictory) {
+      el.btnShareVictory.addEventListener("click", () => {
+        if (currentRoom && currentRoom.winner) {
+          generateVictoryCard(currentRoom.winner, currentRoom.players, currentRoom.board);
+        }
+      });
+    }
+
+    // PWA 1-Click Install Button
+    let deferredInstallPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (el.btnInstallPwa) {
+        el.btnInstallPwa.style.display = "inline-flex";
+      }
+    });
+
+    if (el.btnInstallPwa) {
+      el.btnInstallPwa.addEventListener("click", async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const { outcome } = await deferredInstallPrompt.userChoice;
+          if (outcome === "accepted") {
+            showToast(currentLang === "es" ? "¡Aplicación instalada con éxito!" : "App installed successfully!");
+          }
+          deferredInstallPrompt = null;
+          el.btnInstallPwa.style.display = "none";
+        }
+      });
+    }
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      if (el.btnInstallPwa) el.btnInstallPwa.style.display = "none";
+    });
   }
 
   // -------------------------------------------------------------
-  // Initialization
+  // 11. Canvas Shareable Victory Card Generator
+  // -------------------------------------------------------------
+  function generateVictoryCard(winner, players, board) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 1000;
+    const ctx = canvas.getContext("2d");
+
+    // 1. Festive Mexican background
+    const bgGrad = ctx.createLinearGradient(0, 0, 800, 1000);
+    bgGrad.addColorStop(0, "#2a1205");
+    bgGrad.addColorStop(0.5, "#180a03");
+    bgGrad.addColorStop(1, "#2a0815");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 800, 1000);
+
+    // Decorative Mexican Folk Border
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 10;
+    ctx.strokeRect(20, 20, 760, 960);
+    ctx.strokeStyle = "#ec4899";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(28, 28, 744, 944);
+
+    // Papel picado top garland
+    const garlandColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#06b6d4"];
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = garlandColors[i % garlandColors.length];
+      const gx = 45 + i * 90;
+      ctx.beginPath();
+      ctx.moveTo(gx, 34);
+      ctx.lineTo(gx + 80, 34);
+      ctx.lineTo(gx + 40, 75);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Title Header
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fef08a";
+    ctx.font = "bold 26px 'Lilita One', sans-serif, system-ui";
+    ctx.fillText("🇲🇽 SERPIENTES Y ESCALERAS 🇲🇽", 400, 115);
+
+    // Subtitle
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "16px sans-serif";
+    ctx.fillText(currentLang === "es" ? "CERTIFICADO DE GRAN CAMPEÓN" : "GRAND CHAMPION CERTIFICATE", 400, 145);
+
+    // Golden Trophy Circle
+    ctx.beginPath();
+    ctx.arc(400, 235, 65, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(245, 158, 11, 0.2)";
+    ctx.fill();
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Winner Avatar
+    ctx.font = "68px sans-serif";
+    ctx.fillText(winner.avatar || "🤠", 400, 260);
+
+    // Winner Name
+    ctx.fillStyle = "#fde047";
+    ctx.font = "bold 38px 'Lilita One', sans-serif, system-ui";
+    ctx.fillText(winner.player_name, 400, 345);
+
+    // Goal reached label
+    const totalTiles = (board && board.total_tiles) || 100;
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 18px sans-serif";
+    ctx.fillText(
+      currentLang === "es" ? `¡Llegó a la meta (Casilla ${totalTiles})!` : `Reached the goal (Tile ${totalTiles})!`,
+      400,
+      380
+    );
+
+    // Match Stats Boxes
+    const statBoxes = [
+      { label: currentLang === "es" ? "Tiros" : "Rolls", val: winner.total_rolls, icon: "🎲" },
+      { label: currentLang === "es" ? "Escaleras" : "Ladders", val: winner.ladders_climbed, icon: "🪜" },
+      { label: currentLang === "es" ? "Serpientes" : "Snakes", val: winner.snakes_hit, icon: "🐍" },
+    ];
+    for (let i = 0; i < 3; i++) {
+      const sx = 140 + i * 185;
+      ctx.fillStyle = "rgba(45, 23, 14, 0.9)";
+      ctx.fillRect(sx, 410, 150, 85);
+      ctx.strokeStyle = "#d97706";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sx, 410, 150, 85);
+
+      ctx.fillStyle = "#fef08a";
+      ctx.font = "bold 28px sans-serif";
+      ctx.fillText(`${statBoxes[i].icon} ${statBoxes[i].val}`, sx + 75, 452);
+
+      ctx.fillStyle = "#d6d3d1";
+      ctx.font = "14px sans-serif";
+      ctx.fillText(statBoxes[i].label, sx + 75, 480);
+    }
+
+    // Awards Section
+    ctx.fillStyle = "#fde047";
+    ctx.font = "bold 20px sans-serif";
+    ctx.fillText(currentLang === "es" ? "🎖️ PREMIOS Y MEDALLAS DE HONOR" : "🎖️ HONORARY BADGES & AWARDS", 400, 535);
+
+    const awards = winner.awards || [];
+    for (let i = 0; i < Math.min(awards.length, 4); i++) {
+      const aw = awards[i];
+      const ay = 560 + i * 80;
+      ctx.fillStyle = "rgba(26, 15, 8, 0.85)";
+      ctx.fillRect(90, ay, 620, 68);
+      ctx.strokeStyle = "rgba(254, 240, 138, 0.3)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(90, ay, 620, 68);
+
+      ctx.font = "32px sans-serif";
+      ctx.fillText(aw.badge, 135, ay + 46);
+
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#fde047";
+      ctx.font = "bold 17px sans-serif";
+      const awTitle = currentLang === "es" ? aw.title_es : aw.title_en;
+      ctx.fillText(awTitle, 180, ay + 30);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "14px sans-serif";
+      const awDetail = currentLang === "es" ? aw.detail_es : aw.detail_en;
+      ctx.fillText(`${aw.avatar} ${aw.player_name} • ${awDetail}`, 180, ay + 52);
+      ctx.textAlign = "center";
+    }
+
+    // Footer info
+    ctx.fillStyle = "#a8a29e";
+    ctx.font = "14px sans-serif";
+    const dateStr = new Date().toLocaleDateString();
+    ctx.fillText(`Sala: ${currentRoom ? currentRoom.code : "SERP"} • ${dateStr} • ¡Juega gratis en línea!`, 400, 930);
+
+    // Export & Share/Download
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], "victoria-serpientes-y-escaleras.png", { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: currentLang === "es" ? "¡Gané en Serpientes y Escaleras!" : "I won at Snakes & Ladders!",
+            text: currentLang === "es"
+              ? `¡${winner.player_name} se coronó Gran Campeón en Serpientes y Escaleras! 🇲🇽🏆`
+              : `${winner.player_name} became Grand Champion in Snakes & Ladders! 🇲🇽🏆`,
+            files: [file]
+          });
+          showToast(i18n[currentLang].cardShared);
+          return;
+        } catch (err) {
+          if (err.name !== "AbortError") console.warn("Share failed, falling back to download", err);
+        }
+      }
+
+      // Download fallback
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "victoria-serpientes-y-escaleras.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast(i18n[currentLang].cardDownloaded);
+    }, "image/png");
+  }
+
+  // -------------------------------------------------------------
+  // Initialization & Automated Verification Runner
   // -------------------------------------------------------------
   document.addEventListener("DOMContentLoaded", () => {
     updateLanguage();

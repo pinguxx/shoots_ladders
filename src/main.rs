@@ -2,11 +2,12 @@ mod board;
 mod game;
 mod ws;
 
-use axum::extract::{State, WebSocketUpgrade};
+use axum::extract::{Query, State, WebSocketUpgrade};
 use axum::http::{header, HeaderValue};
 use axum::response::{IntoResponse, Json};
 use axum::routing::get;
 use axum::Router;
+use serde::Deserialize;
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
@@ -14,6 +15,12 @@ use tower_http::set_header::SetResponseHeaderLayer;
 
 use crate::board::BoardDefinition;
 use crate::ws::{handle_ws_connection, start_background_maintenance, AppState};
+
+#[derive(Debug, Deserialize)]
+struct BoardQuery {
+    size: Option<u8>,
+    mystery: Option<bool>,
+}
 
 async fn health_check_api(State(state): State<AppState>) -> impl IntoResponse {
     let rooms_count = state.rooms.read().await.len();
@@ -28,11 +35,17 @@ async fn health_check_api(State(state): State<AppState>) -> impl IntoResponse {
     }))
 }
 
-async fn get_board_api() -> impl IntoResponse {
-    let board = BoardDefinition::classic();
+async fn get_board_api(Query(params): Query<BoardQuery>) -> impl IntoResponse {
+    let size = params.size.unwrap_or(100);
+    let mystery = params.mystery.unwrap_or(false);
+    let board = if size == 50 {
+        BoardDefinition::express().with_mystery_tiles(mystery)
+    } else {
+        BoardDefinition::classic().with_mystery_tiles(mystery)
+    };
     let mut coords = Vec::new();
-    for t in 0..=100 {
-        coords.push(BoardDefinition::tile_coords(t));
+    for t in 0..=board.total_tiles {
+        coords.push(BoardDefinition::tile_coords_for(t, board.total_tiles));
     }
 
     Json(serde_json::json!({
@@ -128,8 +141,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_board_api_direct() {
-        let res = get_board_api().await.into_response();
+        let res = get_board_api(Query(BoardQuery { size: None, mystery: None })).await.into_response();
         assert_eq!(res.status(), StatusCode::OK);
+
+        let res_express = get_board_api(Query(BoardQuery { size: Some(50), mystery: Some(true) })).await.into_response();
+        assert_eq!(res_express.status(), StatusCode::OK);
     }
 
     #[tokio::test]

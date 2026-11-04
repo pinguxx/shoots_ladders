@@ -16,11 +16,28 @@ pub struct Portal {
     pub is_ladder: bool,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum MysteryKind {
+    Taco,   // +3 tiles boost
+    Chile,  // +5 tiles boost
+    Pinata, // Extra roll immediately!
+    Nopal,  // Trap: miss 1 turn
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MysteryTile {
+    pub tile: u8,
+    pub kind: MysteryKind,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BoardDefinition {
     pub total_tiles: u8,
     pub ladders: Vec<Portal>,
     pub snakes: Vec<Portal>,
+    #[serde(default)]
+    pub mystery_tiles: Vec<MysteryTile>,
 }
 
 impl BoardDefinition {
@@ -51,23 +68,72 @@ impl BoardDefinition {
             total_tiles: 100,
             ladders,
             snakes,
+            mystery_tiles: Vec::new(),
         }
     }
 
-    /// Convert tile number 1..=100 into board coordinates.
-    /// Tile 0 represents the starting dock ("Salida" / Start).
-    pub fn tile_coords(tile: u8) -> BoardPosition {
+    pub fn express() -> Self {
+        let ladders = vec![
+            Portal { from: 3, to: 12, is_ladder: true },
+            Portal { from: 14, to: 28, is_ladder: true },
+            Portal { from: 22, to: 37, is_ladder: true },
+            Portal { from: 31, to: 46, is_ladder: true },
+        ];
+
+        let snakes = vec![
+            Portal { from: 18, to: 6, is_ladder: false },
+            Portal { from: 32, to: 16, is_ladder: false },
+            Portal { from: 43, to: 25, is_ladder: false },
+            Portal { from: 49, to: 35, is_ladder: false },
+        ];
+
+        Self {
+            total_tiles: 50,
+            ladders,
+            snakes,
+            mystery_tiles: Vec::new(),
+        }
+    }
+
+    pub fn with_mystery_tiles(mut self, enabled: bool) -> Self {
+        if enabled {
+            if self.total_tiles == 50 {
+                self.mystery_tiles = vec![
+                    MysteryTile { tile: 15, kind: MysteryKind::Taco },
+                    MysteryTile { tile: 21, kind: MysteryKind::Nopal },
+                    MysteryTile { tile: 27, kind: MysteryKind::Chile },
+                    MysteryTile { tile: 39, kind: MysteryKind::Pinata },
+                ];
+            } else {
+                self.mystery_tiles = vec![
+                    MysteryTile { tile: 33, kind: MysteryKind::Taco },
+                    MysteryTile { tile: 44, kind: MysteryKind::Nopal },
+                    MysteryTile { tile: 55, kind: MysteryKind::Chile },
+                    MysteryTile { tile: 77, kind: MysteryKind::Pinata },
+                ];
+            }
+        } else {
+            self.mystery_tiles.clear();
+        }
+        self
+    }
+
+    /// Convert tile number into board coordinates.
+    pub fn tile_coords_for(tile: u8, total_tiles: u8) -> BoardPosition {
+        let max_tile = if total_tiles == 50 { 50 } else { 100 };
+        let total_rows = (max_tile / 10) as f32; // 5.0 or 10.0
+
         if tile == 0 {
             return BoardPosition {
                 tile: 0,
                 row: 0,
                 col: 0,
                 x_pct: -6.0,
-                y_pct: 95.0,
+                y_pct: (total_rows - 0.5) * (100.0 / total_rows),
             };
         }
 
-        let clamped = tile.clamp(1, 100);
+        let clamped = tile.clamp(1, max_tile);
         let row = (clamped - 1) / 10;
         let col = if row.is_multiple_of(2) {
             (clamped - 1) % 10
@@ -75,10 +141,8 @@ impl BoardDefinition {
             9 - ((clamped - 1) % 10)
         };
 
-        // Screen percentage (0% top-left, 100% bottom-right)
-        // Row 0 is at bottom (y ~ 90%..100%), Row 9 is at top (y ~ 0%..10%)
         let x_pct = (col as f32 + 0.5) * 10.0;
-        let y_pct = (9.0 - row as f32 + 0.5) * 10.0;
+        let y_pct = (total_rows - 1.0 - row as f32 + 0.5) * (100.0 / total_rows);
 
         BoardPosition {
             tile: clamped,
@@ -87,6 +151,10 @@ impl BoardDefinition {
             x_pct,
             y_pct,
         }
+    }
+
+    pub fn tile_coords(tile: u8) -> BoardPosition {
+        Self::tile_coords_for(tile, 100)
     }
 
     /// Check if tile has a portal (ladder or snake)
@@ -98,6 +166,11 @@ impl BoardDefinition {
             return Some(s.clone());
         }
         None
+    }
+
+    /// Check if tile has a mystery tile powerup
+    pub fn get_mystery_tile(&self, tile: u8) -> Option<MysteryTile> {
+        self.mystery_tiles.iter().find(|m| m.tile == tile).cloned()
     }
 }
 
@@ -214,5 +287,29 @@ mod tests {
         assert!(board.get_portal(2).is_none());
         assert!(board.get_portal(50).is_none());
         assert!(board.get_portal(100).is_none());
+    }
+
+    #[test]
+    fn test_board_express_and_mystery_tiles() {
+        let express = BoardDefinition::express().with_mystery_tiles(true);
+        assert_eq!(express.total_tiles, 50);
+        assert_eq!(express.ladders.len(), 4);
+        assert_eq!(express.snakes.len(), 4);
+        assert_eq!(express.mystery_tiles.len(), 4);
+
+        // Check mystery tiles
+        assert_eq!(express.get_mystery_tile(15).unwrap().kind, MysteryKind::Taco);
+        assert_eq!(express.get_mystery_tile(21).unwrap().kind, MysteryKind::Nopal);
+        assert_eq!(express.get_mystery_tile(27).unwrap().kind, MysteryKind::Chile);
+        assert_eq!(express.get_mystery_tile(39).unwrap().kind, MysteryKind::Pinata);
+        assert!(express.get_mystery_tile(1).is_none());
+
+        // Check coords for 50-tile board (5 rows)
+        let c1 = BoardDefinition::tile_coords_for(1, 50);
+        assert_eq!(c1.row, 0);
+        assert_eq!(c1.col, 0);
+        let c50 = BoardDefinition::tile_coords_for(50, 50);
+        assert_eq!(c50.row, 4);
+        assert_eq!(c50.col, 9); // Row 4 (even) is left-to-right, so 50 is at col 9!
     }
 }

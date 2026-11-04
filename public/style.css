@@ -1776,3 +1776,198 @@ body {
     to { transform: translateY(0); }
   }
 }
+
+/* -------------------------------------------------------------
+   New Features Styling: Bots, Mystery Tiles, Express, Podium, Awards
+------------------------------------------------------------- */
+/* Bot Controls in Lobby */
+.lobby-bot-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 12px 0;
+}
+.btn-bot-action {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1.5px solid #f59e0b;
+  color: #fef08a;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.btn-bot-action:hover:not(:disabled) {
+  background: #f59e0b;
+  color: #1a0f07;
+  transform: translateY(-1px);
+}
+.btn-bot-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bot-tag {
+  display: inline-block;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+
+/* Express Board (50 Tiles) */
+.board-grid.express {
+  grid-template-rows: repeat(5, 1fr) !important;
+}
+
+/* Mystery Tiles */
+.tile.tile-mystery {
+  position: relative;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.25) 0%, rgba(244, 63, 94, 0.1) 70%);
+  border: 1.5px dashed #f43f5e;
+}
+.tile-mystery-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.3rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  animation: pulseMystery 2s infinite ease-in-out;
+  pointer-events: none;
+}
+@keyframes pulseMystery {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.18); }
+}
+
+/* Winner Modal: Podium & Awards */
+.winner-podium-section,
+.winner-awards-section {
+  width: 100%;
+  margin-top: 14px;
+  text-align: left;
+}
+.podium-title,
+.awards-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fde047;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(253, 224, 71, 0.25);
+  padding-bottom: 4px;
+}
+.winner-podium-list {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.podium-card {
+  flex: 1;
+  background: rgba(45, 23, 14, 0.85);
+  border: 1.5px solid #d97706;
+  border-radius: 10px;
+  padding: 8px 6px;
+  text-align: center;
+  position: relative;
+}
+.podium-card.rank-1 {
+  border-color: #fde047;
+  background: rgba(234, 179, 8, 0.15);
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.35);
+  transform: translateY(-4px);
+}
+.podium-rank-badge {
+  font-size: 1.2rem;
+  margin-bottom: 2px;
+}
+.podium-avatar {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.podium-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.podium-tile {
+  font-size: 0.68rem;
+  color: #fef08a;
+}
+
+.winner-awards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+.award-badge-card {
+  background: rgba(26, 15, 8, 0.8);
+  border: 1px solid rgba(254, 240, 138, 0.25);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.award-badge-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.award-badge-info {
+  overflow: hidden;
+}
+.award-badge-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #fde047;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.award-badge-player {
+  font-size: 0.72rem;
+  color: #ffffff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.award-badge-detail {
+  font-size: 0.65rem;
+  color: #a8a29e;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+.winner-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+}
+.btn-share-victory {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  border: 1.5px solid #34d399 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4) !important;
+}
+.btn-share-victory:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}

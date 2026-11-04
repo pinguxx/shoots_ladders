@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#b45309">
-  <link rel="stylesheet" href="style.css?v=4.1">
+  <link rel="stylesheet" href="style.css?v=5.0">
 </head>
 <body>
 
@@ -57,6 +57,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button id="btn-install-pwa" class="btn-icon" style="display: none;" title="Instalar App / Install App" aria-label="Instalar App">📲</button>
       <button id="btn-header-leave" class="btn-icon" style="display: none;" title="Salir de la Sala" aria-label="Salir de la Sala">🚪</button>
       <button id="btn-toggle-theme" class="btn-icon" title="Cambiar Tema" aria-label="Cambiar Tema">🎨</button>
       <button id="btn-toggle-lang" class="btn-icon btn-lang" title="Idioma / Language" aria-label="Cambiar Idioma"><span class="lang-icon">🌐</span> <span class="lang-text-long">Español</span><span class="lang-text-short">ES</span></button>
@@ -111,8 +112,21 @@
           </div>
 
           <details class="settings-panel">
-            <summary>Ajustes de la Partida</summary>
+            <summary data-i18n="settingsTitle">Ajustes de la Partida</summary>
             <div class="settings-content">
+              <div class="setting-row">
+                <span data-i18n="labelBoardSize">Modo de Tablero:</span>
+                <select id="setting-board-size">
+                  <option value="100" selected data-i18n="board100">Clásico (100 Casillas - 10x10)</option>
+                  <option value="50" data-i18n="board50">Express (50 Casillas - 5x10)</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <span data-i18n="labelMysteryTiles">Casillas Misteriosas (🌮, 🌶️, 🪅, 🌵):</span>
+                <input type="checkbox" id="setting-mystery-tiles">
+              </div>
+
               <div class="setting-row">
                 <span data-i18n="labelDiceCount">Número de Dados:</span>
                 <select id="setting-dice-count">
@@ -187,9 +201,17 @@
 
         <!-- Lobby Settings Badge Strip -->
         <div id="lobby-settings-summary" class="lobby-settings-summary">
+          <span class="lobby-setting-pill" id="lobby-pill-board">🗺️ 100 Casillas</span>
+          <span class="lobby-setting-pill" id="lobby-pill-mystery" style="display: none;">🎉 Fiesta</span>
           <span class="lobby-setting-pill" id="lobby-pill-dice">🎲 1 Dado</span>
           <span class="lobby-setting-pill" id="lobby-pill-timer">⏱️ 15s</span>
           <span class="lobby-setting-pill" id="lobby-pill-rules">🎯 Tiro exacto</span>
+        </div>
+
+        <!-- Solo / Bot Controls (Host only) -->
+        <div id="lobby-bot-controls" class="lobby-bot-controls" style="display: none;">
+          <button id="btn-add-bot" class="btn-bot-action" type="button" data-i18n="btnAddBot">🤖 + Agregar Bot</button>
+          <button id="btn-remove-bot" class="btn-bot-action" type="button" data-i18n="btnRemoveBot">🤖 - Quitar Bot</button>
         </div>
 
         <div>
@@ -349,7 +371,21 @@
         </div>
       </div>
 
-      <button id="btn-play-again" class="btn-primary" data-i18n="btnPlayAgain">🔄 Jugar Otra Vez</button>
+      <!-- Winner Podium & Awards Badges -->
+      <div id="winner-podium-section" class="winner-podium-section">
+        <h4 class="podium-title" data-i18n="podiumTitle">🏆 Podio de Honor</h4>
+        <div id="winner-podium-list" class="winner-podium-list"></div>
+      </div>
+
+      <div id="winner-awards-section" class="winner-awards-section">
+        <h4 class="awards-title" data-i18n="awardsTitle">🎖️ Medallas de la Feria</h4>
+        <div id="winner-awards-grid" class="winner-awards-grid"></div>
+      </div>
+
+      <div class="winner-modal-actions">
+        <button id="btn-share-victory" class="btn-primary btn-share-victory" type="button" data-i18n="btnShareVictory">📸 Compartir Victoria</button>
+        <button id="btn-play-again" class="btn-secondary" type="button" data-i18n="btnPlayAgain">🔄 Jugar Otra Vez</button>
+      </div>
     </div>
   </div>
 
@@ -358,8 +394,8 @@
   <!-- Standalone QR Code Generator -->
   <script src="qrcode.min.js?v=4.0"></script>
   <!-- Web Audio Synthesizer -->
-  <script src="audio.js?v=4.0"></script>
+  <script src="audio.js?v=5.0"></script>
   <!-- Main App Script -->
-  <script src="app.js?v=4.0"></script>
+  <script src="app.js?v=5.0"></script>
 </body>
 </html>
