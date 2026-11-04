@@ -10,6 +10,8 @@
   const i18n = {
     es: {
       appTitle: "SERPIENTES & ESCALERAS",
+      titlePart1: "SERPIENTES Y",
+      titlePart2: "ESCALERAS",
       appSubtitle: "Multijugador en Vivo 🇲🇽",
       tabCreate: "Crear Sala",
       tabJoin: "Unirse a Sala",
@@ -66,6 +68,8 @@
     },
     en: {
       appTitle: "SNAKES & LADDERS",
+      titlePart1: "SNAKES &",
+      titlePart2: "LADDERS",
       appSubtitle: "Real-Time Multiplayer 🇲🇽",
       tabCreate: "Create Room",
       tabJoin: "Join Room",
