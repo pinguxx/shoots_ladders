@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = { version = "=0.7.7", features = ["ws"] }
+axum = { version = "=0.8.3", features = ["ws"] }
 tokio = { version = "=1.54.1", features = ["full"] }
 tokio-util = "=0.7.17"
 hyper-util = "=0.1.21"
