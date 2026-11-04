@@ -1021,7 +1021,7 @@
     if (timerSecs <= 0) {
       el.turnTimer.textContent = "♾️ " + (currentLang === "es" ? "Sin límite" : "No limit");
       el.turnTimer.title = isHost
-        ? (currentLang === "es" ? "Partida manual (Sin límite). Clic para activar temporizador de 25s." : "Manual mode (No limit). Click to enable 25s timer.")
+        ? (currentLang === "es" ? "Partida manual (Sin límite). Clic para activar temporizador de 15s." : "Manual mode (No limit). Click to enable 15s timer.")
         : (currentLang === "es" ? "Partida manual (Sin límite de tiempo)" : "Manual mode (No time limit)");
       el.turnTimer.classList.remove("timer-warning");
       return;
@@ -1035,8 +1035,8 @@
       const remaining = Math.max(0, timerSecs - elapsed);
       el.turnTimer.textContent = `⏱️ ${remaining}s`;
       el.turnTimer.title = isHost
-        ? (currentLang === "es" ? "Temporizador activo (25s). Clic para pausar / quitar límite." : "Timer active (25s). Click to pause / remove limit.")
-        : "";
+        ? (currentLang === "es" ? `Temporizador activo (${timerSecs}s). Clic para cambiar tiempo.` : `Timer active (${timerSecs}s). Click to change time.`)
+        : (currentLang === "es" ? `Temporizador: ${timerSecs}s por turno` : `Timer: ${timerSecs}s per turn`);
 
       if (remaining <= 5 && remaining > 0) {
         el.turnTimer.classList.add("timer-warning");
@@ -1069,6 +1069,25 @@
     if (room.state === "lobby") {
       showScreen("screen-lobby");
       el.lobbyRoomCode.textContent = room.code;
+
+      // Update Lobby Settings Badges
+      if (room.settings) {
+        const timerPill = document.getElementById("lobby-pill-timer");
+        const dicePill = document.getElementById("lobby-pill-dice");
+        const rulesPill = document.getElementById("lobby-pill-rules");
+        if (timerPill) {
+          const s = room.settings.turn_timer_seconds;
+          timerPill.textContent = s > 0 ? `⏱️ ${s}s` : (currentLang === "es" ? "♾️ Sin límite" : "♾️ No limit");
+        }
+        if (dicePill) {
+          dicePill.textContent = room.settings.dice_count > 1 ? "🎲 2 Dados" : "🎲 1 Dado";
+        }
+        if (rulesPill) {
+          rulesPill.textContent = room.settings.exact_win
+            ? (currentLang === "es" ? "🎯 Tiro exacto" : "🎯 Exact finish")
+            : (currentLang === "es" ? "🏁 100 o más" : "🏁 100+ to win");
+        }
+      }
 
       el.lobbyPlayersList.innerHTML = "";
       room.players.forEach(p => {
@@ -1191,8 +1210,9 @@
       const params = new URLSearchParams(window.location.search);
       const urlRoom = params.get("room");
 
-      // Auto-reconnect if session exists
-      if (session && session.roomCode && session.playerId) {
+      // Auto-reconnect ONLY when the page was refreshed while playing in a room (?room=CODE)
+      // If visiting root URL directly, present the Resume Banner without hijacking screen-welcome
+      if (session && session.roomCode && session.playerId && urlRoom && urlRoom.toUpperCase() === session.roomCode.toUpperCase()) {
         if (el.reconnectingOverlay) el.reconnectingOverlay.style.display = "block";
         if (el.resumeBanner) {
           el.resumeRoomCode.textContent = session.roomCode;
@@ -1207,6 +1227,8 @@
           color: session.color,
           playerId: session.playerId
         }));
+      } else if (session && session.roomCode) {
+        checkResumeBanner();
       } else if (urlRoom && !currentRoom) {
         el.tabJoin.click();
         el.joinCode.value = urlRoom.toUpperCase();
@@ -1423,6 +1445,7 @@
     // Create Room Submit
     el.formCreate.addEventListener("submit", (e) => {
       e.preventDefault();
+      clearSession();
       const name = el.createName.value.trim();
       if (!name) {
         showToast(i18n[currentLang].errorFillName);

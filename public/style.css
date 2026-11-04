@@ -618,6 +618,22 @@ body {
   border-radius: 14px;
   padding: 12px 18px;
 }
+.lobby-settings-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.lobby-setting-pill {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde047;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  user-select: none;
+}
 .room-code-display {
   display: flex;
   flex-direction: column;

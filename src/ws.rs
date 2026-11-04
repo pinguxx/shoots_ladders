@@ -464,21 +464,27 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         .map(|p| p.is_host)
                                         .unwrap_or(false);
                                     if is_host {
-                                        if room.settings.turn_timer_seconds > 0 {
-                                            room.settings.turn_timer_seconds = 0;
+                                        // Cycle through timer presets: 0 (Manual) -> 15s -> 25s -> 40s -> 0
+                                        let next_timer: u64 = match room.settings.turn_timer_seconds {
+                                            0 => 15,
+                                            1..=15 => 25,
+                                            16..=25 => 40,
+                                            _ => 0,
+                                        };
+                                        room.settings.turn_timer_seconds = next_timer;
+                                        room.turn_started_at_secs = crate::game::current_epoch_secs();
+                                        if next_timer > 0 {
+                                            room.add_log(
+                                                "timer_on",
+                                                &format!("⏱️ Temporizador cambiado a {}s por turno.", next_timer),
+                                                &format!("⏱️ Turn timer changed to {}s per turn.", next_timer),
+                                                None,
+                                            );
+                                        } else {
                                             room.add_log(
                                                 "timer_off",
                                                 "⏸️ Temporizador desactivado (Sin límite / Manual).",
                                                 "⏸️ Turn timer disabled (No limit / Manual).",
-                                                None,
-                                            );
-                                        } else {
-                                            room.settings.turn_timer_seconds = 25;
-                                            room.turn_started_at_secs = crate::game::current_epoch_secs();
-                                            room.add_log(
-                                                "timer_on",
-                                                "⏱️ Temporizador activado (25s por turno).",
-                                                "⏱️ Turn timer activated (25s per turn).",
                                                 None,
                                             );
                                         }
