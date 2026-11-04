@@ -48,24 +48,13 @@ async fn ws_handler(
     ws.on_upgrade(move |socket| handle_ws_connection(socket, state))
 }
 
-#[tokio::main]
-async fn main() {
-    let port = std::env::var("PORT")
-        .ok()
-        .and_then(|p| p.parse::<u16>().ok())
-        .unwrap_or(3000);
-
-    let state = AppState::new();
-
-    // Spawn background maintenance task (room reaper & AFK turn timeout)
-    tokio::spawn(start_background_maintenance(state.clone()));
-
+pub fn create_app(state: AppState) -> Router {
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let app = Router::new()
+    Router::new()
         .route("/health", get(health_check_api))
         .route("/healthz", get(health_check_api))
         .route("/api/health", get(health_check_api))
@@ -93,7 +82,22 @@ async fn main() {
             HeaderValue::from_static("SAMEORIGIN"),
         ))
         .layer(cors)
-        .with_state(state);
+        .with_state(state)
+}
+
+#[tokio::main]
+async fn main() {
+    let port = std::env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse::<u16>().ok())
+        .unwrap_or(3000);
+
+    let state = AppState::new();
+
+    // Spawn background maintenance task (room reaper & AFK turn timeout)
+    tokio::spawn(start_background_maintenance(state.clone()));
+
+    let app = create_app(state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
@@ -106,4 +110,65 @@ async fn main() {
     println!("========================================================\n");
 
     axum::serve(listener, app).await.unwrap();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::body::Body;
+    use axum::http::{Request, StatusCode};
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn test_health_check_api_direct() {
+        let state = AppState::new();
+        let res = health_check_api(State(state)).await.into_response();
+        assert_eq!(res.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_get_board_api_direct() {
+        let res = get_board_api().await.into_response();
+        assert_eq!(res.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_routes_with_service_oneshot() {
+        let state = AppState::new();
+        let app = create_app(state);
+
+        // 1. /health
+        let req = Request::builder()
+            .uri("/health")
+            .body(Body::empty())
+            .unwrap();
+        let res = app.clone().oneshot(req).await.unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        assert_eq!(
+            res.headers().get("x-content-type-options").unwrap(),
+            "nosniff"
+        );
+        assert_eq!(
+            res.headers().get("x-frame-options").unwrap(),
+            "SAMEORIGIN"
+        );
+
+        let body_bytes = axum::body::to_bytes(res.into_body(), usize::MAX).await.unwrap();
+        let json: serde_json::Value = serde_json::from_slice(&body_bytes).unwrap();
+        assert_eq!(json["status"], "ok");
+        assert_eq!(json["service"], "serpientes-y-escaleras-rust");
+
+        // 2. /api/board
+        let req_board = Request::builder()
+            .uri("/api/board")
+            .body(Body::empty())
+            .unwrap();
+        let res_board = app.clone().oneshot(req_board).await.unwrap();
+        assert_eq!(res_board.status(), StatusCode::OK);
+
+        let board_bytes = axum::body::to_bytes(res_board.into_body(), usize::MAX).await.unwrap();
+        let board_json: serde_json::Value = serde_json::from_slice(&board_bytes).unwrap();
+        assert_eq!(board_json["board"]["total_tiles"], 100);
+        assert_eq!(board_json["coordinates"].as_array().unwrap().len(), 101);
+    }
 }

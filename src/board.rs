@@ -100,3 +100,119 @@ impl BoardDefinition {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_board_classic_definition() {
+        let board = BoardDefinition::classic();
+        assert_eq!(board.total_tiles, 100);
+        assert_eq!(board.ladders.len(), 8);
+        assert_eq!(board.snakes.len(), 8);
+
+        // Verify all ladders ascend
+        for ladder in &board.ladders {
+            assert!(ladder.is_ladder);
+            assert!(ladder.to > ladder.from, "Ladder must ascend: {} -> {}", ladder.from, ladder.to);
+            assert!(ladder.from >= 1 && ladder.to <= 100);
+        }
+
+        // Verify all snakes descend
+        for snake in &board.snakes {
+            assert!(!snake.is_ladder);
+            assert!(snake.to < snake.from, "Snake must descend: {} -> {}", snake.from, snake.to);
+            assert!(snake.to >= 1 && snake.from <= 100);
+        }
+    }
+
+    #[test]
+    fn test_tile_coords_start_dock() {
+        let dock = BoardDefinition::tile_coords(0);
+        assert_eq!(dock.tile, 0);
+        assert_eq!(dock.row, 0);
+        assert_eq!(dock.col, 0);
+        assert_eq!(dock.x_pct, -6.0);
+        assert_eq!(dock.y_pct, 95.0);
+    }
+
+    #[test]
+    fn test_tile_coords_zigzag_boustrophedon() {
+        // Row 0 (bottom, left to right): tiles 1..=10
+        let t1 = BoardDefinition::tile_coords(1);
+        assert_eq!(t1.row, 0);
+        assert_eq!(t1.col, 0);
+        assert_eq!(t1.x_pct, 5.0);
+        assert_eq!(t1.y_pct, 95.0);
+
+        let t10 = BoardDefinition::tile_coords(10);
+        assert_eq!(t10.row, 0);
+        assert_eq!(t10.col, 9);
+        assert_eq!(t10.x_pct, 95.0);
+        assert_eq!(t10.y_pct, 95.0);
+
+        // Row 1 (second row, right to left): tiles 11..=20
+        let t11 = BoardDefinition::tile_coords(11);
+        assert_eq!(t11.row, 1);
+        assert_eq!(t11.col, 9);
+        assert_eq!(t11.x_pct, 95.0);
+        assert_eq!(t11.y_pct, 85.0);
+
+        let t20 = BoardDefinition::tile_coords(20);
+        assert_eq!(t20.row, 1);
+        assert_eq!(t20.col, 0);
+        assert_eq!(t20.x_pct, 5.0);
+        assert_eq!(t20.y_pct, 85.0);
+
+        // Row 9 (top row, right to left): tiles 91..=100
+        let t91 = BoardDefinition::tile_coords(91);
+        assert_eq!(t91.row, 9);
+        assert_eq!(t91.col, 9);
+        assert_eq!(t91.x_pct, 95.0);
+        assert_eq!(t91.y_pct, 5.0);
+
+        let t100 = BoardDefinition::tile_coords(100);
+        assert_eq!(t100.row, 9);
+        assert_eq!(t100.col, 0);
+        assert_eq!(t100.x_pct, 5.0);
+        assert_eq!(t100.y_pct, 5.0);
+
+        // Tile clamping above 100
+        let clamped = BoardDefinition::tile_coords(150);
+        assert_eq!(clamped.tile, 100);
+        assert_eq!(clamped.row, 9);
+        assert_eq!(clamped.col, 0);
+    }
+
+    #[test]
+    fn test_get_portal_ladders_and_snakes() {
+        let board = BoardDefinition::classic();
+
+        // Check each ladder
+        let ladder_tiles = [4, 9, 20, 28, 40, 51, 63, 71];
+        let ladder_destinations = [14, 31, 38, 84, 59, 67, 81, 91];
+        for (from, to) in ladder_tiles.iter().zip(ladder_destinations.iter()) {
+            let portal = board.get_portal(*from).expect("Ladder must exist");
+            assert!(portal.is_ladder);
+            assert_eq!(portal.from, *from);
+            assert_eq!(portal.to, *to);
+        }
+
+        // Check each snake
+        let snake_tiles = [17, 54, 62, 64, 87, 93, 95, 99];
+        let snake_tails = [7, 34, 19, 60, 24, 73, 75, 78];
+        for (from, to) in snake_tiles.iter().zip(snake_tails.iter()) {
+            let portal = board.get_portal(*from).expect("Snake must exist");
+            assert!(!portal.is_ladder);
+            assert_eq!(portal.from, *from);
+            assert_eq!(portal.to, *to);
+        }
+
+        // Tiles without portals
+        assert!(board.get_portal(1).is_none());
+        assert!(board.get_portal(2).is_none());
+        assert!(board.get_portal(50).is_none());
+        assert!(board.get_portal(100).is_none());
+    }
+}

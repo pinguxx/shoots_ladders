@@ -785,3 +785,434 @@ pub async fn start_background_maintenance(state: AppState) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_name() {
+        assert_eq!(sanitize_name("Pancho Villa", "Jugador"), "Pancho Villa");
+        assert_eq!(sanitize_name("   Lucky Charlie   ", "Jugador"), "Lucky Charlie");
+        assert_eq!(sanitize_name("", "Jugador"), "Jugador");
+        assert_eq!(sanitize_name("   ", "Jugador"), "Jugador");
+
+        // XSS and control characters stripped and truncated to 18 chars
+        assert_eq!(sanitize_name("<script>alert(1)</script>", "Jugador"), "scriptalert(1)/scr");
+        assert_eq!(sanitize_name("User <img src=x>", "Jugador"), "User img src=x");
+
+        // Truncated at 18 characters
+        let long_name = "Supercalifragilisticexpialidocious";
+        let sanitized = sanitize_name(long_name, "Jugador");
+        assert_eq!(sanitized.chars().count(), 18);
+        assert_eq!(sanitized, "Supercalifragilist");
+    }
+
+    #[test]
+    fn test_sanitize_avatar() {
+        assert_eq!(sanitize_avatar(Some("🤠".to_string()), "🤠"), "🤠");
+        assert_eq!(sanitize_avatar(Some("💀".to_string()), "🤠"), "💀");
+        assert_eq!(sanitize_avatar(Some("🪅".to_string()), "🤠"), "🪅");
+        assert_eq!(sanitize_avatar(None, "🤠"), "🤠");
+
+        // Disallowed / HTML payloads fallback to default
+        assert_eq!(sanitize_avatar(Some("<x>".to_string()), "🤠"), "🤠");
+        assert_eq!(sanitize_avatar(Some("a&b".to_string()), "🤠"), "🤠");
+        assert_eq!(sanitize_avatar(Some("\"".to_string()), "🤠"), "🤠");
+        assert_eq!(sanitize_avatar(Some("TooLongAvatar".to_string()), "🤠"), "🤠");
+        assert_eq!(sanitize_avatar(Some("".to_string()), "🤠"), "🤠");
+    }
+
+    #[test]
+    fn test_sanitize_color() {
+        assert_eq!(sanitize_color(Some("#f59e0b".to_string()), "#f59e0b"), "#f59e0b");
+        assert_eq!(sanitize_color(Some("#EF4444".to_string()), "#f59e0b"), "#ef4444");
+        assert_eq!(sanitize_color(None, "#f59e0b"), "#f59e0b");
+
+        // Invalid colors fallback to default
+        assert_eq!(sanitize_color(Some("red".to_string()), "#f59e0b"), "#f59e0b");
+        assert_eq!(sanitize_color(Some("#123".to_string()), "#f59e0b"), "#f59e0b");
+        assert_eq!(sanitize_color(Some("#xyz123".to_string()), "#f59e0b"), "#f59e0b");
+        assert_eq!(sanitize_color(Some("<script>".to_string()), "#f59e0b"), "#f59e0b");
+    }
+
+    #[test]
+    fn test_client_messages_deserialization() {
+        let create_json = r#"{"type":"create_room","playerName":"Pancho"}"#;
+        let msg: ClientMessage = serde_json::from_str(create_json).unwrap();
+        match msg {
+            ClientMessage::CreateRoom { player_name, .. } => assert_eq!(player_name, "Pancho"),
+            _ => panic!("Expected CreateRoom"),
+        }
+
+        let join_json = r#"{"type":"join_room","roomCode":"SERP12","playerName":"Lupe","playerId":"p_123"}"#;
+        let msg: ClientMessage = serde_json::from_str(join_json).unwrap();
+        match msg {
+            ClientMessage::JoinRoom { room_code, player_name, player_id, .. } => {
+                assert_eq!(room_code, "SERP12");
+                assert_eq!(player_name, "Lupe");
+                assert_eq!(player_id.as_deref(), Some("p_123"));
+            }
+            _ => panic!("Expected JoinRoom"),
+        }
+
+        let update_profile_json = r##"{"type":"update_profile","roomCode":"SERP12","avatar":"🌵","color":"#10b981"}"##;
+        let msg: ClientMessage = serde_json::from_str(update_profile_json).unwrap();
+        match msg {
+            ClientMessage::UpdateProfile { room_code, avatar, color, .. } => {
+                assert_eq!(room_code, "SERP12");
+                assert_eq!(avatar.as_deref(), Some("🌵"));
+                assert_eq!(color.as_deref(), Some("#10b981"));
+            }
+            _ => panic!("Expected UpdateProfile"),
+        }
+
+        let update_settings_json = r#"{"type":"update_settings","roomCode":"SERP12","settings":{"dice_count":2}}"#;
+        let msg: ClientMessage = serde_json::from_str(update_settings_json).unwrap();
+        match msg {
+            ClientMessage::UpdateSettings { room_code, settings } => {
+                assert_eq!(room_code, "SERP12");
+                assert_eq!(settings.dice_count, 2);
+            }
+            _ => panic!("Expected UpdateSettings"),
+        }
+
+        let roll_json = r#"{"type":"roll_dice","roomCode":"SERP12"}"#;
+        let msg: ClientMessage = serde_json::from_str(roll_json).unwrap();
+        match msg {
+            ClientMessage::RollDice { room_code } => assert_eq!(room_code, "SERP12"),
+            _ => panic!("Expected RollDice"),
+        }
+
+        let toggle_timer_json = r#"{"type":"toggle_timer","roomCode":"SERP12"}"#;
+        let msg: ClientMessage = serde_json::from_str(toggle_timer_json).unwrap();
+        match msg {
+            ClientMessage::ToggleTimer { room_code } => assert_eq!(room_code, "SERP12"),
+            _ => panic!("Expected ToggleTimer"),
+        }
+
+        let reaction_json = r#"{"type":"send_reaction","roomCode":"SERP12","emoji":"Watch out for snakes! 🐍"}"#;
+        let msg: ClientMessage = serde_json::from_str(reaction_json).unwrap();
+        match msg {
+            ClientMessage::SendReaction { room_code, emoji } => {
+                assert_eq!(room_code, "SERP12");
+                assert_eq!(emoji, "Watch out for snakes! 🐍");
+            }
+            _ => panic!("Expected SendReaction"),
+        }
+
+        let leave_json = r#"{"type":"leave_room","roomCode":"SERP12"}"#;
+        let msg: ClientMessage = serde_json::from_str(leave_json).unwrap();
+        match msg {
+            ClientMessage::LeaveRoom { room_code } => assert_eq!(room_code, "SERP12"),
+            _ => panic!("Expected LeaveRoom"),
+        }
+
+        let ping_json = r#"{"type":"ping"}"#;
+        let msg: ClientMessage = serde_json::from_str(ping_json).unwrap();
+        match msg {
+            ClientMessage::Ping => (),
+            _ => panic!("Expected Ping"),
+        }
+    }
+
+    #[test]
+    fn test_allowed_reactions_whitelist() {
+        let allowed = [
+            "🎉", "🐍", "🪜", "😱", "🎲", "🌮", "🎺", "🌶️", "💀",
+            "¡Aguas con la víbora! 🐍",
+            "¡Sube, compadre! 🪜",
+            "¡Ya merito llego! 🏁",
+            "¡Tírale con fe! 🎲",
+            "¡Salado me quedé! 🧂",
+            "¡Ándale, te toca! ⏰",
+            "¡Pura suerte! 🍀",
+            "Watch out for snakes! 🐍",
+            "Climb that ladder! 🪜",
+            "Almost at 100! 🏁",
+            "Roll with faith! 🎲",
+            "Down I go! 🧂",
+            "Hurry up, your turn! ⏰",
+            "Pure luck! 🍀",
+            "shoutSnake",
+            "shoutLadder",
+            "shoutAlmost",
+            "shoutFaith",
+            "shoutUnlucky",
+            "shoutYourTurn",
+            "shoutLucky",
+        ];
+
+        // Valid ones
+        assert!(allowed.contains(&"🎉"));
+        assert!(allowed.contains(&"¡Aguas con la víbora! 🐍"));
+        assert!(allowed.contains(&"Watch out for snakes! 🐍"));
+        assert!(allowed.contains(&"shoutSnake"));
+
+        // Malicious or unapproved ones
+        assert!(!allowed.contains(&"<script>"));
+        assert!(!allowed.contains(&"spam"));
+        assert!(!allowed.contains(&"hacked"));
+    }
+
+    #[tokio::test]
+    async fn test_app_state_and_room_lifecycle() {
+        let state = AppState::new();
+        assert_eq!(state.rooms.read().await.len(), 0);
+        assert_eq!(state.sockets.read().await.len(), 0);
+
+        // Insert room
+        let room = Room::new("ROOM99".to_string(), GameSettings::default());
+        state.rooms.write().await.insert("ROOM99".to_string(), room);
+        assert_eq!(state.rooms.read().await.len(), 1);
+
+        // Broadcast to room with no sockets shouldn't panic
+        broadcast_to_room("ROOM99", json!({"type": "test"}), &state).await;
+        broadcast_room_state("ROOM99", &state).await;
+
+        // Clean up
+        state.rooms.write().await.remove("ROOM99");
+        assert_eq!(state.rooms.read().await.len(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_timer_cycling_presets() {
+        let mut settings = GameSettings::default();
+        assert_eq!(settings.turn_timer_seconds, 0);
+
+        // Cycle 1: 0 -> 15
+        settings.turn_timer_seconds = match settings.turn_timer_seconds {
+            0 => 15,
+            15 => 25,
+            25 => 40,
+            _ => 0,
+        };
+        assert_eq!(settings.turn_timer_seconds, 15);
+
+        // Cycle 2: 15 -> 25
+        settings.turn_timer_seconds = match settings.turn_timer_seconds {
+            0 => 15,
+            15 => 25,
+            25 => 40,
+            _ => 0,
+        };
+        assert_eq!(settings.turn_timer_seconds, 25);
+
+        // Cycle 3: 25 -> 40
+        settings.turn_timer_seconds = match settings.turn_timer_seconds {
+            0 => 15,
+            15 => 25,
+            25 => 40,
+            _ => 0,
+        };
+        assert_eq!(settings.turn_timer_seconds, 40);
+
+        // Cycle 4: 40 -> 0
+        settings.turn_timer_seconds = match settings.turn_timer_seconds {
+            0 => 15,
+            15 => 25,
+            25 => 40,
+            _ => 0,
+        };
+        assert_eq!(settings.turn_timer_seconds, 0);
+    }
+
+    #[tokio::test]
+    async fn test_websocket_full_lifecycle() {
+        use futures_util::{SinkExt, StreamExt};
+        use tokio_tungstenite::tungstenite::Message as WsMsg;
+
+        let state = AppState::new();
+        let app = crate::create_app(state.clone());
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server_handle = tokio::spawn(async move {
+            axum::serve(listener, app).await.unwrap();
+        });
+
+        let ws_url = format!("ws://{}/ws", addr);
+
+        // 1. Client 1 connects (Host)
+        let (mut client1, _) = tokio_tungstenite::connect_async(&ws_url).await.unwrap();
+
+        // Send create_room
+        let create_msg = json!({
+            "type": "create_room",
+            "playerName": "HostPancho",
+            "avatar": "🤠",
+            "color": "#f59e0b",
+            "settings": {
+                "dice_count": 1,
+                "turn_timer_seconds": 15
+            }
+        });
+        client1.send(WsMsg::Text(create_msg.to_string())).await.unwrap();
+
+        // Receive room_joined
+        let resp = client1.next().await.unwrap().unwrap();
+        let text = resp.to_text().unwrap();
+        let parsed: Value = serde_json::from_str(text).unwrap();
+        assert_eq!(parsed["type"], "room_joined");
+        let room_code = parsed["roomCode"].as_str().unwrap().to_string();
+        let host_id = parsed["playerId"].as_str().unwrap().to_string();
+        assert_eq!(parsed["room"]["players"].as_array().unwrap().len(), 1);
+
+        // Send update_profile
+        let update_prof = json!({
+            "type": "update_profile",
+            "roomCode": room_code,
+            "avatar": "🌵",
+            "color": "#10b981",
+            "playerName": "PanchoVilla"
+        });
+        client1.send(WsMsg::Text(update_prof.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+
+        // Send update_settings
+        let update_sett = json!({
+            "type": "update_settings",
+            "roomCode": room_code,
+            "settings": {
+                "dice_count": 2,
+                "bonus_on_six": true,
+                "exact_win": true,
+                "three_sixes_penalty": false,
+                "turn_timer_seconds": 25,
+                "board_theme": "selva"
+            }
+        });
+        client1.send(WsMsg::Text(update_sett.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+
+        // Send toggle_timer
+        let toggle_timer = json!({
+            "type": "toggle_timer",
+            "roomCode": room_code
+        });
+        client1.send(WsMsg::Text(toggle_timer.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+
+        // 2. Client 2 connects (Guest)
+        let (mut client2, _) = tokio_tungstenite::connect_async(&ws_url).await.unwrap();
+        let join_msg = json!({
+            "type": "join_room",
+            "roomCode": room_code,
+            "playerName": "GuestAdelita",
+            "avatar": "💀",
+            "color": "#ef4444"
+        });
+        client2.send(WsMsg::Text(join_msg.to_string())).await.unwrap();
+
+        // Client 2 receives room_joined
+        let join_resp = client2.next().await.unwrap().unwrap();
+        let join_parsed: Value = serde_json::from_str(join_resp.to_text().unwrap()).unwrap();
+        assert_eq!(join_parsed["type"], "room_joined");
+        assert_eq!(join_parsed["room"]["players"].as_array().unwrap().len(), 2);
+
+        // Client 1 receives room_state broadcast
+        let _ = client1.next().await.unwrap().unwrap();
+
+        // 3. Client 1 starts game
+        let start_msg = json!({
+            "type": "start_game",
+            "roomCode": room_code
+        });
+        client1.send(WsMsg::Text(start_msg.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+        let _ = client2.next().await.unwrap().unwrap();
+
+        // 4. Client 1 rolls dice
+        let roll_msg = json!({
+            "type": "roll_dice",
+            "roomCode": room_code
+        });
+        client1.send(WsMsg::Text(roll_msg.to_string())).await.unwrap();
+        // Receives player_moved and room_state on client1
+        let _ = client1.next().await.unwrap().unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+        // Receives player_moved and room_state on client2
+        let _ = client2.next().await.unwrap().unwrap();
+        let _ = client2.next().await.unwrap().unwrap();
+
+        // 5. Client 2 sends reaction
+        let reaction_msg = json!({
+            "type": "send_reaction",
+            "roomCode": room_code,
+            "emoji": "Watch out for snakes! 🐍"
+        });
+        client2.send(WsMsg::Text(reaction_msg.to_string())).await.unwrap();
+        let rx1 = client1.next().await.unwrap().unwrap();
+        let rx_parsed: Value = serde_json::from_str(rx1.to_text().unwrap()).unwrap();
+        assert_eq!(rx_parsed["type"], "reaction");
+        assert_eq!(rx_parsed["emoji"], "Watch out for snakes! 🐍");
+        let _ = client2.next().await.unwrap().unwrap();
+
+        // 6. Ping / Pong
+        client1.send(WsMsg::Text(json!({"type": "ping"}).to_string())).await.unwrap();
+        let pong = client1.next().await.unwrap().unwrap();
+        let pong_parsed: Value = serde_json::from_str(pong.to_text().unwrap()).unwrap();
+        assert_eq!(pong_parsed["type"], "pong");
+
+        // 7. Restart game
+        let restart_msg = json!({
+            "type": "restart_game",
+            "roomCode": room_code
+        });
+        client1.send(WsMsg::Text(restart_msg.to_string())).await.unwrap();
+        let _ = client1.next().await.unwrap().unwrap();
+        let _ = client2.next().await.unwrap().unwrap();
+
+        // 8. Client 1 leaves room (triggers host transfer to Client 2!)
+        let leave_msg = json!({
+            "type": "leave_room",
+            "roomCode": room_code
+        });
+        client1.send(WsMsg::Text(leave_msg.to_string())).await.unwrap();
+
+        // Read messages from client2 until we get room_state with is_host = true
+        let mut promoted = false;
+        for _ in 0..10 {
+            if let Some(Ok(msg)) = client2.next().await {
+                if let Ok(parsed) = serde_json::from_str::<Value>(msg.to_text().unwrap()) {
+                    if parsed["type"] == "room_state" {
+                        if let Some(players) = parsed["room"]["players"].as_array() {
+                            if let Some(c2) = players.iter().find(|p| p["name"] == "GuestAdelita") {
+                                if c2["is_host"] == true {
+                                    promoted = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert!(promoted, "Client 2 must be promoted to host after Client 1 leaves");
+
+        // 9. Reconnect with existing playerId
+        let (mut client3, _) = tokio_tungstenite::connect_async(&ws_url).await.unwrap();
+        let rejoin_msg = json!({
+            "type": "join_room",
+            "roomCode": room_code,
+            "playerName": "PanchoReconnected",
+            "playerId": host_id
+        });
+        client3.send(WsMsg::Text(rejoin_msg.to_string())).await.unwrap();
+        let rejoin_resp = client3.next().await.unwrap().unwrap();
+        let rejoin_parsed: Value = serde_json::from_str(rejoin_resp.to_text().unwrap()).unwrap();
+        assert_eq!(rejoin_parsed["type"], "room_joined");
+
+        // Client 2 receives broadcast of Client 3 rejoining
+        let _ = client2.next().await.unwrap().unwrap();
+
+        // Client 2 leaves
+        client2.send(WsMsg::Text(leave_msg.to_string())).await.unwrap();
+        let _ = client3.next().await.unwrap().unwrap();
+
+        // Client 3 leaves (room now empty -> cleaned up)
+        client3.send(WsMsg::Text(leave_msg.to_string())).await.unwrap();
+
+        server_handle.abort();
+    }
+}

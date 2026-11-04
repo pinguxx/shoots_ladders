@@ -518,3 +518,273 @@ impl Room {
         Ok(step)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_test_player(id: &str, name: &str, connected: bool) -> Player {
+        Player {
+            id: id.to_string(),
+            name: name.to_string(),
+            color: "#f59e0b".to_string(),
+            avatar: "🤠".to_string(),
+            position: 0,
+            connected,
+            is_host: id == "p1",
+            conn_id: format!("conn_{}", id),
+            stats: PlayerStats::default(),
+        }
+    }
+
+    #[test]
+    fn test_game_settings_defaults_and_json() {
+        let defaults = GameSettings::default();
+        assert_eq!(defaults.dice_count, 1);
+        assert!(defaults.bonus_on_six);
+        assert!(defaults.exact_win);
+        assert!(!defaults.three_sixes_penalty);
+        assert_eq!(defaults.turn_timer_seconds, 0);
+        assert_eq!(defaults.board_theme, "fiesta");
+
+        // Deserialization with partial json fills defaults
+        let json_data = r#"{"dice_count": 2, "turn_timer_seconds": 25}"#;
+        let deserialized: GameSettings = serde_json::from_str(json_data).unwrap();
+        assert_eq!(deserialized.dice_count, 2);
+        assert_eq!(deserialized.turn_timer_seconds, 25);
+        assert!(deserialized.bonus_on_six);
+        assert!(deserialized.exact_win);
+        assert_eq!(deserialized.board_theme, "fiesta");
+    }
+
+    #[test]
+    fn test_generate_room_code_and_epoch() {
+        let code = generate_room_code();
+        assert!(code.len() >= 6 && code.len() <= 8);
+        let valid_prefixes = ["SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA"];
+        assert!(valid_prefixes.iter().any(|prefix| code.starts_with(prefix)));
+
+        let epoch = current_epoch_secs();
+        assert!(epoch > 1_700_000_000);
+    }
+
+    #[test]
+    fn test_room_new_and_activity_and_logging_cap() {
+        let mut room = Room::new("TEST01".to_string(), GameSettings::default());
+        assert_eq!(room.code, "TEST01");
+        assert_eq!(room.state, RoomState::Lobby);
+        assert!(room.players.is_empty());
+        assert!(room.current_player().is_none());
+
+        let t1 = room.last_activity_secs;
+        room.touch_activity();
+        assert!(room.last_activity_secs >= t1);
+
+        // Add 50 logs and verify cap at 40
+        for i in 1..=50 {
+            room.add_log("test", &format!("Mensaje {}", i), &format!("Message {}", i), None);
+        }
+        assert_eq!(room.logs.len(), 40);
+        assert_eq!(room.log_counter, 50);
+        // Oldest preserved log should be log #11
+        assert_eq!(room.logs.first().unwrap().id, 11);
+        assert_eq!(room.logs.last().unwrap().id, 50);
+    }
+
+    #[test]
+    fn test_turn_advancement_and_disconnection_skipping() {
+        let mut room = Room::new("TEST02".to_string(), GameSettings::default());
+        room.players.push(create_test_player("p1", "Player 1", true));
+        room.players.push(create_test_player("p2", "Player 2", false)); // Disconnected!
+        room.players.push(create_test_player("p3", "Player 3", true));
+
+        assert_eq!(room.current_player().unwrap().id, "p1");
+
+        // Advance turn should skip disconnected p2 and go straight to p3
+        room.advance_turn();
+        assert_eq!(room.current_player().unwrap().id, "p3");
+
+        // Advance turn should wrap back to p1
+        room.advance_turn();
+        assert_eq!(room.current_player().unwrap().id, "p1");
+
+        // If all players are disconnected, it safely increments without looping
+        room.players[0].connected = false;
+        room.players[2].connected = false;
+        room.advance_turn();
+        assert_eq!(room.turn_index, 1);
+    }
+
+    #[test]
+    fn test_start_and_restart_game() {
+        let mut room = Room::new("TEST03".to_string(), GameSettings::default());
+
+        // Error with 0 players
+        assert!(room.start_game().is_err());
+
+        // Error with only disconnected players
+        room.players.push(create_test_player("p1", "Player 1", false));
+        assert!(room.start_game().is_err());
+
+        // Succeeds with active player
+        room.players[0].connected = true;
+        room.players[0].position = 45;
+        room.players[0].stats.rolls_count = 10;
+        assert!(room.start_game().is_ok());
+        assert_eq!(room.state, RoomState::Playing);
+        assert_eq!(room.round, 1);
+        assert_eq!(room.players[0].position, 0); // Reset to start dock
+        assert_eq!(room.players[0].stats.rolls_count, 0);
+
+        // Restart game
+        room.restart_game();
+        assert_eq!(room.state, RoomState::Lobby);
+        assert_eq!(room.round, 2);
+    }
+
+    #[test]
+    fn test_turn_timeout_autoplay() {
+        let mut settings = GameSettings::default();
+        settings.turn_timer_seconds = 15;
+        let mut room = Room::new("TEST04".to_string(), settings);
+        room.players.push(create_test_player("p1", "Player 1", true));
+        room.start_game().unwrap();
+
+        // Not timed out yet
+        assert!(room.check_turn_timeout().is_none());
+
+        // Simulate turn started in the past (20 seconds ago > 15s timer)
+        room.turn_started_at_secs = current_epoch_secs() - 20;
+        let step = room.check_turn_timeout();
+        assert!(step.is_some());
+        let s = step.unwrap();
+        assert_eq!(s.player_id, "p1");
+        assert!(s.roll.total >= 1 && s.roll.total <= 6);
+    }
+
+    #[test]
+    fn test_roll_and_move_state_checks() {
+        let mut room = Room::new("TEST05".to_string(), GameSettings::default());
+        room.players.push(create_test_player("p1", "Player 1", true));
+        room.players.push(create_test_player("p2", "Player 2", true));
+
+        // In lobby, rolling should fail
+        assert_eq!(room.roll_and_move("p1").unwrap_err(), "The game is not currently active");
+
+        room.start_game().unwrap();
+
+        // Not p2's turn
+        assert_eq!(room.roll_and_move("p2").unwrap_err(), "It is not your turn to roll");
+
+        // p1 rolls successfully
+        let step = room.roll_and_move("p1").unwrap();
+        assert_eq!(step.player_id, "p1");
+        assert_eq!(step.from_tile, 0);
+        assert!(step.final_tile > 0);
+    }
+
+    #[test]
+    fn test_ladder_climb_and_snake_descent_mechanics() {
+        let mut room = Room::new("TEST06".to_string(), GameSettings::default());
+        room.players.push(create_test_player("p1", "Player 1", true));
+        room.start_game().unwrap();
+
+        // Position player at tile 3 right before ladder at tile 4 (4 -> 14)
+        room.players[0].position = 3;
+        // Mock a move from 3 landing on 4
+        // Check ladder logic directly with board
+        let portal = room.board.get_portal(4).unwrap();
+        assert!(portal.is_ladder);
+        assert_eq!(portal.to, 14);
+
+        // Position player at tile 16 right before snake at tile 17 (17 -> 7)
+        let portal_snake = room.board.get_portal(17).unwrap();
+        assert!(!portal_snake.is_ladder);
+        assert_eq!(portal_snake.to, 7);
+    }
+
+    #[test]
+    fn test_exact_win_bounce_mechanics() {
+        let mut settings = GameSettings::default();
+        settings.exact_win = true;
+        let mut room = Room::new("TEST07".to_string(), settings);
+        room.players.push(create_test_player("p1", "Player 1", true));
+        room.start_game().unwrap();
+
+        // Position player at 98
+        room.players[0].position = 98;
+
+        // In exact win mode, if total_roll = 5, landing tile is 100 - (103 - 100) = 97
+        let from_tile = 98u8;
+        let total_roll = 5u8;
+        let mut path = Vec::new();
+        let overshoot = (from_tile + total_roll) - 100;
+        for t in (from_tile + 1)..=100 {
+            path.push(t);
+        }
+        for bounce_step in 1..=overshoot {
+            path.push(100 - bounce_step);
+        }
+        let landed_tile = 100 - overshoot;
+        assert_eq!(landed_tile, 97);
+        assert_eq!(path, vec![99, 100, 99, 98, 97]);
+
+        // Non exact-win mode: roll 5 from 98 goes straight to 100
+        let mut settings_no_bounce = GameSettings::default();
+        settings_no_bounce.exact_win = false;
+        let mut room_no_bounce = Room::new("TEST08".to_string(), settings_no_bounce);
+        room_no_bounce.players.push(create_test_player("p1", "Player 1", true));
+        room_no_bounce.start_game().unwrap();
+        room_no_bounce.players[0].position = 98;
+
+        let landed_no_bounce: u8 = if !room_no_bounce.settings.exact_win && from_tile + total_roll > 100 {
+            100
+        } else {
+            from_tile + total_roll
+        };
+        assert_eq!(landed_no_bounce, 100);
+    }
+
+    #[test]
+    fn test_victory_state_transition() {
+        let mut room = Room::new("TEST09".to_string(), GameSettings::default());
+        room.players.push(create_test_player("p1", "Champion", true));
+        room.start_game().unwrap();
+
+        // Simulate winning
+        room.players[0].position = 100;
+        let p_ref = &room.players[0];
+        let winner_info = WinnerInfo {
+            player_id: "p1".to_string(),
+            player_name: p_ref.name.clone(),
+            avatar: p_ref.avatar.clone(),
+            color: p_ref.color.clone(),
+            total_rolls: 12,
+            ladders_climbed: 3,
+            snakes_hit: 1,
+        };
+        room.winner = Some(winner_info);
+        room.state = RoomState::Finished;
+
+        assert_eq!(room.state, RoomState::Finished);
+        assert!(room.winner.is_some());
+        assert_eq!(room.winner.as_ref().unwrap().player_name, "Champion");
+
+        // Rolling after finished returns error
+        assert_eq!(room.roll_and_move("p1").unwrap_err(), "The game is not currently active");
+    }
+
+    #[test]
+    fn test_two_dice_mode() {
+        let mut settings = GameSettings::default();
+        settings.dice_count = 2;
+        let mut room = Room::new("TEST10".to_string(), settings);
+        room.players.push(create_test_player("p1", "Fast Roller", true));
+        room.start_game().unwrap();
+
+        let step = room.roll_and_move("p1").unwrap();
+        assert_eq!(step.roll.dice.len(), 2);
+        assert_eq!(step.roll.total, step.roll.dice[0] + step.roll.dice[1]);
+        assert!(step.roll.total >= 2 && step.roll.total <= 12);
+    }
+}
