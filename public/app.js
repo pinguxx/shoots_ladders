@@ -1462,7 +1462,13 @@
           });
         }
 
-        el.btnPlayAgain.style.display = isHost ? "flex" : "none";
+        if (isHost) {
+          el.btnPlayAgain.style.display = "flex";
+          if (el.btnShareVictory) el.btnShareVictory.style.gridColumn = "1";
+        } else {
+          el.btnPlayAgain.style.display = "none";
+          if (el.btnShareVictory) el.btnShareVictory.style.gridColumn = "1 / -1";
+        }
         el.modalWinner.classList.add("active");
 
         // Grand fiesta victory confetti barrage
