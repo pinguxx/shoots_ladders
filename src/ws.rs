@@ -280,7 +280,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                     "isHost": true,
                                     "room": room
                                 })
-                                .to_string().into(),
+                                .to_string()
+                                .into(),
                             ));
                         }
 
@@ -329,7 +330,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                                 "type": "error",
                                                 "message": "Room is full (max 10 players)"
                                             })
-                                            .to_string().into(),
+                                            .to_string()
+                                            .into(),
                                         ));
                                         continue;
                                     }
@@ -417,7 +419,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         "isHost": is_host,
                                         "room": snapshot
                                     })
-                                    .to_string().into(),
+                                    .to_string()
+                                    .into(),
                                 ));
 
                                 broadcast_room_state(&code, &state).await;
@@ -427,7 +430,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         "type": "error",
                                         "message": "Room not found. Check the code and try again."
                                     })
-                                    .to_string().into(),
+                                    .to_string()
+                                    .into(),
                                 ));
                             }
                         }
@@ -562,7 +566,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         if let Err(err) = room.start_game() {
                                             let _ = tx.send(Message::Text(
                                                 json!({ "type": "error", "message": err })
-                                                    .to_string().into(),
+                                                    .to_string()
+                                                    .into(),
                                             ));
                                         }
                                     }
@@ -585,7 +590,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         Err(err) => {
                                             let _ = tx.send(Message::Text(
                                                 json!({ "type": "error", "message": err })
-                                                    .to_string().into(),
+                                                    .to_string()
+                                                    .into(),
                                             ));
                                         }
                                     }
@@ -816,7 +822,8 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                         }
 
                         ClientMessage::Ping => {
-                            let _ = tx.send(Message::Text(json!({ "type": "pong" }).to_string().into()));
+                            let _ = tx
+                                .send(Message::Text(json!({ "type": "pong" }).to_string().into()));
                         }
                     },
                     Err(e) => {

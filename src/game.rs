@@ -506,8 +506,7 @@ impl Room {
                                 "¡Pura suerte con el dado! 🍀",
                                 "¡Directo a la meta! 🏆",
                             ];
-                            bot_shout =
-                                Some(shouts.choose(&mut rand::rng()).unwrap().to_string());
+                            bot_shout = Some(shouts.choose(&mut rand::rng()).unwrap().to_string());
                         }
                         return Some((step, bot_shout));
                     }
