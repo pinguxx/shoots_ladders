@@ -11,12 +11,20 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#b45309">
-  <link rel="stylesheet" href="style.css?v=3.1">
+  <link rel="stylesheet" href="style.css?v=3.2">
 </head>
 <body>
 
   <!-- Ambient Theme Floating Decorations Layer -->
   <div id="ambient-theme-layer" class="ambient-theme-layer" aria-hidden="true"></div>
+
+  <!-- Reconnecting Banner Indicator -->
+  <div id="reconnecting-overlay" class="reconnecting-overlay" style="display: none;">
+    <div class="reconnecting-card">
+      <span class="reconnecting-spinner">🎲</span>
+      <span class="reconnecting-text" data-i18n="reconnectingText">Reconectando a la partida...</span>
+    </div>
+  </div>
 
   <!-- Floating Emojis Layer for Live Reactions -->
   <div id="floating-emojis-layer" class="floating-emojis-container" aria-hidden="true"></div>
@@ -59,6 +67,23 @@
 
     <!-- 1. WELCOME SCREEN -->
     <section id="screen-welcome" class="screen active">
+      <!-- Active Game Resume Banner -->
+      <div id="resume-banner" class="resume-banner" style="display: none;">
+        <div class="resume-info">
+          <span class="resume-icon">🎮</span>
+          <div>
+            <div class="resume-title" data-i18n="resumeTitle">Partida en Curso</div>
+            <div class="resume-sub">
+              <span data-i18n="labelRoomCode">SALA:</span> <strong id="resume-room-code" style="color: #fde047; letter-spacing: 1.5px;">-----</strong> • <span id="resume-player-name">Jugador</span>
+            </div>
+          </div>
+        </div>
+        <div class="resume-actions">
+          <button id="btn-resume-game" class="btn-primary resume-btn" data-i18n="btnResume">▶️ Reanudar</button>
+          <button id="btn-dismiss-resume" class="btn-icon resume-dismiss" title="Descartar">✖</button>
+        </div>
+      </div>
+
       <div class="welcome-container card-box">
         <div class="tab-nav">
           <button id="tab-create" class="tab-btn active" data-i18n="tabCreate">Crear Sala</button>
@@ -314,10 +339,10 @@
   <!-- Confetti Canvas Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <!-- Standalone QR Code Generator -->
-  <script src="qrcode.min.js?v=3.1"></script>
+  <script src="qrcode.min.js?v=3.2"></script>
   <!-- Web Audio Synthesizer -->
-  <script src="audio.js?v=3.1"></script>
+  <script src="audio.js?v=3.2"></script>
   <!-- Main App Script -->
-  <script src="app.js?v=3.1"></script>
+  <script src="app.js?v=3.2"></script>
 </body>
 </html>

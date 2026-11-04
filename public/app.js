@@ -56,7 +56,12 @@
       errorFillName: "Por favor escribe tu nombre.",
       errorFillCode: "Por favor ingresa un código de sala válido.",
       leaveRoom: "Salir de la Sala",
-      confirmLeave: "¿Seguro que deseas salir de la sala?"
+      confirmLeave: "¿Seguro que deseas salir de la sala?",
+      resumeTitle: "Partida en Curso",
+      btnResume: "▶️ Reanudar",
+      reconnectingText: "Reconectando a la partida...",
+      toastReconnected: "¡Reconectado a la partida!",
+      toastGameEnded: "La partida anterior ha finalizado."
     },
     en: {
       appTitle: "SNAKES & LADDERS",
@@ -106,7 +111,12 @@
       errorFillName: "Please enter your name.",
       errorFillCode: "Please enter a valid room code.",
       leaveRoom: "Leave Room",
-      confirmLeave: "Are you sure you want to leave the room?"
+      confirmLeave: "Are you sure you want to leave the room?",
+      resumeTitle: "Game in Progress",
+      btnResume: "▶️ Resume",
+      reconnectingText: "Reconnecting to game...",
+      toastReconnected: "Reconnected to game!",
+      toastGameEnded: "The previous game has ended."
     }
   };
 
@@ -144,6 +154,13 @@
     screenWelcome: document.getElementById("screen-welcome"),
     screenLobby: document.getElementById("screen-lobby"),
     screenGame: document.getElementById("screen-game"),
+
+    resumeBanner: document.getElementById("resume-banner"),
+    resumeRoomCode: document.getElementById("resume-room-code"),
+    resumePlayerName: document.getElementById("resume-player-name"),
+    btnResumeGame: document.getElementById("btn-resume-game"),
+    btnDismissResume: document.getElementById("btn-dismiss-resume"),
+    reconnectingOverlay: document.getElementById("reconnecting-overlay"),
 
     tabCreate: document.getElementById("tab-create"),
     tabJoin: document.getElementById("tab-join"),
@@ -314,6 +331,63 @@
       toast.style.transition = "opacity 0.3s";
       setTimeout(() => toast.remove(), 300);
     }, 2200);
+  }
+
+  // Session Persistence & Reconnection Management
+  const SESSION_KEY = "serpientes_session";
+
+  function saveSession(rCode, pId, pName, avatar, color, hostFlag) {
+    const session = {
+      roomCode: rCode,
+      playerId: pId,
+      playerName: pName,
+      avatar: avatar,
+      color: color,
+      isHost: hostFlag
+    };
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      localStorage.setItem("serpientes_player_id", pId);
+    } catch (e) {
+      console.warn("Could not save session to localStorage", e);
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.set("room", rCode);
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  function clearSession() {
+    try {
+      localStorage.removeItem(SESSION_KEY);
+    } catch (e) {}
+    const url = new URL(window.location.href);
+    url.searchParams.delete("room");
+    window.history.replaceState({}, "", url.toString());
+    if (el.resumeBanner) el.resumeBanner.style.display = "none";
+    if (el.reconnectingOverlay) el.reconnectingOverlay.style.display = "none";
+  }
+
+  function getStoredSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function checkResumeBanner() {
+    const session = getStoredSession();
+    if (session && session.roomCode && session.playerName) {
+      if (el.resumeBanner) {
+        el.resumeRoomCode.textContent = session.roomCode;
+        el.resumePlayerName.textContent = session.playerName;
+        el.resumeBanner.style.display = "flex";
+      }
+    } else {
+      if (el.resumeBanner) el.resumeBanner.style.display = "none";
+    }
   }
 
   // -------------------------------------------------------------
@@ -1010,9 +1084,27 @@
 
     ws.onopen = () => {
       console.log("WebSocket connected.");
+      const session = getStoredSession();
       const params = new URLSearchParams(window.location.search);
       const urlRoom = params.get("room");
-      if (urlRoom && !currentRoom) {
+
+      // Auto-reconnect if session exists
+      if (session && session.roomCode && session.playerId) {
+        if (el.reconnectingOverlay) el.reconnectingOverlay.style.display = "block";
+        if (el.resumeBanner) {
+          el.resumeRoomCode.textContent = session.roomCode;
+          el.resumePlayerName.textContent = session.playerName;
+          el.resumeBanner.style.display = "flex";
+        }
+        ws.send(JSON.stringify({
+          type: "join_room",
+          roomCode: session.roomCode,
+          playerName: session.playerName,
+          avatar: session.avatar,
+          color: session.color,
+          playerId: session.playerId
+        }));
+      } else if (urlRoom && !currentRoom) {
         el.tabJoin.click();
         el.joinCode.value = urlRoom.toUpperCase();
       }
@@ -1027,7 +1119,20 @@
             roomCode = msg.roomCode;
             playerId = msg.playerId;
             isHost = msg.isHost;
-            localStorage.setItem("serpientes_player_id", playerId);
+
+            if (el.reconnectingOverlay) el.reconnectingOverlay.style.display = "none";
+            if (el.resumeBanner) el.resumeBanner.style.display = "none";
+
+            const myPlayer = msg.room.players.find(p => p.id === playerId);
+            saveSession(
+              roomCode,
+              playerId,
+              myPlayer ? myPlayer.name : el.joinName.value || el.createName.value || "Jugador",
+              myPlayer ? myPlayer.avatar : selectedAvatar,
+              myPlayer ? myPlayer.color : selectedColor,
+              isHost
+            );
+
             syncRoomState(msg.room);
             break;
 
@@ -1049,7 +1154,14 @@
             break;
 
           case "error":
-            showToast(`⚠️ ${msg.message}`);
+            if (el.reconnectingOverlay && el.reconnectingOverlay.style.display !== "none") {
+              el.reconnectingOverlay.style.display = "none";
+              clearSession();
+              showScreen("screen-welcome");
+              showToast(i18n[currentLang].toastGameEnded);
+            } else {
+              showToast(`⚠️ ${msg.message}`);
+            }
             break;
 
           default:
@@ -1097,9 +1209,40 @@
     // Leave Room
     el.btnHeaderLeave.addEventListener("click", () => {
       if (confirm(i18n[currentLang].confirmLeave)) {
+        if (ws && ws.readyState === WebSocket.OPEN && roomCode) {
+          ws.send(JSON.stringify({
+            type: "leave_room",
+            roomCode
+          }));
+        }
+        clearSession();
         location.href = "/";
       }
     });
+
+    // Resume Game Banner Controls
+    if (el.btnResumeGame) {
+      el.btnResumeGame.addEventListener("click", () => {
+        const session = getStoredSession();
+        if (session && ws && ws.readyState === WebSocket.OPEN) {
+          if (el.reconnectingOverlay) el.reconnectingOverlay.style.display = "block";
+          ws.send(JSON.stringify({
+            type: "join_room",
+            roomCode: session.roomCode,
+            playerName: session.playerName,
+            avatar: session.avatar,
+            color: session.color,
+            playerId: session.playerId
+          }));
+        }
+      });
+    }
+
+    if (el.btnDismissResume) {
+      el.btnDismissResume.addEventListener("click", () => {
+        clearSession();
+      });
+    }
 
     // Mobile Activity Feed Drawer Toggle
     el.btnToggleFeedMobile.addEventListener("click", () => {
@@ -1317,6 +1460,7 @@
   // -------------------------------------------------------------
   document.addEventListener("DOMContentLoaded", () => {
     updateLanguage();
+    checkResumeBanner();
     updateAmbientDecorations(THEMES[currentThemeIdx]);
     initEventListeners();
     connectWebSocket();

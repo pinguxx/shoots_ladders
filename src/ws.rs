@@ -136,6 +136,11 @@ pub enum ClientMessage {
         room_code: String,
         emoji: String,
     },
+    #[serde(rename = "leave_room")]
+    LeaveRoom {
+        #[serde(rename = "roomCode")]
+        room_code: String,
+    },
     #[serde(rename = "ping")]
     Ping,
 }
@@ -556,6 +561,61 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                             }
                         }
 
+                        ClientMessage::LeaveRoom { room_code } => {
+                            let code = room_code.trim().to_uppercase();
+                            if let Some(ref pid) = current_player_id {
+                                let mut rooms = state.rooms.write().await;
+                                if let Some(room) = rooms.get_mut(&code) {
+                                    room.touch_activity();
+                                    let mut player_name = "Player".to_string();
+                                    let mut was_host = false;
+
+                                    if let Some(pos) = room.players.iter().position(|p| &p.id == pid) {
+                                        let p = room.players.remove(pos);
+                                        player_name = p.name;
+                                        was_host = p.is_host;
+                                    }
+
+                                    room.add_log(
+                                        "leave",
+                                        &format!("🚪 {} abandonó la sala.", player_name),
+                                        &format!("🚪 {} left the room.", player_name),
+                                        Some(pid.clone()),
+                                    );
+
+                                    if was_host {
+                                        if let Some(next_host) = room.players.iter_mut().find(|p| p.connected) {
+                                            next_host.is_host = true;
+                                            let h_name = next_host.name.clone();
+                                            let h_id = next_host.id.clone();
+                                            room.add_log(
+                                                "host_change",
+                                                &format!("👑 {} es ahora el nuevo anfitrión.", h_name),
+                                                &format!("👑 {} is now the new host.", h_name),
+                                                Some(h_id),
+                                            );
+                                        }
+                                    }
+
+                                    if room.state == RoomState::Playing && !room.players.is_empty() {
+                                        room.advance_turn();
+                                    }
+                                }
+                                drop(rooms);
+
+                                {
+                                    let mut sockets = state.sockets.write().await;
+                                    if let Some(room_sockets) = sockets.get_mut(&code) {
+                                        room_sockets.remove(pid);
+                                    }
+                                }
+
+                                current_room = None;
+                                current_player_id = None;
+                                broadcast_room_state(&code, &state).await;
+                            }
+                        }
+
                         ClientMessage::Ping => {
                             let _ = tx.send(Message::Text(json!({ "type": "pong" }).to_string()));
                         }
@@ -570,51 +630,14 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
         }
     }
 
-    // Handle disconnect cleanup
+    // Handle momentary disconnect cleanup (e.g. browser refresh or cellular network blip)
+    // NOTE: We mark connected = false but do NOT immediately skip their turn or strip host.
+    // The background maintenance timer will advance turn if they stay disconnected past the deadline.
     if let (Some(code), Some(pid)) = (current_room, current_player_id) {
         let mut rooms = state.rooms.write().await;
         if let Some(room) = rooms.get_mut(&code) {
-            let mut player_name = "Player".to_string();
-            let mut was_host = false;
-
             if let Some(player) = room.players.iter_mut().find(|p| p.id == pid) {
                 player.connected = false;
-                player_name = player.name.clone();
-                was_host = player.is_host;
-            }
-
-            room.add_log(
-                "leave",
-                &format!("🔌 {} se desconectó.", player_name),
-                &format!("🔌 {} disconnected.", player_name),
-                Some(pid.clone()),
-            );
-
-            // If disconnected player was host, transfer host to next connected player
-            if was_host {
-                let mut new_host_info = None;
-                if let Some(next_host) = room.players.iter_mut().find(|p| p.connected) {
-                    next_host.is_host = true;
-                    new_host_info = Some((next_host.name.clone(), next_host.id.clone()));
-                }
-
-                if let Some((h_name, h_id)) = new_host_info {
-                    room.add_log(
-                        "host_change",
-                        &format!("👑 {} es ahora el nuevo anfitrión.", h_name),
-                        &format!("👑 {} is now the new host.", h_name),
-                        Some(h_id),
-                    );
-                }
-            }
-
-            // If it was disconnected player's turn in an active game, advance turn
-            if room.state == RoomState::Playing {
-                if let Some(cur) = room.current_player() {
-                    if cur.id == pid {
-                        room.advance_turn();
-                    }
-                }
             }
         }
         drop(rooms);
