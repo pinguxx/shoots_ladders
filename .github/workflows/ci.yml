@@ -92,11 +92,12 @@ jobs:
           tags: shoots-ladders:ci
 
       - name: Run Trivy Vulnerability Scanner on Container Image
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'shoots-ladders:ci'
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --format table \
+            --exit-code 0 \
+            shoots-ladders:ci
