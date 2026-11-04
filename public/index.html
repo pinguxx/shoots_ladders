@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="fiesta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>¡Serpientes y Escaleras Multijugador!</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ea580c">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Emojis Layer for Live Reactions -->
+  <div id="floating-emojis-layer" class="floating-emojis-container" aria-hidden="true"></div>
+
+  <!-- Confetti Canvas for Victory Celebrations -->
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- Papel Picado Festive Garland -->
+  <div class="papel-picado" aria-hidden="true">
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+    <div class="papel-flag"></div>
+  </div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="logo-container">
+      <span class="logo-badge">🐍</span>
+      <div class="logo-text">
+        <h1 data-i18n="appTitle">SERPIENTES Y ESCALERAS</h1>
+        <span data-i18n="appSubtitle">Juego Multijugador en Tiempo Real</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn-header-leave" class="btn-icon header-leave-btn" style="display: none;" title="Salir de la Sala" aria-label="Salir de la Sala">🚪</button>
+      <button id="btn-toggle-theme" class="btn-icon" title="Cambiar Tema / Theme" aria-label="Cambiar Tema">🎨</button>
+      <button id="btn-toggle-lang" class="btn-icon btn-lang" title="Idioma / Language" aria-label="Cambiar Idioma">🌐 Español</button>
+      <button id="btn-toggle-sound" class="btn-icon" title="Sonido / Sound" aria-label="Alternar Sonido">🔊</button>
+      <button id="btn-toggle-speech" class="btn-icon" title="Voz / Voice Caller" aria-label="Alternar Voz">🗣️</button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="main-content">
+
+    <!-- 1. WELCOME SCREEN -->
+    <section id="screen-welcome" class="screen active">
+      <div class="welcome-container card-box">
+        <div class="tab-nav">
+          <button id="tab-create" class="tab-btn active" data-i18n="tabCreate">Crear Sala</button>
+          <button id="tab-join" class="tab-btn" data-i18n="tabJoin">Unirse a Sala</button>
+        </div>
+
+        <!-- Create Form -->
+        <form id="form-create">
+          <div class="form-group">
+            <label for="create-name" data-i18n="labelName">Tu Nombre o Apodo</label>
+            <input type="text" id="create-name" class="form-control" placeholder="Ej. Pancho Villa" data-i18n-ph="placeholderName" maxlength="18" autocomplete="nickname" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="labelAvatar">Elige tu Ficha / Avatar</label>
+            <div id="avatar-picker" class="avatar-picker-grid"></div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="labelColor">Elige tu Color</label>
+            <div id="color-picker" class="color-picker-grid"></div>
+          </div>
+
+          <details class="settings-panel">
+            <summary>Ajustes de la Partida</summary>
+            <div class="settings-content">
+              <div class="setting-row">
+                <span data-i18n="labelDiceCount">Número de Dados:</span>
+                <select id="setting-dice-count">
+                  <option value="1" selected data-i18n="dice1">1 Dado (Clásico)</option>
+                  <option value="2" data-i18n="dice2">2 Dados (Rápido)</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <span data-i18n="labelExactWin">¿Rebotar al pasar de 100?</span>
+                <select id="setting-exact-win">
+                  <option value="true" selected data-i18n="exactWinYes">Sí (Tiro exacto)</option>
+                  <option value="false" data-i18n="exactWinNo">No (100 o más)</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <span data-i18n="labelBonusSix">Tiro extra al sacar 6:</span>
+                <input type="checkbox" id="setting-bonus-six" checked>
+              </div>
+
+              <div class="setting-row">
+                <span data-i18n="labelThreeSixes">Castigo por 3 seises seguidos:</span>
+                <input type="checkbox" id="setting-three-sixes">
+              </div>
+
+              <div class="setting-row">
+                <span data-i18n="labelTimer">Tiempo por turno:</span>
+                <select id="setting-turn-timer">
+                  <option value="0" data-i18n="timerNone">Sin límite</option>
+                  <option value="15" data-i18n="timer15">15 segundos</option>
+                  <option value="25" selected data-i18n="timer25">25 segundos</option>
+                  <option value="40" data-i18n="timer40">40 segundos</option>
+                </select>
+              </div>
+            </div>
+          </details>
+
+          <button type="submit" class="btn-primary" data-i18n="btnCreate">🎲 Crear Sala & Jugar</button>
+        </form>
+
+        <!-- Join Form -->
+        <form id="form-join" style="display: none;">
+          <div class="form-group">
+            <label for="join-code" data-i18n="labelRoomCode">Código de la Sala</label>
+            <input type="text" id="join-code" class="form-control font-code" placeholder="Ej. SERP12" data-i18n-ph="placeholderRoomCode" maxlength="8" required>
+          </div>
+
+          <div class="form-group">
+            <label for="join-name" data-i18n="labelName">Tu Nombre o Apodo</label>
+            <input type="text" id="join-name" class="form-control" placeholder="Ej. Emiliano Zapata" data-i18n-ph="placeholderName" maxlength="18" autocomplete="nickname" required>
+          </div>
+
+          <button type="submit" class="btn-primary" data-i18n="btnJoin">🚀 Entrar a la Sala</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. LOBBY SCREEN -->
+    <section id="screen-lobby" class="screen">
+      <div class="lobby-container card-box">
+        <div class="room-code-banner">
+          <div class="room-code-display">
+            <span class="room-code-label" data-i18n="labelRoomCode">CÓDIGO DE SALA</span>
+            <span id="lobby-room-code" class="room-code-val">-----</span>
+          </div>
+          <div class="room-code-actions">
+            <button id="btn-copy-link" class="btn-icon" title="Copiar Enlace">📋</button>
+            <button id="btn-show-qr" class="btn-icon" title="Código QR">📱</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="section-title" data-i18n="waitingPlayers">Esperando jugadores...</h3>
+          <div id="lobby-players-list" class="lobby-players-list"></div>
+        </div>
+
+        <button id="btn-start-game" class="btn-primary" style="display: none;" data-i18n="btnStartGame">🏁 ¡Iniciar Partida!</button>
+      </div>
+    </section>
+
+    <!-- 3. GAME BOARD SCREEN -->
+    <section id="screen-game" class="screen">
+      <div class="game-layout">
+
+        <!-- Turn Status Banner -->
+        <div class="turn-banner">
+          <div class="turn-info">
+            <div id="turn-avatar" class="turn-avatar">🤠</div>
+            <div class="turn-details">
+              <span class="turn-title" data-i18n="turnTitle">Turno Actual</span>
+              <span id="turn-player-name" class="turn-player">Jugador</span>
+            </div>
+          </div>
+          <div class="turn-timer-wrap">
+            <div id="turn-timer" class="turn-timer">⏱️ 25s</div>
+            <button id="btn-toggle-feed-mobile" class="btn-icon mobile-feed-toggle" title="Ver Crónica / Log">📜</button>
+          </div>
+        </div>
+
+        <!-- 10x10 Board Area -->
+        <div class="board-container">
+          <div class="board-wrapper">
+            <div id="board-grid" class="board-grid"></div>
+            <!-- SVG Overlay for dynamic Ladders & Snakes -->
+            <svg id="board-svg-overlay" class="board-svg-overlay" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+            <!-- Player Tokens Layer -->
+            <div id="board-tokens-layer" class="board-tokens-layer"></div>
+            <div class="start-dock-indicator">🏁 Salida</div>
+          </div>
+        </div>
+
+        <!-- Controls & Dashboard (Unified for Mobile & Desktop) -->
+        <div class="game-dashboard">
+          
+          <!-- Tactical Action Controls -->
+          <div class="action-panel card-box">
+            <div class="dice-and-action-row">
+              <!-- 3D Dice Display -->
+              <div class="dice-container" id="dice-container-box" title="Haz clic en el dado o en el botón para tirar">
+                <!-- Cube Die 1 -->
+                <div id="cube-die-1" class="cube-die">
+                  <div class="cube-face face-1"><span class="pip"></span></div>
+                  <div class="cube-face face-2"><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                </div>
+
+                <!-- Cube Die 2 (For 2-dice mode) -->
+                <div id="cube-die-2" class="cube-die" style="display: none;">
+                  <div class="cube-face face-1"><span class="pip"></span></div>
+                  <div class="cube-face face-2"><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                  <div class="cube-face face-6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                </div>
+              </div>
+
+              <!-- Big Tactile Roll Button -->
+              <button id="btn-roll-dice" class="btn-roll" disabled data-i18n="btnRollDice">
+                🎲 ¡Tirar Dado!
+              </button>
+            </div>
+
+            <!-- Quick Reaction Emotes Strip -->
+            <div id="reactions-bar" class="reactions-bar" aria-label="Reacciones en vivo">
+              <button class="btn-react" data-emoji="🎉" title="Celebrar">🎉</button>
+              <button class="btn-react" data-emoji="🐍" title="Serpiente">🐍</button>
+              <button class="btn-react" data-emoji="🪜" title="Escalera">🪜</button>
+              <button class="btn-react" data-emoji="😱" title="Susto">😱</button>
+              <button class="btn-react" data-emoji="🎲" title="Dado">🎲</button>
+              <button class="btn-react" data-emoji="🌮" title="Taco">🌮</button>
+              <button class="btn-react" data-emoji="🎺" title="Trompeta">🎺</button>
+              <button class="btn-react" data-emoji="🌶️" title="Picante">🌶️</button>
+              <button class="btn-react" data-emoji="💀" title="Calavera">💀</button>
+            </div>
+          </div>
+
+          <!-- Activity Chronicle Feed (Desktop inline / Mobile slide drawer) -->
+          <div id="drawer-activity-log" class="activity-feed-box card-box">
+            <div class="feed-header-row">
+              <span class="feed-header" data-i18n="feedTitle">Crónica de la Partida</span>
+              <button id="btn-close-feed-drawer" class="feed-close-btn" aria-label="Cerrar crónica">✖</button>
+            </div>
+            <div id="activity-feed" class="feed-logs" role="log" aria-live="polite"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: QR Code -->
+  <div id="modal-qr" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <button class="modal-close" aria-label="Cerrar modal">✖</button>
+      <h3 class="modal-title" data-i18n="qrTitle">Invita a tus Amigos</h3>
+      <p class="modal-sub" data-i18n="qrSub">Escanea con la cámara de tu celular para entrar directamente a la partida:</p>
+      <div id="qr-container" class="qr-container-box"></div>
+      <div class="modal-input-row">
+        <input type="text" id="qr-share-link" class="form-control font-code-sm" readonly>
+        <button id="btn-copy-modal-link" class="btn-icon" title="Copiar Enlace">📋</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Winner Celebration -->
+  <div id="modal-winner" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div id="winner-avatar" class="winner-avatar">🤠</div>
+      <h2 class="winner-title" data-i18n="winnerTitle">¡VICTORIA!</h2>
+      <div id="winner-name" class="winner-name">Campeón</div>
+      <p class="modal-sub" data-i18n="winnerSub">¡Ha llegado a la casilla 100 y se corona Campeón!</p>
+
+      <div class="winner-stats-grid">
+        <div>
+          <div id="winner-stat-rolls" class="winner-stat-val">0</div>
+          <div class="winner-stat-lbl" data-i18n="statRolls">Tiros</div>
+        </div>
+        <div>
+          <div id="winner-stat-ladders" class="winner-stat-val">0</div>
+          <div class="winner-stat-lbl" data-i18n="statLadders">Escaleras</div>
+        </div>
+        <div>
+          <div id="winner-stat-snakes" class="winner-stat-val">0</div>
+          <div class="winner-stat-lbl" data-i18n="statSnakes">Serpientes</div>
+        </div>
+      </div>
+
+      <button id="btn-play-again" class="btn-primary" data-i18n="btnPlayAgain">🔄 Jugar Otra Vez</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="qrcode.min.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

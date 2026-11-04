@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+    <linearGradient id="snakeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="50%" stop-color="#fef3c7" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Circle with festive border -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGrad)" stroke="#fef08a" stroke-width="12" />
+
+  <!-- Papel picado border dots -->
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="14 16" opacity="0.6"/>
+
+  <!-- Ladder (Escalera) -->
+  <g filter="url(#shadow)">
+    <!-- Left Rail -->
+    <rect x="180" y="70" width="16" height="370" rx="8" fill="url(#woodGrad)" />
+    <!-- Right Rail -->
+    <rect x="290" y="70" width="16" height="370" rx="8" fill="url(#woodGrad)" />
+    <!-- Rungs -->
+    <rect x="180" y="110" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+    <rect x="180" y="160" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+    <rect x="180" y="210" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+    <rect x="180" y="260" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+    <rect x="180" y="310" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+    <rect x="180" y="360" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+    <rect x="180" y="410" width="126" height="12" rx="6" fill="url(#woodGrad)" />
+  </g>
+
+  <!-- Snake (Serpiente) winding around ladder -->
+  <g filter="url(#shadow)">
+    <!-- Snake Body -->
+    <path d="M 330 90 C 420 130, 410 210, 310 240 C 170 280, 160 360, 240 430"
+          fill="none" stroke="url(#snakeGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Snake Belly Pattern -->
+    <path d="M 330 90 C 420 130, 410 210, 310 240 C 170 280, 160 360, 240 430"
+          fill="none" stroke="#fef08a" stroke-width="8" stroke-dasharray="14 18" stroke-linecap="round" opacity="0.85"/>
+    <!-- Snake Head -->
+    <circle cx="335" cy="85" r="26" fill="#059669" />
+    <circle cx="343" cy="78" r="6" fill="#fff" />
+    <circle cx="345" cy="77" r="3" fill="#111" />
+    <!-- Tongue -->
+    <path d="M 358 85 L 382 82 L 392 74 M 382 82 L 392 90" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round" />
+  </g>
+
+  <!-- Big Red & Gold 3D Die in foreground -->
+  <g transform="translate(100, 310) rotate(-12)" filter="url(#shadow)">
+    <rect x="0" y="0" width="105" height="105" rx="20" fill="#dc2626" stroke="#fef08a" stroke-width="5"/>
+    <!-- Pips (5) -->
+    <circle cx="26" cy="26" r="10" fill="#fff"/>
+    <circle cx="79" cy="26" r="10" fill="#fff"/>
+    <circle cx="52.5" cy="52.5" r="10" fill="#fff"/>
+    <circle cx="26" cy="79" r="10" fill="#fff"/>
+    <circle cx="79" cy="79" r="10" fill="#fff"/>
+  </g>
+</svg>
