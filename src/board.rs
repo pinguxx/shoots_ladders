@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BoardPosition {
     pub tile: u8,
-    pub row: u8, // 0..9 (0 is bottom, 9 is top)
-    pub col: u8, // 0..9 (0 is left, 9 is right)
+    pub row: u8,    // 0..9 (0 is bottom, 9 is top)
+    pub col: u8,    // 0..9 (0 is left, 9 is right)
     pub x_pct: f32, // 0.0 .. 100.0%
     pub y_pct: f32, // 0.0 .. 100.0% (0% is top)
 }
@@ -43,25 +43,89 @@ pub struct BoardDefinition {
 impl BoardDefinition {
     pub fn classic() -> Self {
         let ladders = vec![
-            Portal { from: 4, to: 14, is_ladder: true },
-            Portal { from: 9, to: 31, is_ladder: true },
-            Portal { from: 20, to: 38, is_ladder: true },
-            Portal { from: 28, to: 84, is_ladder: true },
-            Portal { from: 40, to: 59, is_ladder: true },
-            Portal { from: 51, to: 67, is_ladder: true },
-            Portal { from: 63, to: 81, is_ladder: true },
-            Portal { from: 71, to: 91, is_ladder: true },
+            Portal {
+                from: 4,
+                to: 14,
+                is_ladder: true,
+            },
+            Portal {
+                from: 9,
+                to: 31,
+                is_ladder: true,
+            },
+            Portal {
+                from: 20,
+                to: 38,
+                is_ladder: true,
+            },
+            Portal {
+                from: 28,
+                to: 84,
+                is_ladder: true,
+            },
+            Portal {
+                from: 40,
+                to: 59,
+                is_ladder: true,
+            },
+            Portal {
+                from: 51,
+                to: 67,
+                is_ladder: true,
+            },
+            Portal {
+                from: 63,
+                to: 81,
+                is_ladder: true,
+            },
+            Portal {
+                from: 71,
+                to: 91,
+                is_ladder: true,
+            },
         ];
 
         let snakes = vec![
-            Portal { from: 17, to: 7, is_ladder: false },
-            Portal { from: 54, to: 34, is_ladder: false },
-            Portal { from: 62, to: 19, is_ladder: false },
-            Portal { from: 64, to: 60, is_ladder: false },
-            Portal { from: 87, to: 24, is_ladder: false },
-            Portal { from: 93, to: 73, is_ladder: false },
-            Portal { from: 95, to: 75, is_ladder: false },
-            Portal { from: 99, to: 78, is_ladder: false },
+            Portal {
+                from: 17,
+                to: 7,
+                is_ladder: false,
+            },
+            Portal {
+                from: 54,
+                to: 34,
+                is_ladder: false,
+            },
+            Portal {
+                from: 62,
+                to: 19,
+                is_ladder: false,
+            },
+            Portal {
+                from: 64,
+                to: 60,
+                is_ladder: false,
+            },
+            Portal {
+                from: 87,
+                to: 24,
+                is_ladder: false,
+            },
+            Portal {
+                from: 93,
+                to: 73,
+                is_ladder: false,
+            },
+            Portal {
+                from: 95,
+                to: 75,
+                is_ladder: false,
+            },
+            Portal {
+                from: 99,
+                to: 78,
+                is_ladder: false,
+            },
         ];
 
         Self {
@@ -74,17 +138,49 @@ impl BoardDefinition {
 
     pub fn express() -> Self {
         let ladders = vec![
-            Portal { from: 3, to: 12, is_ladder: true },
-            Portal { from: 14, to: 28, is_ladder: true },
-            Portal { from: 22, to: 37, is_ladder: true },
-            Portal { from: 31, to: 46, is_ladder: true },
+            Portal {
+                from: 3,
+                to: 12,
+                is_ladder: true,
+            },
+            Portal {
+                from: 14,
+                to: 28,
+                is_ladder: true,
+            },
+            Portal {
+                from: 22,
+                to: 37,
+                is_ladder: true,
+            },
+            Portal {
+                from: 31,
+                to: 46,
+                is_ladder: true,
+            },
         ];
 
         let snakes = vec![
-            Portal { from: 18, to: 6, is_ladder: false },
-            Portal { from: 32, to: 16, is_ladder: false },
-            Portal { from: 43, to: 25, is_ladder: false },
-            Portal { from: 49, to: 35, is_ladder: false },
+            Portal {
+                from: 18,
+                to: 6,
+                is_ladder: false,
+            },
+            Portal {
+                from: 32,
+                to: 16,
+                is_ladder: false,
+            },
+            Portal {
+                from: 43,
+                to: 25,
+                is_ladder: false,
+            },
+            Portal {
+                from: 49,
+                to: 35,
+                is_ladder: false,
+            },
         ];
 
         Self {
@@ -99,17 +195,41 @@ impl BoardDefinition {
         if enabled {
             if self.total_tiles == 50 {
                 self.mystery_tiles = vec![
-                    MysteryTile { tile: 15, kind: MysteryKind::Taco },
-                    MysteryTile { tile: 21, kind: MysteryKind::Nopal },
-                    MysteryTile { tile: 27, kind: MysteryKind::Chile },
-                    MysteryTile { tile: 39, kind: MysteryKind::Pinata },
+                    MysteryTile {
+                        tile: 15,
+                        kind: MysteryKind::Taco,
+                    },
+                    MysteryTile {
+                        tile: 21,
+                        kind: MysteryKind::Nopal,
+                    },
+                    MysteryTile {
+                        tile: 27,
+                        kind: MysteryKind::Chile,
+                    },
+                    MysteryTile {
+                        tile: 39,
+                        kind: MysteryKind::Pinata,
+                    },
                 ];
             } else {
                 self.mystery_tiles = vec![
-                    MysteryTile { tile: 33, kind: MysteryKind::Taco },
-                    MysteryTile { tile: 44, kind: MysteryKind::Nopal },
-                    MysteryTile { tile: 55, kind: MysteryKind::Chile },
-                    MysteryTile { tile: 77, kind: MysteryKind::Pinata },
+                    MysteryTile {
+                        tile: 33,
+                        kind: MysteryKind::Taco,
+                    },
+                    MysteryTile {
+                        tile: 44,
+                        kind: MysteryKind::Nopal,
+                    },
+                    MysteryTile {
+                        tile: 55,
+                        kind: MysteryKind::Chile,
+                    },
+                    MysteryTile {
+                        tile: 77,
+                        kind: MysteryKind::Pinata,
+                    },
                 ];
             }
         } else {
@@ -135,7 +255,7 @@ impl BoardDefinition {
 
         let clamped = tile.clamp(1, max_tile);
         let row = (clamped - 1) / 10;
-        let col = if row.is_multiple_of(2) {
+        let col = if row % 2 == 0 {
             (clamped - 1) % 10
         } else {
             9 - ((clamped - 1) % 10)
@@ -188,14 +308,24 @@ mod tests {
         // Verify all ladders ascend
         for ladder in &board.ladders {
             assert!(ladder.is_ladder);
-            assert!(ladder.to > ladder.from, "Ladder must ascend: {} -> {}", ladder.from, ladder.to);
+            assert!(
+                ladder.to > ladder.from,
+                "Ladder must ascend: {} -> {}",
+                ladder.from,
+                ladder.to
+            );
             assert!(ladder.from >= 1 && ladder.to <= 100);
         }
 
         // Verify all snakes descend
         for snake in &board.snakes {
             assert!(!snake.is_ladder);
-            assert!(snake.to < snake.from, "Snake must descend: {} -> {}", snake.from, snake.to);
+            assert!(
+                snake.to < snake.from,
+                "Snake must descend: {} -> {}",
+                snake.from,
+                snake.to
+            );
             assert!(snake.to >= 1 && snake.from <= 100);
         }
     }
@@ -298,10 +428,22 @@ mod tests {
         assert_eq!(express.mystery_tiles.len(), 4);
 
         // Check mystery tiles
-        assert_eq!(express.get_mystery_tile(15).unwrap().kind, MysteryKind::Taco);
-        assert_eq!(express.get_mystery_tile(21).unwrap().kind, MysteryKind::Nopal);
-        assert_eq!(express.get_mystery_tile(27).unwrap().kind, MysteryKind::Chile);
-        assert_eq!(express.get_mystery_tile(39).unwrap().kind, MysteryKind::Pinata);
+        assert_eq!(
+            express.get_mystery_tile(15).unwrap().kind,
+            MysteryKind::Taco
+        );
+        assert_eq!(
+            express.get_mystery_tile(21).unwrap().kind,
+            MysteryKind::Nopal
+        );
+        assert_eq!(
+            express.get_mystery_tile(27).unwrap().kind,
+            MysteryKind::Chile
+        );
+        assert_eq!(
+            express.get_mystery_tile(39).unwrap().kind,
+            MysteryKind::Pinata
+        );
         assert!(express.get_mystery_tile(1).is_none());
 
         // Check coords for 50-tile board (5 rows)

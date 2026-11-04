@@ -181,7 +181,9 @@ pub struct Room {
 }
 
 pub fn generate_room_code() -> String {
-    let prefixes = ["SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA"];
+    let prefixes = [
+        "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA",
+    ];
     let mut rng = rand::thread_rng();
     let prefix = prefixes.choose(&mut rng).unwrap_or(&"SERP");
     let num: u16 = rng.gen_range(10..99);
@@ -209,8 +211,14 @@ pub fn calculate_awards(players: &[Player], winner_id: &str, total_tiles: u8) ->
                 player_name: climber.name.clone(),
                 avatar: climber.avatar.clone(),
                 color: climber.color.clone(),
-                detail_es: format!("Subió {} escaleras hacia la gloria.", climber.stats.ladders_climbed),
-                detail_en: format!("Climbed {} ladders towards glory.", climber.stats.ladders_climbed),
+                detail_es: format!(
+                    "Subió {} escaleras hacia la gloria.",
+                    climber.stats.ladders_climbed
+                ),
+                detail_en: format!(
+                    "Climbed {} ladders towards glory.",
+                    climber.stats.ladders_climbed
+                ),
             });
         }
     }
@@ -226,7 +234,10 @@ pub fn calculate_awards(players: &[Player], winner_id: &str, total_tiles: u8) ->
                 player_name: snake_victim.name.clone(),
                 avatar: snake_victim.avatar.clone(),
                 color: snake_victim.color.clone(),
-                detail_es: format!("Fue mordido por {} serpientes traicioneras.", snake_victim.stats.snakes_hit),
+                detail_es: format!(
+                    "Fue mordido por {} serpientes traicioneras.",
+                    snake_victim.stats.snakes_hit
+                ),
                 detail_en: format!("Bitten by {} sneaky snakes.", snake_victim.stats.snakes_hit),
             });
         }
@@ -242,8 +253,14 @@ pub fn calculate_awards(players: &[Player], winner_id: &str, total_tiles: u8) ->
             player_name: winner.name.clone(),
             avatar: winner.avatar.clone(),
             color: winner.color.clone(),
-            detail_es: format!("Llegó a la meta en solo {} tiros.", winner.stats.rolls_count),
-            detail_en: format!("Reached the goal in only {} rolls.", winner.stats.rolls_count),
+            detail_es: format!(
+                "Llegó a la meta en solo {} tiros.",
+                winner.stats.rolls_count
+            ),
+            detail_en: format!(
+                "Reached the goal in only {} rolls.",
+                winner.stats.rolls_count
+            ),
         });
     }
 
@@ -259,8 +276,14 @@ pub fn calculate_awards(players: &[Player], winner_id: &str, total_tiles: u8) ->
             player_name: runner_up.name.clone(),
             avatar: runner_up.avatar.clone(),
             color: runner_up.color.clone(),
-            detail_es: format!("Subcampeón en la casilla {} de {}.", runner_up.position, total_tiles),
-            detail_en: format!("Runner-up at tile {} of {}.", runner_up.position, total_tiles),
+            detail_es: format!(
+                "Subcampeón en la casilla {} de {}.",
+                runner_up.position, total_tiles
+            ),
+            detail_en: format!(
+                "Runner-up at tile {} of {}.",
+                runner_up.position, total_tiles
+            ),
         });
     }
 
@@ -483,7 +506,8 @@ impl Room {
                                 "¡Aguas con la víbora! 🐍",
                                 "¡Sube, compadre! 🪜",
                             ];
-                            bot_shout = Some(shouts.choose(&mut rand::thread_rng()).unwrap().to_string());
+                            bot_shout =
+                                Some(shouts.choose(&mut rand::thread_rng()).unwrap().to_string());
                         }
                         return Some((step, bot_shout));
                     }
@@ -532,8 +556,14 @@ impl Room {
 
             self.add_log(
                 "trap",
-                &format!("🌵 ¡{} está quitándose las espinas del nopal y pierde su turno!", player_name),
-                &format!("🌵 {} is trapped by the prickly cactus and skips their turn!", player_name),
+                &format!(
+                    "🌵 ¡{} está quitándose las espinas del nopal y pierde su turno!",
+                    player_name
+                ),
+                &format!(
+                    "🌵 {} is trapped by the prickly cactus and skips their turn!",
+                    player_name
+                ),
                 Some(player_id.to_string()),
             );
 
@@ -609,8 +639,14 @@ impl Room {
 
                 self.add_log(
                     "penalty",
-                    &format!("⚠️ ¡Tres tiros dobles/seises seguidos! {} regresa a la casilla 1.", player_name),
-                    &format!("⚠️ Three consecutive sixes! {} goes back to tile 1.", player_name),
+                    &format!(
+                        "⚠️ ¡Tres tiros dobles/seises seguidos! {} regresa a la casilla 1.",
+                        player_name
+                    ),
+                    &format!(
+                        "⚠️ Three consecutive sixes! {} goes back to tile 1.",
+                        player_name
+                    ),
                     Some(player_id.to_string()),
                 );
 
@@ -691,12 +727,20 @@ impl Room {
                         for step in (tile_after_portal + 1)..=boosted {
                             path.push(step);
                         }
-                        mystery_message_es = Some("🌮 ¡Taquitos al pastor! Avanzas 3 casillas extra.".to_string());
-                        mystery_message_en = Some("🌮 Taco boost! Dash 3 extra tiles forward.".to_string());
+                        mystery_message_es =
+                            Some("🌮 ¡Taquitos al pastor! Avanzas 3 casillas extra.".to_string());
+                        mystery_message_en =
+                            Some("🌮 Taco boost! Dash 3 extra tiles forward.".to_string());
                         self.add_log(
                             "mystery_taco",
-                            &format!("🌮 ¡TACO POWER! {} comió tacos en la casilla {} y avanzó a la {}.", player_name, m.tile, boosted),
-                            &format!("🌮 TACO POWER! {} ate tacos at tile {} and boosted to {}.", player_name, m.tile, boosted),
+                            &format!(
+                                "🌮 ¡TACO POWER! {} comió tacos en la casilla {} y avanzó a la {}.",
+                                player_name, m.tile, boosted
+                            ),
+                            &format!(
+                                "🌮 TACO POWER! {} ate tacos at tile {} and boosted to {}.",
+                                player_name, m.tile, boosted
+                            ),
                             Some(player_id.to_string()),
                         );
                         boosted
@@ -706,8 +750,11 @@ impl Room {
                         for step in (tile_after_portal + 1)..=boosted {
                             path.push(step);
                         }
-                        mystery_message_es = Some("🌶️ ¡Chile picante! Corres 5 casillas hacia adelante.".to_string());
-                        mystery_message_en = Some("🌶️ Spicy chili! Dash 5 extra tiles forward.".to_string());
+                        mystery_message_es = Some(
+                            "🌶️ ¡Chile picante! Corres 5 casillas hacia adelante.".to_string(),
+                        );
+                        mystery_message_en =
+                            Some("🌶️ Spicy chili! Dash 5 extra tiles forward.".to_string());
                         self.add_log(
                             "mystery_chile",
                             &format!("🌶️ ¡ENCHILADO! {} probó chile picante en la casilla {} y corrió a la {}.", player_name, m.tile, boosted),
@@ -718,8 +765,10 @@ impl Room {
                     }
                     MysteryKind::Pinata => {
                         pinata_bonus = true;
-                        mystery_message_es = Some("🪅 ¡Rompiste la piñata! ¡Tienes otro tiro!".to_string());
-                        mystery_message_en = Some("🪅 Smashed the piñata! Extra roll granted!".to_string());
+                        mystery_message_es =
+                            Some("🪅 ¡Rompiste la piñata! ¡Tienes otro tiro!".to_string());
+                        mystery_message_en =
+                            Some("🪅 Smashed the piñata! Extra roll granted!".to_string());
                         self.add_log(
                             "mystery_pinata",
                             &format!("🪅 ¡DALE DALE DALE! {} rompió la piñata en la casilla {} y gana otro tiro.", player_name, m.tile),
@@ -731,8 +780,11 @@ impl Room {
                     MysteryKind::Nopal => {
                         let p_idx = self.turn_index % self.players.len();
                         self.players[p_idx].skipped_turns = 1;
-                        mystery_message_es = Some("🌵 ¡Te espinaste con el nopal! Quedas atrapado 1 turno.".to_string());
-                        mystery_message_en = Some("🌵 Prickly cactus! Trapped for 1 turn.".to_string());
+                        mystery_message_es = Some(
+                            "🌵 ¡Te espinaste con el nopal! Quedas atrapado 1 turno.".to_string(),
+                        );
+                        mystery_message_en =
+                            Some("🌵 Prickly cactus! Trapped for 1 turn.".to_string());
                         self.add_log(
                             "mystery_nopal",
                             &format!("🌵 ¡AY NOPAL! {} se espinó en la casilla {} y perderá su próximo turno.", player_name, m.tile),
@@ -773,8 +825,14 @@ impl Room {
 
         self.add_log(
             "roll",
-            &format!("🎲 {} tiró [{}] y avanzó a la casilla {}.", player_name, dice_str, landed_tile),
-            &format!("🎲 {} rolled [{}] and moved to tile {}.", player_name, dice_str, landed_tile),
+            &format!(
+                "🎲 {} tiró [{}] y avanzó a la casilla {}.",
+                player_name, dice_str, landed_tile
+            ),
+            &format!(
+                "🎲 {} rolled [{}] and moved to tile {}.",
+                player_name, dice_str, landed_tile
+            ),
             Some(player_id.to_string()),
         );
 
@@ -782,8 +840,14 @@ impl Room {
             if p.is_ladder {
                 self.add_log(
                     "ladder",
-                    &format!("🪜 ¡QUÉ SUERTE! {} subió por una escalera de la casilla {} a la {}.", player_name, p.from, p.to),
-                    &format!("🪜 LUCKY! {} climbed a ladder from tile {} to {}.", player_name, p.from, p.to),
+                    &format!(
+                        "🪜 ¡QUÉ SUERTE! {} subió por una escalera de la casilla {} a la {}.",
+                        player_name, p.from, p.to
+                    ),
+                    &format!(
+                        "🪜 LUCKY! {} climbed a ladder from tile {} to {}.",
+                        player_name, p.from, p.to
+                    ),
                     Some(player_id.to_string()),
                 );
             } else {
@@ -801,8 +865,14 @@ impl Room {
             self.turn_started_at_secs = current_epoch_secs(); // Reset turn timer for bonus roll
             self.add_log(
                 "extra_turn",
-                &format!("✨ ¡Tiro extra! {} tiró un seis y vuelve a tirar.", player_name),
-                &format!("✨ Extra roll! {} rolled a six and gets another turn.", player_name),
+                &format!(
+                    "✨ ¡Tiro extra! {} tiró un seis y vuelve a tirar.",
+                    player_name
+                ),
+                &format!(
+                    "✨ Extra roll! {} rolled a six and gets another turn.",
+                    player_name
+                ),
                 Some(player_id.to_string()),
             );
         } else if extra_turn && pinata_bonus {
@@ -827,8 +897,14 @@ impl Room {
 
             self.add_log(
                 "win",
-                &format!("🏆 ¡VICTORIA! ¡{} llegó a la meta ({}) y es el Gran Campeón!", player_name, total_tiles),
-                &format!("🏆 VICTORY! {} reached tile {} and won the game!", player_name, total_tiles),
+                &format!(
+                    "🏆 ¡VICTORIA! ¡{} llegó a la meta ({}) y es el Gran Campeón!",
+                    player_name, total_tiles
+                ),
+                &format!(
+                    "🏆 VICTORY! {} reached tile {} and won the game!",
+                    player_name, total_tiles
+                ),
                 Some(player_id.to_string()),
             );
         } else if !extra_turn {
@@ -901,7 +977,9 @@ mod tests {
     fn test_generate_room_code_and_epoch() {
         let code = generate_room_code();
         assert!(code.len() >= 6 && code.len() <= 8);
-        let valid_prefixes = ["SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA"];
+        let valid_prefixes = [
+            "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA",
+        ];
         assert!(valid_prefixes.iter().any(|prefix| code.starts_with(prefix)));
 
         let epoch = current_epoch_secs();
@@ -922,7 +1000,12 @@ mod tests {
 
         // Add 50 logs and verify cap at 40
         for i in 1..=50 {
-            room.add_log("test", &format!("Mensaje {}", i), &format!("Message {}", i), None);
+            room.add_log(
+                "test",
+                &format!("Mensaje {}", i),
+                &format!("Message {}", i),
+                None,
+            );
         }
         assert_eq!(room.logs.len(), 40);
         assert_eq!(room.log_counter, 50);
@@ -934,9 +1017,12 @@ mod tests {
     #[test]
     fn test_turn_advancement_and_disconnection_skipping() {
         let mut room = Room::new("TEST02".to_string(), GameSettings::default());
-        room.players.push(create_test_player("p1", "Player 1", true));
-        room.players.push(create_test_player("p2", "Player 2", false)); // Disconnected!
-        room.players.push(create_test_player("p3", "Player 3", true));
+        room.players
+            .push(create_test_player("p1", "Player 1", true));
+        room.players
+            .push(create_test_player("p2", "Player 2", false)); // Disconnected!
+        room.players
+            .push(create_test_player("p3", "Player 3", true));
 
         assert_eq!(room.current_player().unwrap().id, "p1");
 
@@ -963,7 +1049,8 @@ mod tests {
         assert!(room.start_game().is_err());
 
         // Error with only disconnected players
-        room.players.push(create_test_player("p1", "Player 1", false));
+        room.players
+            .push(create_test_player("p1", "Player 1", false));
         assert!(room.start_game().is_err());
 
         // Succeeds with active player
@@ -989,7 +1076,8 @@ mod tests {
             ..Default::default()
         };
         let mut room = Room::new("TEST04".to_string(), settings);
-        room.players.push(create_test_player("p1", "Player 1", true));
+        room.players
+            .push(create_test_player("p1", "Player 1", true));
         room.start_game().unwrap();
 
         // Not timed out yet
@@ -1007,16 +1095,24 @@ mod tests {
     #[test]
     fn test_roll_and_move_state_checks() {
         let mut room = Room::new("TEST05".to_string(), GameSettings::default());
-        room.players.push(create_test_player("p1", "Player 1", true));
-        room.players.push(create_test_player("p2", "Player 2", true));
+        room.players
+            .push(create_test_player("p1", "Player 1", true));
+        room.players
+            .push(create_test_player("p2", "Player 2", true));
 
         // In lobby, rolling should fail
-        assert_eq!(room.roll_and_move("p1").unwrap_err(), "The game is not currently active");
+        assert_eq!(
+            room.roll_and_move("p1").unwrap_err(),
+            "The game is not currently active"
+        );
 
         room.start_game().unwrap();
 
         // Not p2's turn
-        assert_eq!(room.roll_and_move("p2").unwrap_err(), "It is not your turn to roll");
+        assert_eq!(
+            room.roll_and_move("p2").unwrap_err(),
+            "It is not your turn to roll"
+        );
 
         // p1 rolls successfully
         let step = room.roll_and_move("p1").unwrap();
@@ -1028,7 +1124,8 @@ mod tests {
     #[test]
     fn test_ladder_climb_and_snake_descent_mechanics() {
         let mut room = Room::new("TEST06".to_string(), GameSettings::default());
-        room.players.push(create_test_player("p1", "Player 1", true));
+        room.players
+            .push(create_test_player("p1", "Player 1", true));
         room.start_game().unwrap();
 
         // Position player at tile 3 right before ladder at tile 4 (4 -> 14)
@@ -1052,7 +1149,8 @@ mod tests {
             ..Default::default()
         };
         let mut room = Room::new("TEST07".to_string(), settings);
-        room.players.push(create_test_player("p1", "Player 1", true));
+        room.players
+            .push(create_test_player("p1", "Player 1", true));
         room.start_game().unwrap();
 
         // Position player at 98
@@ -1079,22 +1177,26 @@ mod tests {
             ..Default::default()
         };
         let mut room_no_bounce = Room::new("TEST08".to_string(), settings_no_bounce);
-        room_no_bounce.players.push(create_test_player("p1", "Player 1", true));
+        room_no_bounce
+            .players
+            .push(create_test_player("p1", "Player 1", true));
         room_no_bounce.start_game().unwrap();
         room_no_bounce.players[0].position = 98;
 
-        let landed_no_bounce: u8 = if !room_no_bounce.settings.exact_win && from_tile + total_roll > 100 {
-            100
-        } else {
-            from_tile + total_roll
-        };
+        let landed_no_bounce: u8 =
+            if !room_no_bounce.settings.exact_win && from_tile + total_roll > 100 {
+                100
+            } else {
+                from_tile + total_roll
+            };
         assert_eq!(landed_no_bounce, 100);
     }
 
     #[test]
     fn test_victory_state_transition() {
         let mut room = Room::new("TEST09".to_string(), GameSettings::default());
-        room.players.push(create_test_player("p1", "Champion", true));
+        room.players
+            .push(create_test_player("p1", "Champion", true));
         room.start_game().unwrap();
 
         // Simulate winning
@@ -1118,7 +1220,10 @@ mod tests {
         assert_eq!(room.winner.as_ref().unwrap().player_name, "Champion");
 
         // Rolling after finished returns error
-        assert_eq!(room.roll_and_move("p1").unwrap_err(), "The game is not currently active");
+        assert_eq!(
+            room.roll_and_move("p1").unwrap_err(),
+            "The game is not currently active"
+        );
     }
 
     #[test]
@@ -1128,7 +1233,8 @@ mod tests {
             ..Default::default()
         };
         let mut room = Room::new("TEST10".to_string(), settings);
-        room.players.push(create_test_player("p1", "Fast Roller", true));
+        room.players
+            .push(create_test_player("p1", "Fast Roller", true));
         room.start_game().unwrap();
 
         let step = room.roll_and_move("p1").unwrap();
@@ -1144,7 +1250,8 @@ mod tests {
             ..Default::default()
         };
         let mut room = Room::new("BOTS01".to_string(), settings);
-        room.players.push(create_test_player("p1", "Host Player", true));
+        room.players
+            .push(create_test_player("p1", "Host Player", true));
 
         // Add 2 bots
         let bot1 = room.add_bot().unwrap();
@@ -1188,7 +1295,8 @@ mod tests {
     fn test_max_10_players_and_bots() {
         let settings = GameSettings::default();
         let mut room = Room::new("MAX10A".to_string(), settings);
-        room.players.push(create_test_player("p1", "Host Player", true));
+        room.players
+            .push(create_test_player("p1", "Host Player", true));
 
         // Add 9 bots so total is 10
         for _ in 0..9 {

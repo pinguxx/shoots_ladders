@@ -54,10 +54,7 @@ async fn get_board_api(Query(params): Query<BoardQuery>) -> impl IntoResponse {
     }))
 }
 
-async fn ws_handler(
-    ws: WebSocketUpgrade,
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
     ws.on_upgrade(move |socket| handle_ws_connection(socket, state))
 }
 
@@ -141,10 +138,20 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_board_api_direct() {
-        let res = get_board_api(Query(BoardQuery { size: None, mystery: None })).await.into_response();
+        let res = get_board_api(Query(BoardQuery {
+            size: None,
+            mystery: None,
+        }))
+        .await
+        .into_response();
         assert_eq!(res.status(), StatusCode::OK);
 
-        let res_express = get_board_api(Query(BoardQuery { size: Some(50), mystery: Some(true) })).await.into_response();
+        let res_express = get_board_api(Query(BoardQuery {
+            size: Some(50),
+            mystery: Some(true),
+        }))
+        .await
+        .into_response();
         assert_eq!(res_express.status(), StatusCode::OK);
     }
 
@@ -164,12 +171,11 @@ mod tests {
             res.headers().get("x-content-type-options").unwrap(),
             "nosniff"
         );
-        assert_eq!(
-            res.headers().get("x-frame-options").unwrap(),
-            "SAMEORIGIN"
-        );
+        assert_eq!(res.headers().get("x-frame-options").unwrap(), "SAMEORIGIN");
 
-        let body_bytes = axum::body::to_bytes(res.into_body(), usize::MAX).await.unwrap();
+        let body_bytes = axum::body::to_bytes(res.into_body(), usize::MAX)
+            .await
+            .unwrap();
         let json: serde_json::Value = serde_json::from_slice(&body_bytes).unwrap();
         assert_eq!(json["status"], "ok");
         assert_eq!(json["service"], "serpientes-y-escaleras-rust");
@@ -182,7 +188,9 @@ mod tests {
         let res_board = app.clone().oneshot(req_board).await.unwrap();
         assert_eq!(res_board.status(), StatusCode::OK);
 
-        let board_bytes = axum::body::to_bytes(res_board.into_body(), usize::MAX).await.unwrap();
+        let board_bytes = axum::body::to_bytes(res_board.into_body(), usize::MAX)
+            .await
+            .unwrap();
         let board_json: serde_json::Value = serde_json::from_slice(&board_bytes).unwrap();
         assert_eq!(board_json["board"]["total_tiles"], 100);
         assert_eq!(board_json["coordinates"].as_array().unwrap().len(), 101);
