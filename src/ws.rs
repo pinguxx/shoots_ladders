@@ -344,7 +344,7 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
 
                                     let default_colors = [
                                         "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899",
-                                        "#06b6d4", "#f97316", "#14b8a6", "#eab308", "#f43f5e",
+                                        "#06b6d4", "#f97316", "#14b8a6", "#eab308", "#000000",
                                     ];
                                     let default_avatars = [
                                         "🧗‍♂️",
@@ -1013,6 +1013,10 @@ mod tests {
         assert_eq!(
             sanitize_color(Some("#EF4444".to_string()), "#f59e0b"),
             "#ef4444"
+        );
+        assert_eq!(
+            sanitize_color(Some("#000000".to_string()), "#f59e0b"),
+            "#000000"
         );
         assert_eq!(sanitize_color(None, "#f59e0b"), "#f59e0b");
 

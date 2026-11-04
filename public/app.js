@@ -193,7 +193,7 @@
   const COLORS = [
     "#ef4444", "#f59e0b", "#10b981", "#3b82f6",
     "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
-    "#14b8a6", "#eab308"
+    "#14b8a6", "#eab308", "#000000"
   ];
   const THEMES = ["royale", "esmeralda", "arcade"];
 
