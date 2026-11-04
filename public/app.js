@@ -9,8 +9,8 @@
   // -------------------------------------------------------------
   const i18n = {
     es: {
-      appTitle: "SERPIENTES Y ESCALERAS",
-      appSubtitle: "Juego Multijugador en Tiempo Real",
+      appTitle: "SERPIENTES & ESCALERAS",
+      appSubtitle: "Multijugador en Vivo 🇲🇽",
       tabCreate: "Crear Sala",
       tabJoin: "Unirse a Sala",
       labelName: "Tu Nombre o Apodo",
@@ -39,7 +39,7 @@
       btnStartGame: "🏁 ¡Iniciar Partida!",
       btnCopyLink: "📋 Copiar Enlace",
       btnQr: "📱 Código QR",
-      btnRollDice: "🎲 ¡Tirar Dado!",
+      btnRollDice: "🎲 ¡TIRAR DADO!",
       waitingRoll: "Esperando a",
       turnTitle: "Turno actual",
       feedTitle: "Crónica de la Partida",
@@ -60,7 +60,7 @@
     },
     en: {
       appTitle: "SNAKES & LADDERS",
-      appSubtitle: "Real-Time Multiplayer Game",
+      appSubtitle: "Real-Time Multiplayer 🇲🇽",
       tabCreate: "Create Room",
       tabJoin: "Join Room",
       labelName: "Your Name or Nickname",
@@ -89,7 +89,7 @@
       btnStartGame: "🏁 Start Game!",
       btnCopyLink: "📋 Copy Link",
       btnQr: "📱 QR Code",
-      btnRollDice: "🎲 Roll Dice!",
+      btnRollDice: "🎲 ROLL DICE!",
       waitingRoll: "Waiting for",
       turnTitle: "Current Turn",
       feedTitle: "Live Activity Log",
@@ -229,10 +229,51 @@
     if (currentRoom) renderActivityFeed(currentRoom.logs);
   }
 
+  function updateAmbientDecorations(themeName) {
+    const layer = document.getElementById("ambient-theme-layer");
+    if (!layer) return;
+    layer.innerHTML = "";
+
+    let icons = ["🎉", "✨", "🪅", "🎊", "🇲🇽", "🌮", "🌶️"];
+    let count = 12;
+
+    if (themeName === "muertos") {
+      icons = ["💀", "🌼", "🏵️", "🕯️", "💀", "🌼", "🏵️"];
+      count = 14;
+    } else if (themeName === "selva") {
+      icons = ["🌿", "🦜", "🍃", "🐆", "☀️", "🌺"];
+      count = 12;
+    }
+
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("div");
+      p.className = "ambient-particle";
+      const icon = icons[i % icons.length];
+      p.textContent = icon;
+
+      const left = (i * (94 / count) + Math.random() * (90 / count)).toFixed(1);
+      const duration = (10 + Math.random() * 8).toFixed(1);
+      const delay = (Math.random() * 7).toFixed(1);
+      const size = (0.95 + Math.random() * 0.75).toFixed(2);
+      const driftX = (Math.random() * 90 - 45).toFixed(0) + "px";
+      const rot = (Math.random() * 140 - 70).toFixed(0) + "deg";
+
+      p.style.left = `${left}%`;
+      p.style.fontSize = `${size}rem`;
+      p.style.animationDuration = `${duration}s`;
+      p.style.animationDelay = `${delay}s`;
+      p.style.setProperty("--drift-x", driftX);
+      p.style.setProperty("--rot", rot);
+
+      layer.appendChild(p);
+    }
+  }
+
   function toggleTheme() {
     currentThemeIdx = (currentThemeIdx + 1) % THEMES.length;
     const theme = THEMES[currentThemeIdx];
     document.documentElement.setAttribute("data-theme", theme);
+    updateAmbientDecorations(theme);
   }
 
   function showScreen(screenId) {
@@ -254,13 +295,13 @@
       bottom: 24px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid #f59e0b;
+      background: rgba(28, 18, 14, 0.95);
+      border: 1.5px solid #f59e0b;
       color: #fff;
       padding: 9px 18px;
       border-radius: 20px;
       font-size: 0.88rem;
-      font-weight: 700;
+      font-weight: 800;
       z-index: 999;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       animation: fadeIn 0.2s ease;
@@ -276,11 +317,11 @@
   }
 
   // -------------------------------------------------------------
-  // 4. Board Geometry & SVG Renderer
+  // 4. Board Geometry & SVG Renderer (High-Aesthetic Mexican Style)
   // -------------------------------------------------------------
   function getTileCoords(tile) {
     if (tile <= 0) {
-      return { x: 50, y: 1050 };
+      return { x: 50, y: 1040 };
     }
     const clamped = Math.min(100, Math.max(1, tile));
     const row = Math.floor((clamped - 1) / 10);
@@ -304,30 +345,45 @@
         tileDiv.className = "tile";
         tileDiv.id = `tile-${tileNum}`;
 
+        // True checkerboard pattern:
+        if ((row + col) % 2 === 0) {
+          tileDiv.classList.add("tile-alt");
+        }
+
         if (tileNum === 100) tileDiv.classList.add("tile-goal");
         if (tileNum === 1) tileDiv.classList.add("tile-start");
 
         const numSpan = document.createElement("span");
         numSpan.className = "tile-number";
-        numSpan.textContent = tileNum === 100 ? "🏆 100" : (tileNum === 1 ? "🏁 1" : String(tileNum));
+        if (tileNum === 100) {
+          numSpan.textContent = "🏆 100";
+        } else if (tileNum === 1) {
+          numSpan.textContent = "🏁 1";
+        } else {
+          numSpan.textContent = String(tileNum);
+        }
         tileDiv.appendChild(numSpan);
 
-        // Check for ladder start
-        const ladder = board.ladders.find(l => l.from === tileNum);
-        if (ladder) {
-          const badge = document.createElement("span");
-          badge.className = "tile-badge badge-ladder";
-          badge.textContent = `🪜${ladder.to}`;
-          tileDiv.appendChild(badge);
+        // Subtle indicator if tile is a ladder start or snake mouth
+        if (board && board.ladders) {
+          const lad = board.ladders.find(l => l.from === tileNum);
+          if (lad) {
+            const hint = document.createElement("span");
+            hint.className = "tile-badge-hint tile-badge-ladder";
+            hint.textContent = `▲${lad.to}`;
+            hint.title = `Escalera a casilla ${lad.to}`;
+            tileDiv.appendChild(hint);
+          }
         }
-
-        // Check for snake head
-        const snake = board.snakes.find(s => s.from === tileNum);
-        if (snake) {
-          const badge = document.createElement("span");
-          badge.className = "tile-badge badge-snake";
-          badge.textContent = `🐍${snake.to}`;
-          tileDiv.appendChild(badge);
+        if (board && board.snakes) {
+          const snk = board.snakes.find(s => s.from === tileNum);
+          if (snk) {
+            const hint = document.createElement("span");
+            hint.className = "tile-badge-hint tile-badge-snake";
+            hint.textContent = `▼${snk.to}`;
+            hint.title = `Serpiente a casilla ${snk.to}`;
+            tileDiv.appendChild(hint);
+          }
         }
 
         el.boardGrid.appendChild(tileDiv);
@@ -341,48 +397,59 @@
 
     const defs = document.createElementNS(svgNS, "defs");
 
-    // Ladder wood gradient
+    // Ladder Wood 3D Gradient
     const ladderGrad = document.createElementNS(svgNS, "linearGradient");
-    ladderGrad.id = "ladderWood";
+    ladderGrad.id = "ladderWood3D";
+    ladderGrad.setAttribute("x1", "0%");
+    ladderGrad.setAttribute("y1", "0%");
+    ladderGrad.setAttribute("x2", "100%");
+    ladderGrad.setAttribute("y2", "0%");
     ladderGrad.innerHTML = `
-      <stop offset="0%" stop-color="#b45309" />
+      <stop offset="0%" stop-color="#78350f" />
+      <stop offset="25%" stop-color="#d97706" />
       <stop offset="50%" stop-color="#fef3c7" />
-      <stop offset="100%" stop-color="#d97706" />
+      <stop offset="80%" stop-color="#b45309" />
+      <stop offset="100%" stop-color="#451a03" />
     `;
     defs.appendChild(ladderGrad);
 
-    // Drop shadow filter
+    // Realistic Drop Shadow Filter
     const filter = document.createElementNS(svgNS, "filter");
-    filter.id = "boardShadow";
-    filter.innerHTML = `<feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.45"/>`;
+    filter.id = "ladderDropShadow";
+    filter.setAttribute("x", "-20%");
+    filter.setAttribute("y", "-20%");
+    filter.setAttribute("width", "150%");
+    filter.setAttribute("height", "150%");
+    filter.innerHTML = `<feDropShadow dx="3" dy="6" stdDeviation="4.5" flood-color="#000" flood-opacity="0.45"/>`;
     defs.appendChild(filter);
 
     el.boardSvgOverlay.appendChild(defs);
 
-    // 1. Draw Ladders
+    // 1. Draw 3D Authentic Wooden Ladders
     board.ladders.forEach(l => {
-      const p1 = getTileCoords(l.from);
-      const p2 = getTileCoords(l.to);
+      const p1 = getTileCoords(l.from); // Base
+      const p2 = getTileCoords(l.to);   // Top
 
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
       const len = Math.sqrt(dx * dx + dy * dy);
       const ux = dx / len;
       const uy = dy / len;
-      const nx = -uy * 12;
-      const ny = ux * 12;
+      // Perpendicular rail offset
+      const nx = -uy * 14;
+      const ny = ux * 14;
 
       const group = document.createElementNS(svgNS, "g");
-      group.setAttribute("filter", "url(#boardShadow)");
+      group.setAttribute("filter", "url(#ladderDropShadow)");
 
-      // Left & Right Rails
+      // Left & Right Wooden Rails (Cylindrical with round caps)
       const rail1 = document.createElementNS(svgNS, "line");
       rail1.setAttribute("x1", String(p1.x + nx));
       rail1.setAttribute("y1", String(p1.y + ny));
       rail1.setAttribute("x2", String(p2.x + nx));
       rail1.setAttribute("y2", String(p2.y + ny));
-      rail1.setAttribute("stroke", "url(#ladderWood)");
-      rail1.setAttribute("stroke-width", "6");
+      rail1.setAttribute("stroke", "url(#ladderWood3D)");
+      rail1.setAttribute("stroke-width", "8");
       rail1.setAttribute("stroke-linecap", "round");
       group.appendChild(rail1);
 
@@ -391,25 +458,37 @@
       rail2.setAttribute("y1", String(p1.y - ny));
       rail2.setAttribute("x2", String(p2.x - nx));
       rail2.setAttribute("y2", String(p2.y - ny));
-      rail2.setAttribute("stroke", "url(#ladderWood)");
-      rail2.setAttribute("stroke-width", "6");
+      rail2.setAttribute("stroke", "url(#ladderWood3D)");
+      rail2.setAttribute("stroke-width", "8");
       rail2.setAttribute("stroke-linecap", "round");
       group.appendChild(rail2);
 
-      // Rungs
-      const rungsCount = Math.floor(len / 32);
+      // Wooden Rungs with drop-shadow
+      const rungsCount = Math.floor(len / 34);
       for (let i = 1; i <= rungsCount; i++) {
         const frac = i / (rungsCount + 1);
         const rx = p1.x + dx * frac;
         const ry = p1.y + dy * frac;
 
+        // Shadow under rung
+        const rungShadow = document.createElementNS(svgNS, "line");
+        rungShadow.setAttribute("x1", String(rx + nx));
+        rungShadow.setAttribute("y1", String(ry + ny + 2));
+        rungShadow.setAttribute("x2", String(rx - nx));
+        rungShadow.setAttribute("y2", String(ry - ny + 2));
+        rungShadow.setAttribute("stroke", "rgba(0,0,0,0.35)");
+        rungShadow.setAttribute("stroke-width", "5.5");
+        rungShadow.setAttribute("stroke-linecap", "round");
+        group.appendChild(rungShadow);
+
+        // Actual wooden rung
         const rung = document.createElementNS(svgNS, "line");
         rung.setAttribute("x1", String(rx + nx));
         rung.setAttribute("y1", String(ry + ny));
         rung.setAttribute("x2", String(rx - nx));
         rung.setAttribute("y2", String(ry - ny));
-        rung.setAttribute("stroke", "url(#ladderWood)");
-        rung.setAttribute("stroke-width", "4.5");
+        rung.setAttribute("stroke", "url(#ladderWood3D)");
+        rung.setAttribute("stroke-width", "5.5");
         rung.setAttribute("stroke-linecap", "round");
         group.appendChild(rung);
       }
@@ -417,7 +496,7 @@
       el.boardSvgOverlay.appendChild(group);
     });
 
-    // 2. Draw Snakes
+    // 2. Draw Authentic Mexican Serpientes (Organic, Shaded, Expressive)
     board.snakes.forEach((s, idx) => {
       const head = getTileCoords(s.from);
       const tail = getTileCoords(s.to);
@@ -428,101 +507,140 @@
       const nx = -dy / dist;
       const ny = dx / dist;
 
+      // S-curve wave displacement
       const sign = (idx % 2 === 0) ? 1 : -1;
-      const wave = Math.min(75, dist * 0.26) * sign;
+      const wave = Math.min(80, dist * 0.28) * sign;
 
-      const c1x = head.x + dx * 0.3 + nx * wave;
-      const c1y = head.y + dy * 0.3 + ny * wave;
-      const c2x = head.x + dx * 0.7 - nx * wave;
-      const c2y = head.y + dy * 0.7 - ny * wave;
+      const c1x = head.x + dx * 0.32 + nx * wave;
+      const c1y = head.y + dy * 0.32 + ny * wave;
+      const c2x = head.x + dx * 0.68 - nx * wave;
+      const c2y = head.y + dy * 0.68 - ny * wave;
 
       const pathData = `M ${head.x} ${head.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${tail.x} ${tail.y}`;
 
       const group = document.createElementNS(svgNS, "g");
-      group.setAttribute("filter", "url(#boardShadow)");
+      group.setAttribute("filter", "url(#ladderDropShadow)");
 
-      const snakeGrad = document.createElementNS(svgNS, "linearGradient");
-      const gradId = `snakeGrad-${idx}`;
-      snakeGrad.id = gradId;
-      const colors = [
-        ["#059669", "#10b981", "#34d399"],
-        ["#e11d48", "#f43f5e", "#fb7185"],
-        ["#7c3aed", "#a855f7", "#c084fc"],
-        ["#d97706", "#f59e0b", "#fbbf24"]
+      // Color Palettes for Serpents
+      const snakePalettes = [
+        { main: "#047857", belly: "#34d399", accent: "#fef08a", dark: "#064e3b" }, // Emerald Quetzalcoatl
+        { main: "#be123c", belly: "#fb7185", accent: "#fef08a", dark: "#881337" }, // Coral Viper
+        { main: "#6d28d9", belly: "#c084fc", accent: "#fde047", dark: "#4c1d95" }, // Royal Aztec
+        { main: "#b45309", belly: "#fde047", accent: "#fffbeb", dark: "#78350f" }  // Golden Cascabel
       ];
-      const pal = colors[idx % colors.length];
-      snakeGrad.innerHTML = `
-        <stop offset="0%" stop-color="${pal[0]}" />
-        <stop offset="50%" stop-color="${pal[1]}" />
-        <stop offset="100%" stop-color="${pal[2]}" />
-      `;
-      defs.appendChild(snakeGrad);
+      const p = snakePalettes[idx % snakePalettes.length];
 
-      // Body tube
+      // Snake Linear Gradient
+      const gradId = `snakeGradient-${idx}`;
+      const grad = document.createElementNS(svgNS, "linearGradient");
+      grad.id = gradId;
+      grad.innerHTML = `
+        <stop offset="0%" stop-color="${p.main}" />
+        <stop offset="60%" stop-color="${p.belly}" />
+        <stop offset="100%" stop-color="${p.dark}" />
+      `;
+      defs.appendChild(grad);
+
+      // Main Muscular Body
       const body = document.createElementNS(svgNS, "path");
       body.setAttribute("d", pathData);
       body.setAttribute("fill", "none");
       body.setAttribute("stroke", `url(#${gradId})`);
-      body.setAttribute("stroke-width", "22");
+      body.setAttribute("stroke-width", "26");
       body.setAttribute("stroke-linecap", "round");
       body.setAttribute("stroke-linejoin", "round");
       group.appendChild(body);
 
-      // Scale pattern
-      const pattern = document.createElementNS(svgNS, "path");
-      pattern.setAttribute("d", pathData);
-      pattern.setAttribute("fill", "none");
-      pattern.setAttribute("stroke", "#fef08a");
-      pattern.setAttribute("stroke-width", "4.5");
-      pattern.setAttribute("stroke-dasharray", "8 12");
-      pattern.setAttribute("stroke-linecap", "round");
-      pattern.setAttribute("opacity", "0.85");
-      group.appendChild(pattern);
+      // Snake Belly Shading / Diamond pattern
+      const belly = document.createElementNS(svgNS, "path");
+      belly.setAttribute("d", pathData);
+      belly.setAttribute("fill", "none");
+      belly.setAttribute("stroke", p.accent);
+      belly.setAttribute("stroke-width", "5");
+      belly.setAttribute("stroke-linecap", "round");
+      belly.setAttribute("opacity", "0.8");
+      group.appendChild(belly);
 
-      // Snake Head
-      const headCircle = document.createElementNS(svgNS, "circle");
-      headCircle.setAttribute("cx", String(head.x));
-      headCircle.setAttribute("cy", String(head.y));
-      headCircle.setAttribute("r", "16");
-      headCircle.setAttribute("fill", pal[0]);
-      group.appendChild(headCircle);
-
-      // Eyes
-      const eyeL = document.createElementNS(svgNS, "circle");
-      eyeL.setAttribute("cx", String(head.x - 5));
-      eyeL.setAttribute("cy", String(head.y - 4));
-      eyeL.setAttribute("r", "4");
-      eyeL.setAttribute("fill", "#fff");
-      group.appendChild(eyeL);
-
-      const pupilL = document.createElementNS(svgNS, "circle");
-      pupilL.setAttribute("cx", String(head.x - 5));
-      pupilL.setAttribute("cy", String(head.y - 4));
-      pupilL.setAttribute("r", "2");
-      pupilL.setAttribute("fill", "#111");
-      group.appendChild(pupilL);
-
-      const eyeR = document.createElementNS(svgNS, "circle");
-      eyeR.setAttribute("cx", String(head.x + 5));
-      eyeR.setAttribute("cy", String(head.y - 4));
-      eyeR.setAttribute("r", "4");
-      eyeR.setAttribute("fill", "#fff");
-      group.appendChild(eyeR);
-
-      const pupilR = document.createElementNS(svgNS, "circle");
-      pupilR.setAttribute("cx", String(head.x + 5));
-      pupilR.setAttribute("cy", String(head.y - 4));
-      pupilR.setAttribute("r", "2");
-      pupilR.setAttribute("fill", "#111");
-      group.appendChild(pupilR);
+      // Snake Head (Almond / Teardrop viper head facing outward from body)
+      const headGroup = document.createElementNS(svgNS, "g");
+      const angle = Math.atan2(c1y - head.y, c1x - head.x) * (180 / Math.PI);
+      headGroup.setAttribute("transform", `translate(${head.x}, ${head.y}) rotate(${angle + 90})`);
 
       // Red Forked Tongue
       const tongue = document.createElementNS(svgNS, "path");
-      tongue.setAttribute("d", `M ${head.x} ${head.y + 12} L ${head.x} ${head.y + 22} L ${head.x - 4} ${head.y + 26} M ${head.x} ${head.y + 22} L ${head.x + 4} ${head.y + 26}`);
+      tongue.setAttribute("d", "M 0 16 L 0 32 L -5 38 M 0 32 L 5 38");
       tongue.setAttribute("fill", "none");
-      tongue.setAttribute("stroke", "#ef4444");
-      tongue.setAttribute("stroke-width", "2.5");
-      group.appendChild(tongue);
+      tongue.setAttribute("stroke", "#dc2626");
+      tongue.setAttribute("stroke-width", "3");
+      tongue.setAttribute("stroke-linecap", "round");
+      headGroup.appendChild(tongue);
+
+      // White Sharp Fangs
+      const fangL = document.createElementNS(svgNS, "polygon");
+      fangL.setAttribute("points", "-4,16 -2,22 -6,16");
+      fangL.setAttribute("fill", "#ffffff");
+      headGroup.appendChild(fangL);
+
+      const fangR = document.createElementNS(svgNS, "polygon");
+      fangR.setAttribute("points", "4,16 6,16 2,22");
+      fangR.setAttribute("fill", "#ffffff");
+      headGroup.appendChild(fangR);
+
+      // Viper Head Base
+      const headShape = document.createElementNS(svgNS, "path");
+      headShape.setAttribute("d", "M 0 18 C 14 18, 18 -6, 0 -16 C -18 -6, -14 18, 0 18 Z");
+      headShape.setAttribute("fill", p.main);
+      headShape.setAttribute("stroke", p.dark);
+      headShape.setAttribute("stroke-width", "2");
+      headGroup.appendChild(headShape);
+
+      // Golden Viper Eyes with slit pupils
+      const eyeL = document.createElementNS(svgNS, "circle");
+      eyeL.setAttribute("cx", "-8");
+      eyeL.setAttribute("cy", "4");
+      eyeL.setAttribute("r", "4.5");
+      eyeL.setAttribute("fill", "#fef08a");
+      headGroup.appendChild(eyeL);
+
+      const pupilL = document.createElementNS(svgNS, "ellipse");
+      pupilL.setAttribute("cx", "-8");
+      pupilL.setAttribute("cy", "4");
+      pupilL.setAttribute("rx", "1.5");
+      pupilL.setAttribute("ry", "3.5");
+      pupilL.setAttribute("fill", "#111");
+      headGroup.appendChild(pupilL);
+
+      const eyeR = document.createElementNS(svgNS, "circle");
+      eyeR.setAttribute("cx", "8");
+      eyeR.setAttribute("cy", "4");
+      eyeR.setAttribute("r", "4.5");
+      eyeR.setAttribute("fill", "#fef08a");
+      headGroup.appendChild(eyeR);
+
+      const pupilR = document.createElementNS(svgNS, "ellipse");
+      pupilR.setAttribute("cx", "8");
+      pupilR.setAttribute("cy", "4");
+      pupilR.setAttribute("rx", "1.5");
+      pupilR.setAttribute("ry", "3.5");
+      pupilR.setAttribute("fill", "#111");
+      headGroup.appendChild(pupilR);
+
+      group.appendChild(headGroup);
+
+      // Tail Rattle Rings at destination
+      const tailGroup = document.createElementNS(svgNS, "g");
+      tailGroup.setAttribute("transform", `translate(${tail.x}, ${tail.y})`);
+      for (let r = 0; r < 3; r++) {
+        const ring = document.createElementNS(svgNS, "circle");
+        ring.setAttribute("cx", "0");
+        ring.setAttribute("cy", String(r * 5));
+        ring.setAttribute("r", String(6.5 - r * 1.5));
+        ring.setAttribute("fill", "#f59e0b");
+        ring.setAttribute("stroke", "#78350f");
+        ring.setAttribute("stroke-width", "1.5");
+        tailGroup.appendChild(ring);
+      }
+      group.appendChild(tailGroup);
 
       el.boardSvgOverlay.appendChild(group);
     });
@@ -556,8 +674,8 @@
         let offsetY = 0;
         if (group.length > 1) {
           const angle = (idx / group.length) * (2 * Math.PI);
-          offsetX = Math.cos(angle) * 1.6;
-          offsetY = Math.sin(angle) * 1.6;
+          offsetX = Math.cos(angle) * 1.8;
+          offsetY = Math.sin(angle) * 1.8;
         }
 
         const pctX = (coords.x / 10) + offsetX;
@@ -598,7 +716,7 @@
 
     if (window.serpientesAudio) window.serpientesAudio.playDiceRoll();
 
-    await new Promise(r => setTimeout(r, 420));
+    await new Promise(r => setTimeout(r, 450));
     el.cubeDie1.classList.remove("rolling");
     el.cubeDie2.classList.remove("rolling");
     setDiceRotation(el.cubeDie1, dice[0]);
@@ -617,14 +735,14 @@
 
         if (window.serpientesAudio) window.serpientesAudio.playHop();
 
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 160));
         token.classList.remove("hopping");
       }
     }
 
     // 3. Handle Portal Climb / Slide
     if (step.portal_applied && token) {
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 220));
 
       const finalCoords = getTileCoords(step.final_tile);
       token.style.transition = "top 0.65s cubic-bezier(0.25, 1, 0.5, 1), left 0.65s cubic-bezier(0.25, 1, 0.5, 1)";
@@ -649,7 +767,7 @@
         }
       }
 
-      await new Promise(r => setTimeout(r, 680));
+      await new Promise(r => setTimeout(r, 700));
       token.style.transition = "";
     }
 
@@ -685,7 +803,7 @@
 
     const colors = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#ec4899", "#8b5cf6", "#fef08a"];
     const particles = [];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 140; i++) {
       particles.push({
         x: canvas.width / 2,
         y: canvas.height * 0.45,
@@ -734,7 +852,7 @@
   }
 
   // -------------------------------------------------------------
-  // 7. Activity Feed & Reactions (Safe DOM construction, zero XSS)
+  // 7. Activity Feed & Reactions (Safe DOM methods)
   // -------------------------------------------------------------
   function renderActivityFeed(logs) {
     if (!logs) return;
@@ -761,7 +879,7 @@
   }
 
   // -------------------------------------------------------------
-  // 8. Room State Synchronization (Safe DOM methods)
+  // 8. Room State Synchronization (Safe DOM construction)
   // -------------------------------------------------------------
   function syncRoomState(room) {
     currentRoom = room;
@@ -781,7 +899,6 @@
       showScreen("screen-lobby");
       el.lobbyRoomCode.textContent = room.code;
 
-      // Safe DOM construction for lobby player cards (replaces vulnerable innerHTML)
       el.lobbyPlayersList.innerHTML = "";
       room.players.forEach(p => {
         const card = document.createElement("div");
@@ -835,12 +952,18 @@
         const isMyTurn = (curPlayer.id === playerId);
         el.btnRollDice.disabled = !isMyTurn;
 
+        const turnBanner = document.querySelector(".turn-banner");
+        const turnTitle = document.querySelector(".turn-title");
         if (isMyTurn) {
+          if (turnBanner) turnBanner.classList.add("my-turn");
+          if (turnTitle) turnTitle.textContent = currentLang === "es" ? "⭐ ¡ES TU TURNO! ⭐" : "⭐ YOUR TURN! ⭐";
           el.btnRollDice.classList.add("my-turn-pulse");
           el.btnRollDice.textContent = i18n[currentLang].btnRollDice;
         } else {
+          if (turnBanner) turnBanner.classList.remove("my-turn");
+          if (turnTitle) turnTitle.textContent = i18n[currentLang].turnTitle;
           el.btnRollDice.classList.remove("my-turn-pulse");
-          el.btnRollDice.textContent = `${i18n[currentLang].waitingRoll} ${curPlayer.name}...`;
+          el.btnRollDice.textContent = `⏳ ${i18n[currentLang].waitingRoll} ${curPlayer.name}...`;
         }
       }
 
@@ -865,6 +988,13 @@
 
         el.btnPlayAgain.style.display = isHost ? "flex" : "none";
         el.modalWinner.classList.add("active");
+
+        // Grand fiesta victory confetti barrage
+        if (typeof window.confetti === "function") {
+          window.confetti({ particleCount: 110, spread: 80, origin: { y: 0.6 } });
+          setTimeout(() => window.confetti({ particleCount: 70, angle: 60, spread: 55, origin: { x: 0 } }), 350);
+          setTimeout(() => window.confetti({ particleCount: 70, angle: 120, spread: 55, origin: { x: 1 } }), 700);
+        }
       }
     }
   }
@@ -1103,7 +1233,7 @@
           text: inviteUrl,
           width: 190,
           height: 190,
-          colorDark: "#0f172a",
+          colorDark: "#1c1917",
           colorLight: "#ffffff"
         });
       }
@@ -1137,7 +1267,7 @@
       }
     }
 
-    // Roll on button click or tapping the 3D dice box
+    // Roll on button click or tapping the 3D dice stage
     el.btnRollDice.addEventListener("click", triggerRoll);
     el.diceContainerBox.addEventListener("click", triggerRoll);
 
@@ -1153,6 +1283,22 @@
         }));
       }
     });
+
+    // Gritos y Frases de Feria (El Cotorreo)
+    const cotorreoBar = document.getElementById("cotorreo-bar");
+    if (cotorreoBar) {
+      cotorreoBar.addEventListener("click", (e) => {
+        const btn = e.target.closest(".btn-cotorreo");
+        if (btn && ws && ws.readyState === WebSocket.OPEN && roomCode) {
+          const shout = btn.getAttribute("data-shout");
+          ws.send(JSON.stringify({
+            type: "send_reaction",
+            roomCode,
+            emoji: shout
+          }));
+        }
+      });
+    }
 
     // Play Again
     el.btnPlayAgain.addEventListener("click", () => {
@@ -1171,6 +1317,7 @@
   // -------------------------------------------------------------
   document.addEventListener("DOMContentLoaded", () => {
     updateLanguage();
+    updateAmbientDecorations(THEMES[currentThemeIdx]);
     initEventListeners();
     connectWebSocket();
   });

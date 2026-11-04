@@ -524,9 +524,16 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                             }
                             reaction_history.push(now);
 
-                            // Whitelist approved reaction emojis
-                            let allowed_emojis = ["🎉", "🐍", "🪜", "😱", "🎲", "🌮", "🎺", "🌶️", "💀"];
-                            if !allowed_emojis.contains(&emoji.as_str()) {
+                            // Whitelist approved reaction emojis and festive shouts
+                            let allowed_reactions = [
+                                "🎉", "🐍", "🪜", "😱", "🎲", "🌮", "🎺", "🌶️", "💀",
+                                "¡Aguas con la víbora! 🐍",
+                                "¡Sube, compadre! 🪜",
+                                "¡Ya merito llego! 🏁",
+                                "¡Tírale con fe! 🎲",
+                                "¡Salado me quedé! 🧂",
+                            ];
+                            if !allowed_reactions.contains(&emoji.as_str()) {
                                 continue;
                             }
 

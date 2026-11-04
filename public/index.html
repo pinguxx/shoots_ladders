@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>¡Serpientes y Escaleras Multijugador!</title>
+  <title>¡Serpientes y Escaleras Online! 🇲🇽</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ea580c">
-  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#b45309">
+  <link rel="stylesheet" href="style.css?v=3.1">
 </head>
 <body>
+
+  <!-- Ambient Theme Floating Decorations Layer -->
+  <div id="ambient-theme-layer" class="ambient-theme-layer" aria-hidden="true"></div>
 
   <!-- Floating Emojis Layer for Live Reactions -->
   <div id="floating-emojis-layer" class="floating-emojis-container" aria-hidden="true"></div>
@@ -35,16 +41,16 @@
     <div class="logo-container">
       <span class="logo-badge">🐍</span>
       <div class="logo-text">
-        <h1 data-i18n="appTitle">SERPIENTES Y ESCALERAS</h1>
-        <span data-i18n="appSubtitle">Juego Multijugador en Tiempo Real</span>
+        <h1 class="logo-title" data-i18n="appTitle">SERPIENTES &amp; ESCALERAS</h1>
+        <span class="logo-subtitle" data-i18n="appSubtitle">Multijugador en Vivo 🇲🇽</span>
       </div>
     </div>
     <div class="header-actions">
-      <button id="btn-header-leave" class="btn-icon header-leave-btn" style="display: none;" title="Salir de la Sala" aria-label="Salir de la Sala">🚪</button>
-      <button id="btn-toggle-theme" class="btn-icon" title="Cambiar Tema / Theme" aria-label="Cambiar Tema">🎨</button>
+      <button id="btn-header-leave" class="btn-icon" style="display: none;" title="Salir de la Sala" aria-label="Salir de la Sala">🚪</button>
+      <button id="btn-toggle-theme" class="btn-icon" title="Cambiar Tema" aria-label="Cambiar Tema">🎨</button>
       <button id="btn-toggle-lang" class="btn-icon btn-lang" title="Idioma / Language" aria-label="Cambiar Idioma">🌐 Español</button>
-      <button id="btn-toggle-sound" class="btn-icon" title="Sonido / Sound" aria-label="Alternar Sonido">🔊</button>
-      <button id="btn-toggle-speech" class="btn-icon" title="Voz / Voice Caller" aria-label="Alternar Voz">🗣️</button>
+      <button id="btn-toggle-sound" class="btn-icon" title="Sonido" aria-label="Alternar Sonido">🔊</button>
+      <button id="btn-toggle-speech" class="btn-icon" title="Voz" aria-label="Alternar Voz">🗣️</button>
     </div>
   </header>
 
@@ -175,7 +181,7 @@
           </div>
           <div class="turn-timer-wrap">
             <div id="turn-timer" class="turn-timer">⏱️ 25s</div>
-            <button id="btn-toggle-feed-mobile" class="btn-icon mobile-feed-toggle" title="Ver Crónica / Log">📜</button>
+            <button id="btn-toggle-feed-mobile" class="btn-icon mobile-feed-toggle" title="Ver Crónica">📜</button>
           </div>
         </div>
 
@@ -187,18 +193,17 @@
             <svg id="board-svg-overlay" class="board-svg-overlay" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
             <!-- Player Tokens Layer -->
             <div id="board-tokens-layer" class="board-tokens-layer"></div>
-            <div class="start-dock-indicator">🏁 Salida</div>
           </div>
         </div>
 
-        <!-- Controls & Dashboard (Unified for Mobile & Desktop) -->
+        <!-- Controls Dashboard -->
         <div class="game-dashboard">
           
           <!-- Tactical Action Controls -->
           <div class="action-panel card-box">
             <div class="dice-and-action-row">
               <!-- 3D Dice Display -->
-              <div class="dice-container" id="dice-container-box" title="Haz clic en el dado o en el botón para tirar">
+              <div class="dice-stage" id="dice-container-box" title="Haz clic en el dado o botón para tirar">
                 <!-- Cube Die 1 -->
                 <div id="cube-die-1" class="cube-die">
                   <div class="cube-face face-1"><span class="pip"></span></div>
@@ -222,7 +227,7 @@
 
               <!-- Big Tactile Roll Button -->
               <button id="btn-roll-dice" class="btn-roll" disabled data-i18n="btnRollDice">
-                🎲 ¡Tirar Dado!
+                🎲 ¡TIRAR DADO!
               </button>
             </div>
 
@@ -237,6 +242,15 @@
               <button class="btn-react" data-emoji="🎺" title="Trompeta">🎺</button>
               <button class="btn-react" data-emoji="🌶️" title="Picante">🌶️</button>
               <button class="btn-react" data-emoji="💀" title="Calavera">💀</button>
+            </div>
+
+            <!-- Gritos y Frases de Feria ("El Cotorreo") -->
+            <div id="cotorreo-bar" class="cotorreo-bar" aria-label="Frases y gritos tradicionales">
+              <button class="btn-cotorreo" data-shout="¡Aguas con la víbora! 🐍">¡Aguas con la víbora! 🐍</button>
+              <button class="btn-cotorreo" data-shout="¡Sube, compadre! 🪜">¡Sube, compadre! 🪜</button>
+              <button class="btn-cotorreo" data-shout="¡Ya merito llego! 🏁">¡Ya merito llego! 🏁</button>
+              <button class="btn-cotorreo" data-shout="¡Tírale con fe! 🎲">¡Tírale con fe! 🎲</button>
+              <button class="btn-cotorreo" data-shout="¡Salado me quedé! 🧂">¡Salado me quedé! 🧂</button>
             </div>
           </div>
 
@@ -297,9 +311,13 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="qrcode.min.js"></script>
-  <script src="audio.js"></script>
-  <script src="app.js"></script>
+  <!-- Confetti Canvas Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Standalone QR Code Generator -->
+  <script src="qrcode.min.js?v=3.1"></script>
+  <!-- Web Audio Synthesizer -->
+  <script src="audio.js?v=3.1"></script>
+  <!-- Main App Script -->
+  <script src="app.js?v=3.1"></script>
 </body>
 </html>
