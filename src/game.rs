@@ -1,5 +1,5 @@
-use rand::seq::SliceRandom;
-use rand::Rng;
+use rand::seq::IndexedRandom;
+use rand::RngExt;
 use serde::{Deserialize, Serialize};
 
 use crate::board::{BoardDefinition, MysteryKind, MysteryTile, Portal};
@@ -184,9 +184,9 @@ pub fn generate_room_code() -> String {
     let prefixes = [
         "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "TABL", "DICE", "COBR",
     ];
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let prefix = prefixes.choose(&mut rng).unwrap_or(&"SERP");
-    let num: u16 = rng.gen_range(10..99);
+    let num: u16 = rng.random_range(10..99);
     format!("{}{}", prefix, num)
 }
 
@@ -507,7 +507,7 @@ impl Room {
                                 "¡Directo a la meta! 🏆",
                             ];
                             bot_shout =
-                                Some(shouts.choose(&mut rand::thread_rng()).unwrap().to_string());
+                                Some(shouts.choose(&mut rand::rng()).unwrap().to_string());
                         }
                         return Some((step, bot_shout));
                     }
@@ -592,13 +592,13 @@ impl Room {
             return Ok(step);
         }
 
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         // 1. Roll dice
         let dice_count = self.settings.dice_count.clamp(1, 2);
         let mut dice = Vec::new();
         for _ in 0..dice_count {
-            dice.push(rng.gen_range(1..=6));
+            dice.push(rng.random_range(1..=6));
         }
         let total_roll: u8 = dice.iter().sum();
 
