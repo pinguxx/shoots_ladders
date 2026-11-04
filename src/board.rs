@@ -19,10 +19,14 @@ pub struct Portal {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum MysteryKind {
-    Taco,   // +3 tiles boost
-    Chile,  // +5 tiles boost
-    Pinata, // Extra roll immediately!
-    Nopal,  // Trap: miss 1 turn
+    #[serde(alias = "taco")]
+    Lightning, // +3 tiles boost (Lightning Dash / Impulso Relámpago ⚡)
+    #[serde(alias = "chile")]
+    Star, // +5 tiles boost (Super Star / Estrella de la Suerte 🌟)
+    #[serde(alias = "pinata")]
+    LuckyDie, // Extra roll immediately! (Lucky Die / Dado Dorado 🎲)
+    #[serde(alias = "nopal")]
+    Trap, // Trap: miss 1 turn (Pitfall Trap / Casilla Trampa 🕳️)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -197,38 +201,38 @@ impl BoardDefinition {
                 self.mystery_tiles = vec![
                     MysteryTile {
                         tile: 15,
-                        kind: MysteryKind::Taco,
+                        kind: MysteryKind::Lightning,
                     },
                     MysteryTile {
                         tile: 21,
-                        kind: MysteryKind::Nopal,
+                        kind: MysteryKind::Trap,
                     },
                     MysteryTile {
                         tile: 27,
-                        kind: MysteryKind::Chile,
+                        kind: MysteryKind::Star,
                     },
                     MysteryTile {
                         tile: 39,
-                        kind: MysteryKind::Pinata,
+                        kind: MysteryKind::LuckyDie,
                     },
                 ];
             } else {
                 self.mystery_tiles = vec![
                     MysteryTile {
                         tile: 33,
-                        kind: MysteryKind::Taco,
+                        kind: MysteryKind::Lightning,
                     },
                     MysteryTile {
                         tile: 44,
-                        kind: MysteryKind::Nopal,
+                        kind: MysteryKind::Trap,
                     },
                     MysteryTile {
                         tile: 55,
-                        kind: MysteryKind::Chile,
+                        kind: MysteryKind::Star,
                     },
                     MysteryTile {
                         tile: 77,
-                        kind: MysteryKind::Pinata,
+                        kind: MysteryKind::LuckyDie,
                     },
                 ];
             }
@@ -430,19 +434,19 @@ mod tests {
         // Check mystery tiles
         assert_eq!(
             express.get_mystery_tile(15).unwrap().kind,
-            MysteryKind::Taco
+            MysteryKind::Lightning
         );
         assert_eq!(
             express.get_mystery_tile(21).unwrap().kind,
-            MysteryKind::Nopal
+            MysteryKind::Trap
         );
         assert_eq!(
             express.get_mystery_tile(27).unwrap().kind,
-            MysteryKind::Chile
+            MysteryKind::Star
         );
         assert_eq!(
             express.get_mystery_tile(39).unwrap().kind,
-            MysteryKind::Pinata
+            MysteryKind::LuckyDie
         );
         assert!(express.get_mystery_tile(1).is_none());
 

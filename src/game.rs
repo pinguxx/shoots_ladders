@@ -40,7 +40,7 @@ fn default_turn_timer() -> u64 {
     0 // 0 = Sin límite / Manual (no autoplay)
 }
 fn default_board_theme() -> String {
-    "fiesta".to_string()
+    "royale".to_string()
 }
 fn default_board_size() -> u8 {
     100
@@ -182,7 +182,7 @@ pub struct Room {
 
 pub fn generate_room_code() -> String {
     let prefixes = [
-        "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA",
+        "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "TABL", "DICE", "COBR",
     ];
     let mut rng = rand::thread_rng();
     let prefix = prefixes.choose(&mut rng).unwrap_or(&"SERP");
@@ -547,7 +547,7 @@ impl Room {
 
         self.touch_activity();
 
-        // Check if player is trapped by Nopal
+        // Check if player is trapped by Pitfall Trap
         let p_idx = self.turn_index % self.players.len();
         if self.players[p_idx].skipped_turns > 0 {
             self.players[p_idx].skipped_turns -= 1;
@@ -557,11 +557,11 @@ impl Room {
             self.add_log(
                 "trap",
                 &format!(
-                    "🌵 ¡{} está quitándose las espinas del nopal y pierde su turno!",
+                    "🕳️ ¡{} sigue atrapado en la casilla trampa y pierde su turno!",
                     player_name
                 ),
                 &format!(
-                    "🌵 {} is trapped by the prickly cactus and skips their turn!",
+                    "🕳️ {} is stuck in a pitfall trap and skips their turn!",
                     player_name
                 ),
                 Some(player_id.to_string()),
@@ -575,8 +575,8 @@ impl Room {
                 landed_tile: cur_pos,
                 portal_applied: None,
                 mystery_applied: None,
-                mystery_message_es: Some("🌵 ¡Atrapado en el nopal! Turno perdido.".to_string()),
-                mystery_message_en: Some("🌵 Trapped in cactus! Turn skipped.".to_string()),
+                mystery_message_es: Some("🕳️ ¡Atrapado en la trampa! Turno perdido.".to_string()),
+                mystery_message_en: Some("🕳️ Trapped in pitfall! Turn skipped.".to_string()),
                 final_tile: cur_pos,
                 won: false,
                 extra_turn: false,
@@ -716,79 +716,77 @@ impl Room {
         let mut mystery_applied = None;
         let mut mystery_message_es = None;
         let mut mystery_message_en = None;
-        let mut pinata_bonus = false;
+        let mut lucky_die_bonus = false;
 
         let final_tile = if tile_after_portal < total_tiles {
             if let Some(m) = self.board.get_mystery_tile(tile_after_portal) {
                 mystery_applied = Some(m.clone());
                 match m.kind {
-                    MysteryKind::Taco => {
+                    MysteryKind::Lightning => {
                         let boosted = (tile_after_portal + 3).min(total_tiles);
                         for step in (tile_after_portal + 1)..=boosted {
                             path.push(step);
                         }
                         mystery_message_es =
-                            Some("🌮 ¡Taquitos al pastor! Avanzas 3 casillas extra.".to_string());
+                            Some("⚡ ¡Impulso Relámpago! Avanzas 3 casillas extra.".to_string());
                         mystery_message_en =
-                            Some("🌮 Taco boost! Dash 3 extra tiles forward.".to_string());
+                            Some("⚡ Lightning Dash! Dash 3 extra tiles forward.".to_string());
                         self.add_log(
-                            "mystery_taco",
+                            "mystery_lightning",
                             &format!(
-                                "🌮 ¡TACO POWER! {} comió tacos en la casilla {} y avanzó a la {}.",
+                                "⚡ ¡IMPULSO RELÁMPAGO! {} pisó una casilla relámpago en la casilla {} y avanzó a la {}.",
                                 player_name, m.tile, boosted
                             ),
                             &format!(
-                                "🌮 TACO POWER! {} ate tacos at tile {} and boosted to {}.",
+                                "⚡ LIGHTNING DASH! {} landed on a lightning tile at {} and boosted to {}.",
                                 player_name, m.tile, boosted
                             ),
                             Some(player_id.to_string()),
                         );
                         boosted
                     }
-                    MysteryKind::Chile => {
+                    MysteryKind::Star => {
                         let boosted = (tile_after_portal + 5).min(total_tiles);
                         for step in (tile_after_portal + 1)..=boosted {
                             path.push(step);
                         }
                         mystery_message_es = Some(
-                            "🌶️ ¡Chile picante! Corres 5 casillas hacia adelante.".to_string(),
+                            "🌟 ¡Super Estrella! Corres 5 casillas hacia adelante.".to_string(),
                         );
                         mystery_message_en =
-                            Some("🌶️ Spicy chili! Dash 5 extra tiles forward.".to_string());
+                            Some("🌟 Super Star! Dash 5 extra tiles forward.".to_string());
                         self.add_log(
-                            "mystery_chile",
-                            &format!("🌶️ ¡ENCHILADO! {} probó chile picante en la casilla {} y corrió a la {}.", player_name, m.tile, boosted),
-                            &format!("🌶️ SPICY CHILI! {} tasted hot chili at tile {} and dashed to {}.", player_name, m.tile, boosted),
+                            "mystery_star",
+                            &format!("🌟 ¡SUPER ESTRELLA! {} activó una estrella en la casilla {} y corrió a la {}.", player_name, m.tile, boosted),
+                            &format!("🌟 SUPER STAR! {} activated a star tile at {} and dashed to {}.", player_name, m.tile, boosted),
                             Some(player_id.to_string()),
                         );
                         boosted
                     }
-                    MysteryKind::Pinata => {
-                        pinata_bonus = true;
+                    MysteryKind::LuckyDie => {
+                        lucky_die_bonus = true;
                         mystery_message_es =
-                            Some("🪅 ¡Rompiste la piñata! ¡Tienes otro tiro!".to_string());
-                        mystery_message_en =
-                            Some("🪅 Smashed the piñata! Extra roll granted!".to_string());
+                            Some("🎲 ¡Dado Dorado! ¡Tienes otro tiro de inmediato!".to_string());
+                        mystery_message_en = Some("🎲 Golden Die! Extra roll granted!".to_string());
                         self.add_log(
-                            "mystery_pinata",
-                            &format!("🪅 ¡DALE DALE DALE! {} rompió la piñata en la casilla {} y gana otro tiro.", player_name, m.tile),
-                            &format!("🪅 PIÑATA PARTY! {} smashed the piñata at tile {} and gets another roll.", player_name, m.tile),
+                            "mystery_lucky_die",
+                            &format!("🎲 ¡DADO DORADO! {} encontró un dado de la suerte en la casilla {} y tira de nuevo.", player_name, m.tile),
+                            &format!("🎲 GOLDEN DIE! {} found a lucky die at tile {} and rolls again.", player_name, m.tile),
                             Some(player_id.to_string()),
                         );
                         tile_after_portal
                     }
-                    MysteryKind::Nopal => {
+                    MysteryKind::Trap => {
                         let p_idx = self.turn_index % self.players.len();
                         self.players[p_idx].skipped_turns = 1;
-                        mystery_message_es = Some(
-                            "🌵 ¡Te espinaste con el nopal! Quedas atrapado 1 turno.".to_string(),
-                        );
+                        mystery_message_es =
+                            Some("🕳️ ¡Casilla Trampa! Quedas atrapado 1 turno.".to_string());
                         mystery_message_en =
-                            Some("🌵 Prickly cactus! Trapped for 1 turn.".to_string());
+                            Some("🕳️ Pitfall Trap! Trapped for 1 turn.".to_string());
                         self.add_log(
-                            "mystery_nopal",
-                            &format!("🌵 ¡AY NOPAL! {} se espinó en la casilla {} y perderá su próximo turno.", player_name, m.tile),
-                            &format!("🌵 PRICKLY CACTUS! {} got stuck at tile {} and misses next turn.", player_name, m.tile),
+                            "mystery_trap",
+                            &format!("🕳️ ¡TRAMPA! {} cayó en un hoyo trampa en la casilla {} y perderá su próximo turno.", player_name, m.tile),
+                            &format!("🕳️ PITFALL TRAP! {} fell into a trap at tile {} and misses next turn.", player_name, m.tile),
                             Some(player_id.to_string()),
                         );
                         tile_after_portal
@@ -860,8 +858,8 @@ impl Room {
             }
         }
 
-        let extra_turn = (bonus_on_six_rule && is_bonus && !won) || (pinata_bonus && !won);
-        if extra_turn && !pinata_bonus {
+        let extra_turn = (bonus_on_six_rule && is_bonus && !won) || (lucky_die_bonus && !won);
+        if extra_turn && !lucky_die_bonus {
             self.turn_started_at_secs = current_epoch_secs(); // Reset turn timer for bonus roll
             self.add_log(
                 "extra_turn",
@@ -875,7 +873,7 @@ impl Room {
                 ),
                 Some(player_id.to_string()),
             );
-        } else if extra_turn && pinata_bonus {
+        } else if extra_turn && lucky_die_bonus {
             self.turn_started_at_secs = current_epoch_secs();
         }
 
@@ -961,7 +959,7 @@ mod tests {
         assert!(defaults.exact_win);
         assert!(!defaults.three_sixes_penalty);
         assert_eq!(defaults.turn_timer_seconds, 0);
-        assert_eq!(defaults.board_theme, "fiesta");
+        assert_eq!(defaults.board_theme, "royale");
 
         // Deserialization with partial json fills defaults
         let json_data = r#"{"dice_count": 2, "turn_timer_seconds": 25}"#;
@@ -970,7 +968,7 @@ mod tests {
         assert_eq!(deserialized.turn_timer_seconds, 25);
         assert!(deserialized.bonus_on_six);
         assert!(deserialized.exact_win);
-        assert_eq!(deserialized.board_theme, "fiesta");
+        assert_eq!(deserialized.board_theme, "royale");
     }
 
     #[test]
@@ -978,7 +976,7 @@ mod tests {
         let code = generate_room_code();
         assert!(code.len() >= 6 && code.len() <= 8);
         let valid_prefixes = [
-            "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA",
+            "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "TABL", "DICE", "COBR",
         ];
         assert!(valid_prefixes.iter().any(|prefix| code.starts_with(prefix)));
 

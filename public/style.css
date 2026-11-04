@@ -1,77 +1,89 @@
 /* Serpientes y Escaleras Online - Tabletop Board Game Aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
-:root {
-  /* Default Theme: Tablero Clásico 🎲 */
-  --bg-page-top: #1a0f08;
-  --bg-page-bot: #0a0503;
-  --bg-card: #201109;
-  --bg-card-rgb: 32, 17, 9;
-  --text-primary: #fffdf7;
-  --text-muted: #d4bda6;
-  --border-color: rgba(217, 119, 6, 0.28);
-  --primary: #ea580c;
-  --primary-hover: #c2410c;
+:root, [data-theme="royale"] {
+  /* Default Theme: Tablero Royale 🐍🪜 (Iconic Modern Tabletop) */
+  --bg-page-top: #0b132b;
+  --bg-page-bot: #060913;
+  --bg-card: #141e33;
+  --bg-card-rgb: 20, 30, 51;
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: rgba(56, 189, 248, 0.22);
+  --primary: #059669;
+  --primary-hover: #047857;
   --accent-gold: #f59e0b;
+  --accent-blue: #0284c7;
   --accent-red: #ef4444;
-  --accent-green: #059669;
+  --accent-green: #10b981;
 
-  /* Board & Tiles (Rich Tabletop Parchment for Maximum Contrast) */
-  --board-frame: #78350f;
-  --board-bg: #fffefb;
-  --tile-bg-light: #fffefb;
-  --tile-bg-dark: #faeed0;
-  --tile-border: rgba(120, 53, 15, 0.2);
-  --tile-text: #2a1104;
+  /* Board & Tiles: Crisp Modern Tabletop with High-Contrast Finish */
+  --board-frame: #1e293b;
+  --board-frame-gold: #f59e0b;
+  --board-bg: #ffffff;
+  --tile-bg-light: #ffffff;
+  --tile-bg-dark: #f1f5f9;
+  --tile-border: rgba(148, 163, 184, 0.35);
+  --tile-text: #0f172a;
 
   --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-title: 'Playfair Display', Georgia, serif;
+  --font-title: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-[data-theme="muertos"] {
-  /* Theme: Noche Estelar 🌌 */
-  --bg-page-top: #100a26;
-  --bg-page-bot: #050312;
-  --bg-card: #180f38;
-  --bg-card-rgb: 24, 15, 56;
+[data-theme="arcade"] {
+  /* Theme: Noche Cyber / Arcade 🌌 */
+  --bg-page-top: #110d2e;
+  --bg-page-bot: #060414;
+  --bg-card: #1a1442;
+  --bg-card-rgb: 26, 20, 66;
   --text-primary: #fdf4ff;
-  --text-muted: #d8b4fe;
-  --border-color: rgba(216, 180, 254, 0.25);
-  --primary: #9333ea;
-  --primary-hover: #7e22ce;
-  --accent-gold: #fbbf24;
+  --text-muted: #c084fc;
+  --border-color: rgba(192, 132, 252, 0.25);
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --accent-gold: #facc15;
+  --accent-blue: #38bdf8;
   --accent-red: #f43f5e;
-  --accent-green: #34d399;
+  --accent-green: #2dd4bf;
 
-  --board-frame: #6b21a8;
+  --board-frame: #3b0764;
+  --board-frame-gold: #facc15;
   --board-bg: #faf5ff;
   --tile-bg-light: #faf5ff;
   --tile-bg-dark: #f3e8ff;
-  --tile-border: rgba(147, 51, 234, 0.22);
+  --tile-border: rgba(168, 85, 247, 0.28);
   --tile-text: #3b0764;
+
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-title: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-[data-theme="selva"] {
+[data-theme="esmeralda"] {
   /* Theme: Templo de la Serpiente 🐍 */
-  --bg-page-top: #071f14;
-  --bg-page-bot: #020d08;
-  --bg-card: #092b1c;
-  --bg-card-rgb: 9, 43, 28;
+  --bg-page-top: #062016;
+  --bg-page-bot: #020d09;
+  --bg-card: #0b2e21;
+  --bg-card-rgb: 11, 46, 33;
   --text-primary: #ecfdf5;
-  --text-muted: #a7f3d0;
-  --border-color: rgba(234, 179, 8, 0.25);
-  --primary: #059669;
-  --primary-hover: #047857;
-  --accent-gold: #eab308;
-  --accent-red: #e11d48;
-  --accent-green: #10b981;
+  --text-muted: #6ee7b7;
+  --border-color: rgba(52, 211, 153, 0.25);
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --accent-gold: #fbbf24;
+  --accent-blue: #06b6d4;
+  --accent-red: #f43f5e;
+  --accent-green: #34d399;
 
-  --board-frame: #065f46;
+  --board-frame: #064e3b;
+  --board-frame-gold: #fbbf24;
   --board-bg: #f0fdf4;
   --tile-bg-light: #f0fdf4;
   --tile-bg-dark: #dcfce7;
-  --tile-border: rgba(5, 150, 105, 0.22);
+  --tile-border: rgba(16, 185, 129, 0.3);
   --tile-text: #064e3b;
+
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-title: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 * {
@@ -172,26 +184,31 @@ body {
   font-family: var(--font-title);
   font-size: clamp(0.95rem, 3.2vw, 1.25rem);
   font-weight: 900;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #fef08a, #f59e0b, #ef4444);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.3px;
   white-space: nowrap;
   line-height: 1.1;
   display: inline-flex;
   gap: 6px;
 }
-.logo-title-1,
+.logo-title-1 {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+}
 .logo-title-2 {
-  display: inline;
+  background: linear-gradient(135deg, #fef08a 0%, #fbbf24 50%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
 }
 .logo-subtitle {
   font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #fef08a;
-  opacity: 0.9;
+  color: var(--accent-gold);
+  opacity: 0.95;
   display: block;
 }
 
@@ -560,7 +577,7 @@ body {
   font-weight: 600;
 }
 .setting-row select {
-  background: #1e110a;
+  background: var(--bg-card);
   color: #fff;
   border: 1px solid var(--border-color);
   padding: 4px 8px;
@@ -573,17 +590,17 @@ body {
 .btn-primary {
   width: 100%;
   padding: 13px;
-  background: linear-gradient(135deg, var(--primary), var(--accent-gold));
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #0284c7 100%);
   color: #fff;
   border: none;
-  border-bottom: 4px solid #b45309;
+  border-bottom: 4px solid #047857;
   border-radius: 12px;
   font-size: 1.05rem;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.45);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
   transition: all 0.15s ease;
   min-height: 48px;
   display: flex;
@@ -593,7 +610,7 @@ body {
 }
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.6);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.55);
 }
 .btn-primary:active {
   transform: translateY(2px);
@@ -839,8 +856,10 @@ body {
   aspect-ratio: 1 / 1;
   background: var(--board-bg);
   border-radius: 16px;
-  border: 6px solid var(--board-frame);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.75), inset 0 0 14px rgba(0, 0, 0, 0.35);
+  border: 7px solid var(--board-frame);
+  outline: 2px solid var(--board-frame-gold, #f59e0b);
+  outline-offset: -5px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(5, 150, 105, 0.15);
   overflow: hidden;
   flex-shrink: 0;
   margin: 0 auto;
@@ -860,7 +879,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2px 2.5px;
+  padding: 2.5px 3px;
   background-color: var(--tile-bg-light);
   border: 0.5px solid var(--tile-border);
   overflow: hidden;

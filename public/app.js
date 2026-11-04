@@ -75,7 +75,7 @@
       labelBoardSize: "Modo de Tablero",
       board100: "Clásico (100 Casillas - 10x10)",
       board50: "Express (50 Casillas - 5x10)",
-      labelMysteryTiles: "Casillas Misteriosas (⚡, 🌟, 🪅, 🕳️)",
+      labelMysteryTiles: "Casillas de Poder (⚡, 🌟, 🎲, 🕳️)",
       btnAddBot: "🤖 + Agregar Bot",
       btnRemoveBot: "🤖 - Quitar Bot",
       btnShareVictory: "📸 Compartir Victoria",
@@ -152,7 +152,7 @@
       labelBoardSize: "Board Mode",
       board100: "Classic (100 Tiles - 10x10)",
       board50: "Express (50 Tiles - 5x10)",
-      labelMysteryTiles: "Special Mystery Tiles (⚡, 🌟, 🪅, 🕳️)",
+      labelMysteryTiles: "Power-Up Tiles (⚡, 🌟, 🎲, 🕳️)",
       btnAddBot: "🤖 + Add Bot",
       btnRemoveBot: "🤖 - Remove Bot",
       btnShareVictory: "📸 Share Victory Card",
@@ -195,7 +195,7 @@
     "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
     "#14b8a6", "#eab308"
   ];
-  const THEMES = ["fiesta", "muertos", "selva"];
+  const THEMES = ["royale", "esmeralda", "arcade"];
 
   let currentLang = localStorage.getItem("serpientes_lang") || "es";
   let currentThemeIdx = 0;
@@ -344,10 +344,10 @@
     let icons = ["🐍", "🪜", "🎲", "🏆", "⭐", "♟️"];
     let count = 4;
 
-    if (themeName === "muertos") {
-      icons = ["🌌", "⭐", "🎲", "🪜", "✨", "🏆"];
+    if (themeName === "arcade") {
+      icons = ["🌌", "⭐", "🎲", "🪜", "✨", "⚡"];
       count = 4;
-    } else if (themeName === "selva") {
+    } else if (themeName === "esmeralda") {
       icons = ["🐍", "🪜", "🌿", "⭐", "🎲", "🐆"];
       count = 4;
     }
@@ -573,12 +573,16 @@
             const mSpan = document.createElement("span");
             mSpan.className = "tile-mystery-icon";
             const icons = {
+              lightning: "⚡",
+              star: "🌟",
+              luckydie: "🎲",
+              trap: "🕳️",
               taco: "⚡",
               chile: "🌟",
-              pinata: "🪅",
+              pinata: "🎲",
               nopal: "🕳️"
             };
-            mSpan.textContent = icons[mystery.kind] || "✨";
+            mSpan.textContent = icons[mystery.kind] || "⚡";
             tileDiv.appendChild(mSpan);
           }
         }
@@ -1046,11 +1050,12 @@
       if (msg) showToast(msg);
 
       if (window.serpientesAudio) {
-        if (step.mystery_applied.kind === "taco" || step.mystery_applied.kind === "chile") {
+        const k = step.mystery_applied.kind;
+        if (k === "lightning" || k === "star" || k === "taco" || k === "chile") {
           window.serpientesAudio.playLadder();
-        } else if (step.mystery_applied.kind === "pinata") {
+        } else if (k === "luckydie" || k === "pinata") {
           window.serpientesAudio.playVictory();
-        } else if (step.mystery_applied.kind === "nopal") {
+        } else if (k === "trap" || k === "nopal") {
           window.serpientesAudio.playSnake();
         }
       }
@@ -1300,7 +1305,7 @@
         if (mysteryPill) {
           const enabled = room.settings.mystery_tiles;
           mysteryPill.style.display = enabled ? "inline-block" : "none";
-          mysteryPill.textContent = currentLang === "es" ? "✨ Misterio" : "✨ Mystery";
+          mysteryPill.textContent = currentLang === "es" ? "⚡ Poderes" : "⚡ Power-Ups";
         }
       }
 
@@ -2037,50 +2042,47 @@
     canvas.height = 1000;
     const ctx = canvas.getContext("2d");
 
-    // 1. Festive Mexican background
+    // 1. Tabletop Midnight Navy & Emerald gradient background
     const bgGrad = ctx.createLinearGradient(0, 0, 800, 1000);
-    bgGrad.addColorStop(0, "#2a1205");
-    bgGrad.addColorStop(0.5, "#180a03");
-    bgGrad.addColorStop(1, "#2a0815");
+    bgGrad.addColorStop(0, "#0b132b");
+    bgGrad.addColorStop(0.5, "#1e293b");
+    bgGrad.addColorStop(1, "#0f172a");
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 800, 1000);
 
-    // Decorative Mexican Folk Border
+    // Decorative Double Metallic Gold & Emerald Border
     ctx.strokeStyle = "#f59e0b";
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 8;
     ctx.strokeRect(20, 20, 760, 960);
-    ctx.strokeStyle = "#ec4899";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(28, 28, 744, 944);
 
-    // Papel picado top garland
-    const garlandColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#06b6d4"];
-    for (let i = 0; i < 8; i++) {
-      ctx.fillStyle = garlandColors[i % garlandColors.length];
-      const gx = 45 + i * 90;
-      ctx.beginPath();
-      ctx.moveTo(gx, 34);
-      ctx.lineTo(gx + 80, 34);
-      ctx.lineTo(gx + 40, 75);
-      ctx.closePath();
-      ctx.fill();
-    }
+    ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(30, 30, 740, 940);
+
+    // Corner Star Accents
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "bold 22px 'Outfit', sans-serif";
+    ctx.fillText("✦", 44, 52);
+    ctx.fillText("✦", 756, 52);
+    ctx.fillText("✦", 44, 954);
+    ctx.fillText("✦", 756, 954);
 
     // Title Header
     ctx.textAlign = "center";
-    ctx.fillStyle = "#fef08a";
-    ctx.font = "bold 26px 'Lilita One', sans-serif, system-ui";
-    ctx.fillText("🇲🇽 SERPIENTES Y ESCALERAS 🇲🇽", 400, 115);
+    ctx.fillStyle = "#34d399";
+    ctx.font = "900 30px 'Outfit', sans-serif";
+    ctx.fillText("🐍 SERPIENTES & ESCALERAS 🪜", 400, 105);
 
     // Subtitle
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "16px sans-serif";
-    ctx.fillText(currentLang === "es" ? "CERTIFICADO DE GRAN CAMPEÓN" : "GRAND CHAMPION CERTIFICATE", 400, 145);
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "700 15px 'Outfit', sans-serif";
+    ctx.letterSpacing = "2px";
+    ctx.fillText(currentLang === "es" ? "CERTIFICADO OFICIAL DE VICTORIA" : "OFFICIAL VICTORY CERTIFICATE", 400, 138);
 
-    // Golden Trophy Circle
+    // Golden Trophy Laurel Circle
     ctx.beginPath();
-    ctx.arc(400, 235, 65, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(245, 158, 11, 0.2)";
+    ctx.arc(400, 235, 68, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
     ctx.fill();
     ctx.strokeStyle = "#f59e0b";
     ctx.lineWidth = 4;
@@ -2088,19 +2090,19 @@
 
     // Winner Avatar
     ctx.font = "68px sans-serif";
-    ctx.fillText(winner.avatar || "🤠", 400, 260);
+    ctx.fillText(winner.avatar || "🧗‍♂️", 400, 260);
 
     // Winner Name
-    ctx.fillStyle = "#fde047";
-    ctx.font = "bold 38px 'Lilita One', sans-serif, system-ui";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 40px 'Outfit', sans-serif";
     ctx.fillText(winner.player_name, 400, 345);
 
     // Goal reached label
     const totalTiles = (board && board.total_tiles) || 100;
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 18px sans-serif";
+    ctx.fillStyle = "#38bdf8";
+    ctx.font = "700 17px 'Outfit', sans-serif";
     ctx.fillText(
-      currentLang === "es" ? `¡Llegó a la meta (Casilla ${totalTiles})!` : `Reached the goal (Tile ${totalTiles})!`,
+      currentLang === "es" ? `🏆 ¡Gran Campeón del Tablero (Casilla ${totalTiles})!` : `🏆 Tabletop Grand Champion (Tile ${totalTiles})!`,
       400,
       380
     );
@@ -2113,33 +2115,33 @@
     ];
     for (let i = 0; i < 3; i++) {
       const sx = 140 + i * 185;
-      ctx.fillStyle = "rgba(45, 23, 14, 0.9)";
+      ctx.fillStyle = "rgba(15, 23, 42, 0.88)";
       ctx.fillRect(sx, 410, 150, 85);
-      ctx.strokeStyle = "#d97706";
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
       ctx.lineWidth = 2;
       ctx.strokeRect(sx, 410, 150, 85);
 
-      ctx.fillStyle = "#fef08a";
-      ctx.font = "bold 28px sans-serif";
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "900 28px 'Outfit', sans-serif";
       ctx.fillText(`${statBoxes[i].icon} ${statBoxes[i].val}`, sx + 75, 452);
 
-      ctx.fillStyle = "#d6d3d1";
-      ctx.font = "14px sans-serif";
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "600 14px 'Outfit', sans-serif";
       ctx.fillText(statBoxes[i].label, sx + 75, 480);
     }
 
     // Awards Section
-    ctx.fillStyle = "#fde047";
-    ctx.font = "bold 20px sans-serif";
-    ctx.fillText(currentLang === "es" ? "🎖️ PREMIOS Y MEDALLAS DE HONOR" : "🎖️ HONORARY BADGES & AWARDS", 400, 535);
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "800 20px 'Outfit', sans-serif";
+    ctx.fillText(currentLang === "es" ? "🎖️ MEDALLAS Y RECONOCIMIENTOS" : "🎖️ HONORARY MEDALS & AWARDS", 400, 535);
 
     const awards = winner.awards || [];
     for (let i = 0; i < Math.min(awards.length, 4); i++) {
       const aw = awards[i];
       const ay = 560 + i * 80;
-      ctx.fillStyle = "rgba(26, 15, 8, 0.85)";
+      ctx.fillStyle = "rgba(30, 41, 59, 0.85)";
       ctx.fillRect(90, ay, 620, 68);
-      ctx.strokeStyle = "rgba(254, 240, 138, 0.3)";
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.35)";
       ctx.lineWidth = 1.5;
       ctx.strokeRect(90, ay, 620, 68);
 
@@ -2147,13 +2149,13 @@
       ctx.fillText(aw.badge, 135, ay + 46);
 
       ctx.textAlign = "left";
-      ctx.fillStyle = "#fde047";
-      ctx.font = "bold 17px sans-serif";
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "800 17px 'Outfit', sans-serif";
       const awTitle = currentLang === "es" ? aw.title_es : aw.title_en;
       ctx.fillText(awTitle, 180, ay + 30);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "14px sans-serif";
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "500 14px 'Outfit', sans-serif";
       const awDetail = currentLang === "es" ? aw.detail_es : aw.detail_en;
       ctx.fillText(`${aw.avatar} ${aw.player_name} • ${awDetail}`, 180, ay + 52);
       ctx.textAlign = "center";
@@ -2175,8 +2177,8 @@
           await navigator.share({
             title: currentLang === "es" ? "¡Gané en Serpientes y Escaleras!" : "I won at Snakes & Ladders!",
             text: currentLang === "es"
-              ? `¡${winner.player_name} se coronó Gran Campeón en Serpientes y Escaleras! 🇲🇽🏆`
-              : `${winner.player_name} became Grand Champion in Snakes & Ladders! 🇲🇽🏆`,
+              ? `¡${winner.player_name} se coronó Gran Campeón en Serpientes y Escaleras! 🐍🪜🏆`
+              : `${winner.player_name} became Grand Champion in Snakes & Ladders! 🐍🪜🏆`,
             files: [file]
           });
           showToast(i18n[currentLang].cardShared);

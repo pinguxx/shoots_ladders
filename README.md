@@ -25,21 +25,21 @@ A high-performance, real-time multiplayer web game of the classic **Serpientes y
    - Choose between the **Classic 100-Tile** board or the fast-paced **Express 50-Tile** board (5×10 layout) for quick 3–5 minute games on lunch breaks.
    - Express portals: 4 ladders (3➔12, 14➔28, 22➔37, 31➔46) and 4 snakes (18➔6, 32➔16, 43➔25, 49➔35).
 
-4. **🎉 Casillas Misteriosas (Mexican Party / Mystery Tiles)**:
-   - Optional host toggle in lobby adding Mexican fiesta powerups directly onto the board:
-     - 🌮 **Taco**: +3 tiles forward sprint.
-     - 🌶️ **Chile**: +5 tiles spicy boost.
-     - 🪅 **Piñata**: Free bonus roll!
-     - 🌵 **Nopal**: Trapped in thorns (skips 1 turn).
+4. **⚡ Casillas de Poder (Power-Up Tiles)**:
+   - Optional host toggle in lobby adding adventure power-ups and hazards directly onto the board:
+     - ⚡ **Impulso Relámpago / Lightning Dash**: +3 tiles forward sprint.
+     - 🌟 **Super Estrella / Star Surge**: +5 tiles high-speed boost.
+     - 🎲 **Dado Dorado / Golden Die**: Free consecutive extra roll!
+     - 🕳️ **Casilla Trampa / Pitfall Trap**: Ensnared in a trap (misses 1 turn).
 
 5. **🏆 End-Game Podium, Match Awards & 📸 Shareable Victory Card**:
    - 🥇 🥈 🥉 Celebratory end-game podium showcasing 1st, 2nd, and 3rd place finishes with animated gold glow.
-   - 4 humorous post-match awards calculated from match telemetry:
+   - 4 honorary post-match awards calculated from match telemetry:
      - 🪜 *El Trepador / The Climber*: Most ladders climbed.
-     - 🐍 *El Más Salado / Snake Magnet*: Most snake bites.
+     - 🐍 *Imán de Serpientes / Snake Magnet*: Most snake bites.
      - 🎲 *Mano Bendita / Golden Touch*: Lowest roll count to victory.
-     - ⚡ *Rayo Veloz / Speedy Runner*: Match winner.
-   - **📸 Shareable Victory Card**: Generates a festive 800×1000 canvas diploma with Mexican borders, confetti, winner avatar, awards, and stats, with 1-click Web Share and PNG download.
+     - ⚡ *El Relámpago / Speedy Runner*: Match winner.
+   - **📸 Shareable Victory Card**: Generates a sleek 800×1000 canvas trophy certificate with brushed gold and emerald borders, winner avatar, awards, and stats, with 1-click Web Share and PNG download.
 
 6. **📲 Progressive Web App (PWA) 1-Click Install**:
    - Native header installation button (`#btn-install-pwa`) hooking into `beforeinstallprompt` for smooth 1-tap installation on Android, iOS, Windows, and macOS.
@@ -153,21 +153,21 @@ Access the game:
    - Elige entre el tablero tradicional de 100 casillas o el **Tablero Exprés de 50 casillas** (diseño 5×10) para partidas rápidas de 3 a 5 minutos.
    - Portales exprés: 4 escaleras (3➔12, 14➔28, 22➔37, 31➔46) y 4 serpientes (18➔6, 32➔16, 43➔25, 49➔35).
 
-4. **🎉 Casillas Misteriosas (Poderes de Fiesta Mexicana)**:
+4. **⚡ Casillas de Poder (Power-Up Tiles)**:
    - Interruptor opcional en la sala que activa casillas especiales en el tablero:
-     - 🌮 **Taco**: Impulso rápido de +3 casillas.
-     - 🌶️ **Chile**: Aceleración picante de +5 casillas.
-     - 🪅 **Piñata**: ¡Tiro extra consecutivo de regalo!
-     - 🌵 **Nopal**: Quedas atrapado en las espinas (pierdes 1 turno).
+     - ⚡ **Impulso Relámpago**: Aceleración inmediata de +3 casillas.
+     - 🌟 **Super Estrella**: Impulso veloz de +5 casillas.
+     - 🎲 **Dado Dorado**: ¡Tiro extra consecutivo de regalo!
+     - 🕳️ **Casilla Trampa**: Quedas atrapado en el hoyo (pierdes 1 turno).
 
-5. **🏆 Podio de Victoria, Premios del Encuentro y 📸 Diploma Compartible**:
+5. **🏆 Podio de Victoria, Premios del Encuentro y 📸 Certificado Compartible**:
    - 🥇 🥈 🥉 Podio animado al terminar la partida con el 1º, 2º y 3º lugar y destellos dorados.
-   - 4 reconocimientos cómicos calculados con la telemetría de la partida:
+   - 4 reconocimientos de honor calculados con la telemetría de la partida:
      - 🪜 *El Trepador*: El que subió más escaleras.
-     - 🐍 *El Más Salado*: El que cayó en más serpientes.
+     - 🐍 *Imán de Serpientes*: El que cayó en más serpientes.
      - 🎲 *Mano Bendita*: El más eficiente al tirar los dados.
-     - ⚡ *Rayo Veloz*: El campeón más veloz.
-   - **📸 Diploma de Victoria Compartible**: Genera un certificado festivo en Canvas (800×1000) con bordes mexicanos, confeti, avatar del ganador, estadísticas y medallas, listo para compartir vía Web Share API o descarga en PNG.
+     - ⚡ *El Relámpago*: El campeón más veloz.
+   - **📸 Certificado de Victoria Compartible**: Genera un trofeo oficial en Canvas (800×1000) con bordes de oro y esmeralda, avatar del ganador, estadísticas y medallas, listo para compartir vía Web Share API o descarga en PNG.
 
 6. **📲 Instalación PWA en 1 Clic**:
    - Botón directo en la barra superior (`#btn-install-pwa`) con evento `beforeinstallprompt` para instalar como aplicación nativa en Android, iPhone, Windows y Mac.
@@ -312,12 +312,12 @@ cargo clippy --all-targets -- -D warnings
   }
   ```
 - `GET /api/board?size=50&mystery=true`:
-  - Returns board metadata: `total_tiles` (50 or 100), `ladders`, `snakes`, and `mystery_tiles` with their respective tile positions and powerup types (`taco`, `chile`, `pinata`, `nopal`).
+  - Returns board metadata: `total_tiles` (50 or 100), `ladders`, `snakes`, and `mystery_tiles` with their respective tile positions and powerup types (`lightning`, `star`, `luckydie`, `trap`).
   ```json
   {
     "total_tiles": 50,
     "ladders": [{"from": 3, "to": 12}, {"from": 14, "to": 28}, ...],
     "snakes": [{"from": 18, "to": 6}, {"from": 32, "to": 16}, ...],
-    "mystery_tiles": [{"tile": 15, "kind": "taco"}, {"tile": 21, "kind": "nopal"}, ...]
+    "mystery_tiles": [{"tile": 15, "kind": "lightning"}, {"tile": 21, "kind": "trap"}, ...]
   }
   ```

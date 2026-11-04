@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f59e0b" />
-      <stop offset="50%" stop-color="#ea580c" />
-      <stop offset="100%" stop-color="#b91c1c" />
+      <stop offset="0%" stop-color="#0b132b" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
     </linearGradient>
     <linearGradient id="snakeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#34d399" />
@@ -16,15 +16,13 @@
       <stop offset="100%" stop-color="#b45309" />
     </linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-opacity="0.5"/>
     </filter>
   </defs>
 
-  <!-- Background Circle with festive border -->
-  <circle cx="256" cy="256" r="240" fill="url(#bgGrad)" stroke="#fef08a" stroke-width="12" />
-
-  <!-- Papel picado border dots -->
-  <circle cx="256" cy="256" r="226" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="14 16" opacity="0.6"/>
+  <!-- Tabletop Medallion Background with Gold & Emerald Rim -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGrad)" stroke="#fbbf24" stroke-width="12" />
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#10b981" stroke-width="3" opacity="0.6"/>
 
   <!-- Ladder (Escalera) -->
   <g filter="url(#shadow)">
@@ -60,7 +58,7 @@
 
   <!-- Big Red & Gold 3D Die in foreground -->
   <g transform="translate(100, 310) rotate(-12)" filter="url(#shadow)">
-    <rect x="0" y="0" width="105" height="105" rx="20" fill="#dc2626" stroke="#fef08a" stroke-width="5"/>
+    <rect x="0" y="0" width="105" height="105" rx="20" fill="#dc2626" stroke="#fbbf24" stroke-width="5"/>
     <!-- Pips (5) -->
     <circle cx="26" cy="26" r="10" fill="#fff"/>
     <circle cx="79" cy="26" r="10" fill="#fff"/>

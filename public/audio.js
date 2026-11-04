@@ -176,7 +176,7 @@ class SerpientesAudio {
     } catch (_) {}
   }
 
-  // Triumphant victory fanfare (Mariachi trumpet celebration chords)
+  // Triumphant victory fanfare (Ascending celebration chords)
   playVictory() {
     if (!this.soundEnabled) return;
     this.init();

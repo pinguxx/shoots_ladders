@@ -4,8 +4,8 @@
   "description": "Multiplayer Serpientes y Escaleras (Snakes and Ladders) in real-time with Rust and WebSockets",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2d1810",
-  "theme_color": "#b45309",
+  "background_color": "#0b132b",
+  "theme_color": "#059669",
   "orientation": "portrait-primary",
   "icons": [
     {
