@@ -64,7 +64,14 @@
       reconnectingText: "Reconectando a la partida...",
       toastReconnected: "¡Reconectado a la partida!",
       toastGameEnded: "La partida anterior ha finalizado.",
-      cotorreoTitle: "🗣️ ¡Cotorreo de Feria!"
+      cotorreoTitle: "🗣️ ¡Cotorreo de Feria!",
+      shoutSnake: "¡Aguas con la víbora! 🐍",
+      shoutLadder: "¡Sube, compadre! 🪜",
+      shoutAlmost: "¡Ya merito llego! 🏁",
+      shoutFaith: "¡Tírale con fe! 🎲",
+      shoutUnlucky: "¡Salado me quedé! 🧂",
+      shoutYourTurn: "¡Ándale, te toca! ⏰",
+      shoutLucky: "¡Pura suerte! 🍀"
     },
     en: {
       appTitle: "SNAKES & LADDERS",
@@ -122,9 +129,41 @@
       reconnectingText: "Reconnecting to game...",
       toastReconnected: "Reconnected to game!",
       toastGameEnded: "The previous game has ended.",
-      cotorreoTitle: "🗣️ Fairground Banter!"
+      cotorreoTitle: "🗣️ Fairground Banter!",
+      shoutSnake: "Watch out for snakes! 🐍",
+      shoutLadder: "Climb that ladder! 🪜",
+      shoutAlmost: "Almost at 100! 🏁",
+      shoutFaith: "Roll with faith! 🎲",
+      shoutUnlucky: "Down I go! 🧂",
+      shoutYourTurn: "Hurry up, your turn! ⏰",
+      shoutLucky: "Pure luck! 🍀"
     }
   };
+
+  const SHOUT_TRANSLATIONS = {
+    shoutSnake: { es: "¡Aguas con la víbora! 🐍", en: "Watch out for snakes! 🐍" },
+    shoutLadder: { es: "¡Sube, compadre! 🪜", en: "Climb that ladder! 🪜" },
+    shoutAlmost: { es: "¡Ya merito llego! 🏁", en: "Almost at 100! 🏁" },
+    shoutFaith: { es: "¡Tírale con fe! 🎲", en: "Roll with faith! 🎲" },
+    shoutUnlucky: { es: "¡Salado me quedé! 🧂", en: "Down I go! 🧂" },
+    shoutYourTurn: { es: "¡Ándale, te toca! ⏰", en: "Hurry up, your turn! ⏰" },
+    shoutLucky: { es: "¡Pura suerte! 🍀", en: "Pure luck! 🍀" }
+  };
+
+  const SHOUT_KEY_LOOKUP = {};
+  Object.entries(SHOUT_TRANSLATIONS).forEach(([key, dict]) => {
+    SHOUT_KEY_LOOKUP[key] = key;
+    SHOUT_KEY_LOOKUP[dict.es] = key;
+    SHOUT_KEY_LOOKUP[dict.en] = key;
+  });
+
+  function getLocalizedShout(textOrKey, lang) {
+    const key = SHOUT_KEY_LOOKUP[textOrKey];
+    if (key && SHOUT_TRANSLATIONS[key]) {
+      return SHOUT_TRANSLATIONS[key][lang] || SHOUT_TRANSLATIONS[key].es;
+    }
+    return textOrKey;
+  }
 
   const AVATARS = ["🤠", "💀", "🪅", "🌵", "🤼", "🎸", "🌶️", "🐆", "☀️", "🦅"];
   const COLORS = [
@@ -237,6 +276,12 @@
     document.querySelectorAll("[data-i18n-ph]").forEach(node => {
       const key = node.getAttribute("data-i18n-ph");
       if (texts[key]) node.setAttribute("placeholder", texts[key]);
+    });
+    document.querySelectorAll(".btn-cotorreo[data-shout-key]").forEach(btn => {
+      const key = btn.getAttribute("data-shout-key");
+      if (texts[key]) {
+        btn.setAttribute("data-shout", texts[key]);
+      }
     });
 
     el.btnToggleLang.innerHTML = currentLang === "es"
@@ -1008,6 +1053,33 @@
     setTimeout(() => span.remove(), 2800);
   }
 
+  function spawnFloatingShout(senderName, avatar, shoutText) {
+    const bubble = document.createElement("div");
+    bubble.className = "floating-shout-bubble";
+
+    if (avatar) {
+      const avSpan = document.createElement("span");
+      avSpan.className = "shout-avatar";
+      avSpan.textContent = avatar;
+      bubble.appendChild(avSpan);
+    }
+
+    const nameStrong = document.createElement("strong");
+    nameStrong.textContent = `${senderName}: `;
+    bubble.appendChild(nameStrong);
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "shout-text";
+    textSpan.textContent = shoutText;
+    bubble.appendChild(textSpan);
+
+    const leftOffset = Math.floor(Math.random() * 20) - 10;
+    bubble.style.left = `calc(50% + ${leftOffset}%)`;
+
+    document.body.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 3200);
+  }
+
   let turnTimerTicker = null;
 
   function updateTurnTimerDisplay(room) {
@@ -1277,10 +1349,27 @@
             }
             break;
 
-          case "reaction":
-            spawnFloatingEmoji(msg.emoji);
+          case "reaction": {
+            const raw = msg.emoji;
+            const sender = msg.playerName || (currentLang === "es" ? "Jugador" : "Player");
+            const avatar = msg.avatar || "🗣️";
+            const key = SHOUT_KEY_LOOKUP[raw];
+            if (key) {
+              const localizedText = getLocalizedShout(key, currentLang);
+              spawnFloatingShout(sender, avatar, localizedText);
+              if (window.serpientesAudio && window.serpientesAudio.speechEnabled) {
+                const shoutEs = SHOUT_TRANSLATIONS[key].es.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
+                const shoutEn = SHOUT_TRANSLATIONS[key].en.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
+                window.serpientesAudio.speak(shoutEs, shoutEn);
+              }
+            } else if (raw && (raw.length > 5 || raw.includes(" ") || raw.includes("!"))) {
+              spawnFloatingShout(sender, avatar, raw);
+            } else {
+              spawnFloatingEmoji(raw);
+            }
             if (window.serpientesAudio) window.serpientesAudio.playReactionPop();
             break;
+          }
 
           case "error":
             if (el.reconnectingOverlay && el.reconnectingOverlay.style.display !== "none") {
@@ -1584,7 +1673,8 @@
       cotorreoBar.addEventListener("click", (e) => {
         const btn = e.target.closest(".btn-cotorreo");
         if (btn && ws && ws.readyState === WebSocket.OPEN && roomCode) {
-          const shout = btn.getAttribute("data-shout");
+          const shoutKey = btn.getAttribute("data-shout-key");
+          const shout = shoutKey || btn.getAttribute("data-shout") || btn.textContent.trim();
           ws.send(JSON.stringify({
             type: "send_reaction",
             roomCode,

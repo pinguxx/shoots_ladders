@@ -584,11 +584,30 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                             // Whitelist approved reaction emojis and festive shouts
                             let allowed_reactions = [
                                 "🎉", "🐍", "🪜", "😱", "🎲", "🌮", "🎺", "🌶️", "💀",
+                                // Spanish shouts
                                 "¡Aguas con la víbora! 🐍",
                                 "¡Sube, compadre! 🪜",
                                 "¡Ya merito llego! 🏁",
                                 "¡Tírale con fe! 🎲",
                                 "¡Salado me quedé! 🧂",
+                                "¡Ándale, te toca! ⏰",
+                                "¡Pura suerte! 🍀",
+                                // English shouts
+                                "Watch out for snakes! 🐍",
+                                "Climb that ladder! 🪜",
+                                "Almost at 100! 🏁",
+                                "Roll with faith! 🎲",
+                                "Down I go! 🧂",
+                                "Hurry up, your turn! ⏰",
+                                "Pure luck! 🍀",
+                                // Canonical keys
+                                "shoutSnake",
+                                "shoutLadder",
+                                "shoutAlmost",
+                                "shoutFaith",
+                                "shoutUnlucky",
+                                "shoutYourTurn",
+                                "shoutLucky",
                             ];
                             if !allowed_reactions.contains(&emoji.as_str()) {
                                 continue;
