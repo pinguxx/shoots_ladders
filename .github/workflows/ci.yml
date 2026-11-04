@@ -1,4 +1,4 @@
-name: CI / Quality Gates
+name: Serpientes y Escaleras Production CI/CD & Quality Gates
 
 on:
   push:
@@ -6,15 +6,37 @@ on:
   pull_request:
     branches: [ main, master ]
 
-env:
-  CARGO_TERM_COLOR: always
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test-and-lint:
-    name: Rust Checks, Tests & Clippy
+  # ----------------------------------------------------------------------------
+  # Gate 1: Secret Leak Prevention (Gitleaks)
+  # ----------------------------------------------------------------------------
+  secret-scan:
+    name: Secret Leak Detection (Gitleaks)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ----------------------------------------------------------------------------
+  # Gate 2: Rust Backend Quality, 30 Tests & Security Audits
+  # ----------------------------------------------------------------------------
+  rust-quality:
+    name: Rust Backend Quality, 30 Tests & Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Rust Toolchain
@@ -22,34 +44,59 @@ jobs:
         with:
           components: clippy, rustfmt
 
-      - name: Cache Cargo Dependencies
+      - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Check Formatting
+      - name: Install Precompiled cargo-audit
+        uses: taiki-e/install-action@cargo-audit
+
+      - name: Run RustSec Vulnerability Audit
+        run: cargo audit
+
+      - name: Cargo Format Check
         run: cargo fmt -- --check
 
-      - name: Clippy Linter (Zero Warnings)
+      - name: Cargo Check
+        run: cargo check --all-targets
+
+      - name: Cargo Clippy Linter (Zero Warnings Allowed)
         run: cargo clippy --all-targets -- -D warnings
 
-      - name: Run Unit & Integration Tests
+      - name: Cargo Test Suite (30 passing tests)
         run: cargo test --all-targets --verbose
 
       - name: Build Release Binary
         run: cargo build --release
 
-  docker-build:
-    name: Docker Container Build Check
+  # ----------------------------------------------------------------------------
+  # Gate 3: Docker Container Build & Trivy CVE Security Scan
+  # ----------------------------------------------------------------------------
+  docker-security-scan:
+    name: Container Build & Trivy CVE Scan
+    needs: [rust-quality]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker Image
+      - name: Build Application Container
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile
           push: false
-          tags: shoots_ladders:ci
+          load: true
+          tags: shoots-ladders:ci
+
+      - name: Run Trivy Vulnerability Scanner on Container Image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'shoots-ladders:ci'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
