@@ -9,19 +9,20 @@
   // -------------------------------------------------------------
   const i18n = {
     es: {
-      appTitle: "SERPIENTES & ESCALERAS",
-      titlePart1: "SERPIENTES Y",
-      titlePart2: "ESCALERAS",
-      appSubtitle: "Multijugador en Vivo 🇲🇽",
-      tabCreate: "Crear Sala",
-      tabJoin: "Unirse a Sala",
+      appTitle: "CALABOZOS & DRAGONES",
+      titlePart1: "CALABOZOS Y",
+      titlePart2: "DRAGONES",
+      appSubtitle: "Mazmorras en Vivo ⚔️",
+      tabCreate: "Crear Mazmorra",
+      tabJoin: "Unirse a Mazmorra",
       labelName: "Tu Nombre o Apodo",
-      placeholderName: "Ej. Pancho Villa",
-      labelAvatar: "Elige tu Ficha / Avatar",
+      placeholderName: "Ej. Gandalf el Gris",
+      labelAvatar: "Elige tu Héroe / Clase",
       labelColor: "Elige tu Color",
+      settingsTitle: "Ajustes de la Mazmorra",
       labelDiceCount: "Número de Dados",
-      dice1: "1 Dado (Clásico)",
-      dice2: "2 Dados (Rápido)",
+      dice1: "1 Dado (Clásico d6)",
+      dice2: "2 Dados (Rápido 2d6)",
       labelExactWin: "¿Rebotar si pasa de 100?",
       exactWinYes: "Sí (Tiro exacto para ganar)",
       exactWinNo: "No (100 o más gana)",
@@ -32,73 +33,74 @@
       timer15: "15 segundos",
       timer25: "25 segundos (Recomendado)",
       timer40: "40 segundos",
-      btnCreate: "🎲 Crear Sala & Jugar",
-      btnJoin: "🚀 Entrar a la Sala",
-      labelRoomCode: "Código de la Sala",
-      placeholderRoomCode: "Ej. SERP12",
-      lobbyTitle: "Sala de Espera",
-      waitingPlayers: "Esperando jugadores...",
-      btnStartGame: "🏁 ¡Iniciar Partida!",
+      btnCreate: "🎲 Entrar al Calabozo",
+      btnJoin: "🚀 Entrar a la Mazmorra",
+      labelRoomCode: "Código de la Mazmorra",
+      placeholderRoomCode: "Ej. DRAG12",
+      lobbyTitle: "Sala del Gremio",
+      waitingPlayers: "Reuniendo el grupo de aventureros...",
+      btnStartGame: "⚔️ ¡Iniciar Expedición!",
       btnCopyLink: "📋 Copiar Enlace",
       btnQr: "📱 Código QR",
-      btnRollDice: "🎲 ¡TIRAR DADO!",
-      waitingRoll: "Esperando a",
-      turnTitle: "Turno actual",
-      feedTitle: "Crónica de la Partida",
-      qrTitle: "Invita a tus Amigos",
-      qrSub: "Escanea con la cámara de tu celular para entrar directamente a la partida:",
+      btnRollDice: "🎲 ¡TIRAR DADOS!",
+      waitingRoll: "Esperando tirada de",
+      turnTitle: "Turno del Héroe",
+      feedTitle: "Crónica de la Mazmorra",
+      qrTitle: "Convoca a tus Aliados",
+      qrSub: "Escanea con la cámara de tu celular para unirte a la expedición:",
       modalClose: "Cerrar",
-      winnerTitle: "¡VICTORIA!",
-      winnerSub: "¡Ha llegado a la casilla 100 y se corona Campeón!",
-      btnPlayAgain: "🔄 Jugar Otra Vez",
-      statRolls: "Tiros",
-      statLadders: "Escaleras",
-      statSnakes: "Serpientes",
+      winnerTitle: "¡DRAGON SLAYER!",
+      winnerSub: "¡Ha derrotado al dragón y conquistado el tesoro legendario!",
+      btnPlayAgain: "🔄 Nueva Expedición",
+      statRolls: "Tiradas",
+      statLadders: "Escaleras Mágicas",
+      statSnakes: "Dragones",
       toastCopied: "¡Enlace copiado al portapapeles!",
-      errorFillName: "Por favor escribe tu nombre.",
-      errorFillCode: "Por favor ingresa un código de sala válido.",
-      leaveRoom: "Salir de la Sala",
-      confirmLeave: "¿Seguro que deseas salir de la sala?",
-      resumeTitle: "Partida en Curso",
+      errorFillName: "Por favor escribe tu nombre de aventurero.",
+      errorFillCode: "Por favor ingresa un código de mazmorra válido.",
+      leaveRoom: "Salir de la Mazmorra",
+      confirmLeave: "¿Seguro que deseas abandonar la expedición?",
+      resumeTitle: "Expedición en Curso",
       btnResume: "▶️ Reanudar",
-      reconnectingText: "Reconectando a la partida...",
-      toastReconnected: "¡Reconectado a la partida!",
-      toastGameEnded: "La partida anterior ha finalizado.",
-      cotorreoTitle: "🗣️ ¡Cotorreo de Feria!",
-      shoutSnake: "¡Aguas con la víbora! 🐍",
-      shoutLadder: "¡Sube, compadre! 🪜",
-      shoutAlmost: "¡Ya merito llego! 🏁",
-      shoutFaith: "¡Tírale con fe! 🎲",
-      shoutUnlucky: "¡Salado me quedé! 🧂",
-      shoutYourTurn: "¡Ándale, te toca! ⏰",
-      shoutLucky: "¡Pura suerte! 🍀",
-      labelBoardSize: "Modo de Tablero",
-      board100: "Clásico (100 Casillas - 10x10)",
-      board50: "Express (50 Casillas - 5x10)",
-      labelMysteryTiles: "Casillas de Fiesta (🌮, 🌶️, 🪅, 🌵)",
-      btnAddBot: "🤖 + Agregar Bot",
+      reconnectingText: "Reconectando a la mazmorra...",
+      toastReconnected: "¡Reconectado a la mazmorra!",
+      toastGameEnded: "La expedición anterior ha finalizado.",
+      cotorreoTitle: "⚔️ ¡Gritos de Guerra & Hechizos!",
+      shoutDragon: "¡Cuidado con el Dragón! 🐉",
+      shoutHonor: "¡Por el honor y la gloria! ⚔️",
+      shoutSave: "¡Tirada de salvación! 🛡️",
+      shoutCrit: "¡Golpe crítico! 💥",
+      shoutFail: "¡Fallo crítico! 💀",
+      shoutInit: "¡Lanza iniciativa! 🎲",
+      shoutPotion: "¡Bebiendo poción! 🧪",
+      labelBoardSize: "Modo de Mazmorra",
+      board100: "Torre del Dragón (100 Casillas - 10x10)",
+      board50: "Cripta Express (50 Casillas - 5x10)",
+      labelMysteryTiles: "Casillas Mágicas (🧪, 📜, 📦, 🕸️)",
+      btnAddBot: "🤖 + Agregar Compañero Bot",
       btnRemoveBot: "🤖 - Quitar Bot",
-      btnShareVictory: "📸 Compartir Victoria",
-      podiumTitle: "🏆 Podio de Honor",
-      awardsTitle: "🎖️ Medallas de la Feria",
-      cardDownloaded: "¡Tarjeta de victoria guardada!",
-      cardShared: "¡Victoria compartida!",
+      btnShareVictory: "📜 Certificado Dragon Slayer",
+      podiumTitle: "🏆 Salón de Campeones",
+      awardsTitle: "🎖️ Títulos y Medallas del Gremio",
+      cardDownloaded: "¡Certificado de victoria guardado!",
+      cardShared: "¡Victoria compartida con el reino!",
       installApp: "Instalar App"
     },
     en: {
-      appTitle: "SNAKES & LADDERS",
-      titlePart1: "SNAKES &",
-      titlePart2: "LADDERS",
-      appSubtitle: "Real-Time Multiplayer 🇲🇽",
-      tabCreate: "Create Room",
-      tabJoin: "Join Room",
-      labelName: "Your Name or Nickname",
-      placeholderName: "e.g. Lucky Charlie",
-      labelAvatar: "Choose Your Token / Avatar",
+      appTitle: "DUNGEONS & DRAGONS",
+      titlePart1: "DUNGEONS &",
+      titlePart2: "DRAGONS",
+      appSubtitle: "Real-Time Dungeon Crawler ⚔️",
+      tabCreate: "Create Dungeon",
+      tabJoin: "Join Dungeon",
+      labelName: "Your Adventurer Name",
+      placeholderName: "e.g. Gandalf the Grey",
+      labelAvatar: "Choose Your Hero Class",
       labelColor: "Choose Your Color",
+      settingsTitle: "Dungeon Rules & Settings",
       labelDiceCount: "Number of Dice",
-      dice1: "1 Die (Classic)",
-      dice2: "2 Dice (Fast Pace)",
+      dice1: "1 Die (Classic d6)",
+      dice2: "2 Dice (Fast 2d6)",
       labelExactWin: "Bounce back if overshoot 100?",
       exactWinYes: "Yes (Exact roll to win)",
       exactWinNo: "No (100 or over wins)",
@@ -109,62 +111,70 @@
       timer15: "15 seconds",
       timer25: "25 seconds (Recommended)",
       timer40: "40 seconds",
-      btnCreate: "🎲 Create Room & Play",
-      btnJoin: "🚀 Join Room",
-      labelRoomCode: "Room Code",
-      placeholderRoomCode: "e.g. SERP12",
-      lobbyTitle: "Waiting Lobby",
-      waitingPlayers: "Waiting for players...",
-      btnStartGame: "🏁 Start Game!",
+      btnCreate: "🎲 Enter the Dungeon",
+      btnJoin: "🚀 Join the Dungeon",
+      labelRoomCode: "Dungeon Code",
+      placeholderRoomCode: "e.g. DRAG12",
+      lobbyTitle: "Adventurers Guild Lobby",
+      waitingPlayers: "Gathering party of adventurers...",
+      btnStartGame: "⚔️ Enter the Dungeon!",
       btnCopyLink: "📋 Copy Link",
       btnQr: "📱 QR Code",
       btnRollDice: "🎲 ROLL DICE!",
-      waitingRoll: "Waiting for",
-      turnTitle: "Current Turn",
-      feedTitle: "Live Activity Log",
-      qrTitle: "Invite Your Friends",
-      qrSub: "Scan with your phone camera to jump straight into this match:",
+      waitingRoll: "Waiting for roll from",
+      turnTitle: "Hero's Turn",
+      feedTitle: "Dungeon Chronicle",
+      qrTitle: "Summon Allies",
+      qrSub: "Scan with your phone camera to jump straight into this dungeon:",
       modalClose: "Close",
-      winnerTitle: "VICTORY!",
-      winnerSub: "Has reached tile 100 and is the Grand Champion!",
-      btnPlayAgain: "🔄 Play Again",
+      winnerTitle: "DRAGON SLAYER!",
+      winnerSub: "Has defeated the dragon and claimed the legendary treasure hoard!",
+      btnPlayAgain: "🔄 New Expedition",
       statRolls: "Rolls",
-      statLadders: "Ladders",
-      statSnakes: "Snakes",
-      toastCopied: "Invite link copied to clipboard!",
-      errorFillName: "Please enter your name.",
-      errorFillCode: "Please enter a valid room code.",
-      leaveRoom: "Leave Room",
-      confirmLeave: "Are you sure you want to leave the room?",
-      resumeTitle: "Game in Progress",
+      statLadders: "Magic Ladders",
+      statSnakes: "Dragons",
+      toastCopied: "Dungeon link copied to clipboard!",
+      errorFillName: "Please enter your adventurer name.",
+      errorFillCode: "Please enter a valid dungeon code.",
+      leaveRoom: "Leave Dungeon",
+      confirmLeave: "Are you sure you want to abandon the expedition?",
+      resumeTitle: "Dungeon in Progress",
       btnResume: "▶️ Resume",
-      reconnectingText: "Reconnecting to game...",
-      toastReconnected: "Reconnected to game!",
-      toastGameEnded: "The previous game has ended.",
-      cotorreoTitle: "🗣️ Fairground Banter!",
-      shoutSnake: "Watch out for snakes! 🐍",
-      shoutLadder: "Climb that ladder! 🪜",
-      shoutAlmost: "Almost at 100! 🏁",
-      shoutFaith: "Roll with faith! 🎲",
-      shoutUnlucky: "Down I go! 🧂",
-      shoutYourTurn: "Hurry up, your turn! ⏰",
-      shoutLucky: "Pure luck! 🍀",
-      labelBoardSize: "Board Mode",
-      board100: "Classic (100 Tiles - 10x10)",
-      board50: "Express (50 Tiles - 5x10)",
-      labelMysteryTiles: "Party Mystery Tiles (🌮, 🌶️, 🪅, 🌵)",
-      btnAddBot: "🤖 + Add Bot",
+      reconnectingText: "Reconnecting to dungeon...",
+      toastReconnected: "Reconnected to dungeon!",
+      toastGameEnded: "The previous dungeon run has ended.",
+      cotorreoTitle: "⚔️ Battle Cries & Spells!",
+      shoutDragon: "Beware the Dragon! 🐉",
+      shoutHonor: "For glory and honor! ⚔️",
+      shoutSave: "Saving throw! 🛡️",
+      shoutCrit: "Critical hit! 💥",
+      shoutFail: "Critical fail! 💀",
+      shoutInit: "Roll for initiative! 🎲",
+      shoutPotion: "Drinking a potion! 🧪",
+      labelBoardSize: "Dungeon Mode",
+      board100: "Tower of the Dragon (100 Tiles - 10x10)",
+      board50: "Crypt Express (50 Tiles - 5x10)",
+      labelMysteryTiles: "Magic Tiles (🧪, 📜, 📦, 🕸️)",
+      btnAddBot: "🤖 + Add Party Bot",
       btnRemoveBot: "🤖 - Remove Bot",
-      btnShareVictory: "📸 Share Victory Card",
-      podiumTitle: "🏆 Victory Podium",
-      awardsTitle: "🎖️ Party Badges & Awards",
-      cardDownloaded: "Victory card saved!",
-      cardShared: "Victory shared!",
+      btnShareVictory: "📜 Dragon Slayer Certificate",
+      podiumTitle: "🏆 Hall of Champions",
+      awardsTitle: "🎖️ Guild Honors & Badges",
+      cardDownloaded: "Victory certificate saved!",
+      cardShared: "Victory shared with the realm!",
       installApp: "Install App"
     }
   };
 
   const SHOUT_TRANSLATIONS = {
+    shoutDragon: { es: "¡Cuidado con el Dragón! 🐉", en: "Beware the Dragon! 🐉" },
+    shoutHonor: { es: "¡Por el honor y la gloria! ⚔️", en: "For glory and honor! ⚔️" },
+    shoutSave: { es: "¡Tirada de salvación! 🛡️", en: "Saving throw! 🛡️" },
+    shoutCrit: { es: "¡Golpe crítico! 💥", en: "Critical hit! 💥" },
+    shoutFail: { es: "¡Fallo crítico! 💀", en: "Critical fail! 💀" },
+    shoutInit: { es: "¡Lanza iniciativa! 🎲", en: "Roll for initiative! 🎲" },
+    shoutPotion: { es: "¡Bebiendo poción! 🧪", en: "Drinking a potion! 🧪" },
+    // Backwards-compatible legacy shouts
     shoutSnake: { es: "¡Aguas con la víbora! 🐍", en: "Watch out for snakes! 🐍" },
     shoutLadder: { es: "¡Sube, compadre! 🪜", en: "Climb that ladder! 🪜" },
     shoutAlmost: { es: "¡Ya merito llego! 🏁", en: "Almost at 100! 🏁" },
@@ -189,13 +199,13 @@
     return textOrKey;
   }
 
-  const AVATARS = ["🤠", "💀", "🪅", "🌵", "🦜", "🎸", "🌶️", "🐆", "☀️", "🦅"];
+  const AVATARS = ["🧙‍♂️", "⚔️", "🏹", "🧝", "🛡️", "🧌", "🐉", "🧝‍♀️", "🧛", "🪕"];
   const COLORS = [
     "#ef4444", "#f59e0b", "#10b981", "#3b82f6",
     "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
     "#14b8a6", "#eab308"
   ];
-  const THEMES = ["fiesta", "muertos", "selva"];
+  const THEMES = ["calabozo", "dragon", "arcano"];
 
   let currentLang = localStorage.getItem("serpientes_lang") || "es";
   let currentThemeIdx = 0;
@@ -340,14 +350,14 @@
     if (!layer) return;
     layer.innerHTML = "";
 
-    let icons = ["🎉", "✨", "🪅", "🎊", "🇲🇽", "🌮", "🌶️"];
+    let icons = ["✨", "⚔️", "🛡️", "💎", "🗝️", "🦇", "⛓️"];
     let count = 4;
 
-    if (themeName === "muertos") {
-      icons = ["💀", "🌼", "🏵️", "🕯️", "💀", "🌼", "🏵️"];
+    if (themeName === "dragon") {
+      icons = ["🔥", "🐉", "⚡", "💥", "🌋", "🔥", "💎"];
       count = 4;
-    } else if (themeName === "selva") {
-      icons = ["🌿", "🦜", "🍃", "🐆", "☀️", "🌺"];
+    } else if (themeName === "arcano") {
+      icons = ["🔮", "✨", "📜", "⚡", "🌟", "🧙‍♂️", "🌌"];
       count = 4;
     }
 
@@ -532,9 +542,9 @@
         const numSpan = document.createElement("span");
         numSpan.className = "tile-number";
         if (tileNum === totalTiles) {
-          numSpan.textContent = `🏆 ${totalTiles}`;
+          numSpan.textContent = `🐉 ${totalTiles}`;
         } else if (tileNum === 1) {
-          numSpan.textContent = "🏁 1";
+          numSpan.textContent = "🏰 1";
         } else {
           numSpan.textContent = String(tileNum);
         }
@@ -548,24 +558,28 @@
             const mSpan = document.createElement("span");
             mSpan.className = "tile-mystery-icon";
             const icons = {
-              taco: "🌮",
-              chile: "🌶️",
-              pinata: "🪅",
-              nopal: "🌵"
+              potion: "🧪",
+              scroll: "📜",
+              chest: "📦",
+              trap: "🕸️",
+              taco: "🧪",
+              chile: "📜",
+              pinata: "📦",
+              nopal: "🕸️"
             };
             mSpan.textContent = icons[mystery.kind] || "✨";
             tileDiv.appendChild(mSpan);
           }
         }
 
-        // Subtle indicator if tile is a ladder start or snake mouth
+        // Subtle indicator if tile is a ladder start or dragon dive
         if (board && board.ladders) {
           const lad = board.ladders.find(l => l.from === tileNum);
           if (lad) {
             const hint = document.createElement("span");
             hint.className = "tile-badge-hint tile-badge-ladder";
             hint.textContent = `▲${lad.to}`;
-            hint.title = `Escalera a casilla ${lad.to}`;
+            hint.title = currentLang === "en" ? `Runic ladder to tile ${lad.to}` : `Escalera rúnica a casilla ${lad.to}`;
             tileDiv.appendChild(hint);
           }
         }
@@ -574,8 +588,8 @@
           if (snk) {
             const hint = document.createElement("span");
             hint.className = "tile-badge-hint tile-badge-snake";
-            hint.textContent = `▼${snk.to}`;
-            hint.title = `Serpiente a casilla ${snk.to}`;
+            hint.textContent = `🐉▼${snk.to}`;
+            hint.title = currentLang === "en" ? `Dragon dive to tile ${snk.to}` : `Caída de dragón a casilla ${snk.to}`;
             tileDiv.appendChild(hint);
           }
         }
@@ -738,7 +752,7 @@
       el.boardSvgOverlay.appendChild(group);
     });
 
-    // 2. Draw Authentic Mexican Serpientes (Organic, Shaded, Expressive)
+    // 2. Draw Fearsome Dungeon Dragons (Majestic, Horned, Spined, Glowing Eyes)
     board.snakes.forEach((s, idx) => {
       const head = getTileCoords(s.from);
       const tail = getTileCoords(s.to);
@@ -763,61 +777,105 @@
       const group = document.createElementNS(svgNS, "g");
       group.setAttribute("filter", "url(#ladderDropShadow)");
 
-      // Color Palettes for Serpents
-      const snakePalettes = [
-        { main: "#047857", belly: "#34d399", accent: "#fef08a", dark: "#064e3b" }, // Emerald Quetzalcoatl
-        { main: "#be123c", belly: "#fb7185", accent: "#fef08a", dark: "#881337" }, // Coral Viper
-        { main: "#6d28d9", belly: "#c084fc", accent: "#fde047", dark: "#4c1d95" }, // Royal Aztec
-        { main: "#b45309", belly: "#fde047", accent: "#fffbeb", dark: "#78350f" }  // Golden Cascabel
+      // Color Palettes for High-Fantasy Dragons
+      const dragonPalettes = [
+        { main: "#dc2626", belly: "#f97316", accent: "#fde047", dark: "#7f1d1d", eye: "#fef08a", horn: "#451a03", flame: "#ea580c" }, // Crimson Fire Drake
+        { main: "#334155", belly: "#64748b", accent: "#cbd5e1", dark: "#0f172a", eye: "#c084fc", horn: "#1e1b4b", flame: "#818cf8" }, // Shadow Wyrm
+        { main: "#047857", belly: "#10b981", accent: "#a7f3d0", dark: "#064e3b", eye: "#fbbf24", horn: "#14532d", flame: "#34d399" }, // Emerald Wyvern
+        { main: "#b45309", belly: "#f59e0b", accent: "#fef08a", dark: "#451a03", eye: "#fef08a", horn: "#292524", flame: "#f97316" }  // Golden Elder Dragon
       ];
-      const p = snakePalettes[idx % snakePalettes.length];
+      const p = dragonPalettes[idx % dragonPalettes.length];
 
-      // Snake Linear Gradient
-      const gradId = `snakeGradient-${idx}`;
+      // Dragon Linear Gradient
+      const gradId = `dragonGradient-${idx}`;
       const grad = document.createElementNS(svgNS, "linearGradient");
       grad.id = gradId;
       grad.innerHTML = `
         <stop offset="0%" stop-color="${p.main}" />
-        <stop offset="60%" stop-color="${p.belly}" />
+        <stop offset="55%" stop-color="${p.belly}" />
         <stop offset="100%" stop-color="${p.dark}" />
       `;
       defs.appendChild(grad);
 
-      // Main Muscular Body
+      // Dorsal Spine Spikes along dragon curve
+      [0.25, 0.42, 0.58, 0.75].forEach(t => {
+        const it = 1 - t;
+        const bx = it*it*it*head.x + 3*it*it*t*c1x + 3*it*t*t*c2x + t*t*t*tail.x;
+        const by = it*it*it*head.y + 3*it*it*t*c1y + 3*it*t*t*c2y + t*t*t*tail.y;
+        // Approximate normal
+        const tx = 3*it*it*(c1x-head.x) + 6*it*t*(c2x-c1x) + 3*t*t*(tail.x-c2x);
+        const ty = 3*it*it*(c1y-head.y) + 6*it*t*(c2y-c1y) + 3*t*t*(tail.y-c2y);
+        const tLen = Math.sqrt(tx*tx + ty*ty) || 1;
+        const snx = (-ty / tLen) * sign;
+        const sny = (tx / tLen) * sign;
+
+        const spike = document.createElementNS(svgNS, "polygon");
+        const b1x = bx - (tx/tLen)*6;
+        const b1y = by - (ty/tLen)*6;
+        const b2x = bx + (tx/tLen)*6;
+        const b2y = by + (ty/tLen)*6;
+        const tipX = bx + snx * 19;
+        const tipY = by + sny * 19;
+        spike.setAttribute("points", `${b1x},${b1y} ${tipX},${tipY} ${b2x},${b2y}`);
+        spike.setAttribute("fill", p.horn);
+        spike.setAttribute("stroke", p.dark);
+        spike.setAttribute("stroke-width", "1");
+        group.appendChild(spike);
+      });
+
+      // Main Muscular Dragon Body
       const body = document.createElementNS(svgNS, "path");
       body.setAttribute("d", pathData);
       body.setAttribute("fill", "none");
       body.setAttribute("stroke", `url(#${gradId})`);
-      body.setAttribute("stroke-width", "26");
+      body.setAttribute("stroke-width", "25");
       body.setAttribute("stroke-linecap", "round");
       body.setAttribute("stroke-linejoin", "round");
       group.appendChild(body);
 
-      // Snake Belly Shading / Diamond pattern
+      // Dragon Armored Belly Scales
       const belly = document.createElementNS(svgNS, "path");
       belly.setAttribute("d", pathData);
       belly.setAttribute("fill", "none");
       belly.setAttribute("stroke", p.accent);
       belly.setAttribute("stroke-width", "5");
       belly.setAttribute("stroke-linecap", "round");
-      belly.setAttribute("opacity", "0.8");
+      belly.setAttribute("opacity", "0.85");
       group.appendChild(belly);
 
-      // Snake Head (Almond / Teardrop viper head facing outward from body)
+      // Dragon Head
       const headGroup = document.createElementNS(svgNS, "g");
       const angle = Math.atan2(c1y - head.y, c1x - head.x) * (180 / Math.PI);
       headGroup.setAttribute("transform", `translate(${head.x}, ${head.y}) rotate(${angle + 90})`);
 
-      // Red Forked Tongue
-      const tongue = document.createElementNS(svgNS, "path");
-      tongue.setAttribute("d", "M 0 16 L 0 32 L -5 38 M 0 32 L 5 38");
-      tongue.setAttribute("fill", "none");
-      tongue.setAttribute("stroke", "#dc2626");
-      tongue.setAttribute("stroke-width", "3");
-      tongue.setAttribute("stroke-linecap", "round");
-      headGroup.appendChild(tongue);
+      // Sweeping Dragon Horns (Left & Right)
+      const hornL = document.createElementNS(svgNS, "path");
+      hornL.setAttribute("d", "M -6 -4 C -14 -16, -20 -22, -26 -28 C -19 -20, -11 -12, -3 -6 Z");
+      hornL.setAttribute("fill", p.horn);
+      hornL.setAttribute("stroke", p.dark);
+      hornL.setAttribute("stroke-width", "1.5");
+      headGroup.appendChild(hornL);
 
-      // White Sharp Fangs
+      const hornR = document.createElementNS(svgNS, "path");
+      hornR.setAttribute("d", "M 6 -4 C 14 -16, 20 -22, 26 -28 C 19 -20, 11 -12, 3 -6 Z");
+      hornR.setAttribute("fill", p.horn);
+      hornR.setAttribute("stroke", p.dark);
+      hornR.setAttribute("stroke-width", "1.5");
+      headGroup.appendChild(hornR);
+
+      // Fiery Breath / Flame burst from mouth
+      const flame = document.createElementNS(svgNS, "polygon");
+      flame.setAttribute("points", "0,20 -5,28 -2,33 0,38 3,32 5,28");
+      flame.setAttribute("fill", p.flame);
+      flame.setAttribute("filter", "drop-shadow(0 0 3px #f59e0b)");
+      headGroup.appendChild(flame);
+
+      const flameCore = document.createElementNS(svgNS, "polygon");
+      flameCore.setAttribute("points", "0,21 -2,26 0,30 2,26");
+      flameCore.setAttribute("fill", "#fef08a");
+      headGroup.appendChild(flameCore);
+
+      // Sharp Dragon Fangs
       const fangL = document.createElementNS(svgNS, "polygon");
       fangL.setAttribute("points", "-4,16 -2,22 -6,16");
       fangL.setAttribute("fill", "#ffffff");
@@ -828,60 +886,67 @@
       fangR.setAttribute("fill", "#ffffff");
       headGroup.appendChild(fangR);
 
-      // Viper Head Base
+      // Dragon Head / Snout Base
       const headShape = document.createElementNS(svgNS, "path");
-      headShape.setAttribute("d", "M 0 18 C 14 18, 18 -6, 0 -16 C -18 -6, -14 18, 0 18 Z");
+      headShape.setAttribute("d", "M 0 19 C 15 18, 17 -5, 0 -17 C -17 -5, -15 18, 0 19 Z");
       headShape.setAttribute("fill", p.main);
       headShape.setAttribute("stroke", p.dark);
       headShape.setAttribute("stroke-width", "2");
       headGroup.appendChild(headShape);
 
-      // Golden Viper Eyes with slit pupils
-      const eyeL = document.createElementNS(svgNS, "circle");
+      // Draconic Eyes with vertical slit pupils
+      const eyeL = document.createElementNS(svgNS, "ellipse");
       eyeL.setAttribute("cx", "-8");
       eyeL.setAttribute("cy", "4");
-      eyeL.setAttribute("r", "4.5");
-      eyeL.setAttribute("fill", "#fef08a");
+      eyeL.setAttribute("rx", "4.5");
+      eyeL.setAttribute("ry", "3.5");
+      eyeL.setAttribute("fill", p.eye);
       headGroup.appendChild(eyeL);
 
       const pupilL = document.createElementNS(svgNS, "ellipse");
       pupilL.setAttribute("cx", "-8");
       pupilL.setAttribute("cy", "4");
-      pupilL.setAttribute("rx", "1.5");
+      pupilL.setAttribute("rx", "1.2");
       pupilL.setAttribute("ry", "3.5");
       pupilL.setAttribute("fill", "#111");
       headGroup.appendChild(pupilL);
 
-      const eyeR = document.createElementNS(svgNS, "circle");
+      const eyeR = document.createElementNS(svgNS, "ellipse");
       eyeR.setAttribute("cx", "8");
       eyeR.setAttribute("cy", "4");
-      eyeR.setAttribute("r", "4.5");
-      eyeR.setAttribute("fill", "#fef08a");
+      eyeR.setAttribute("rx", "4.5");
+      eyeR.setAttribute("ry", "3.5");
+      eyeR.setAttribute("fill", p.eye);
       headGroup.appendChild(eyeR);
 
       const pupilR = document.createElementNS(svgNS, "ellipse");
       pupilR.setAttribute("cx", "8");
       pupilR.setAttribute("cy", "4");
-      pupilR.setAttribute("rx", "1.5");
+      pupilR.setAttribute("rx", "1.2");
       pupilR.setAttribute("ry", "3.5");
       pupilR.setAttribute("fill", "#111");
       headGroup.appendChild(pupilR);
 
       group.appendChild(headGroup);
 
-      // Tail Rattle Rings at destination
+      // Barbed Dragon Tail Blade / Spade
       const tailGroup = document.createElementNS(svgNS, "g");
-      tailGroup.setAttribute("transform", `translate(${tail.x}, ${tail.y})`);
-      for (let r = 0; r < 3; r++) {
-        const ring = document.createElementNS(svgNS, "circle");
-        ring.setAttribute("cx", "0");
-        ring.setAttribute("cy", String(r * 5));
-        ring.setAttribute("r", String(6.5 - r * 1.5));
-        ring.setAttribute("fill", "#f59e0b");
-        ring.setAttribute("stroke", "#78350f");
-        ring.setAttribute("stroke-width", "1.5");
-        tailGroup.appendChild(ring);
-      }
+      const tailAngle = Math.atan2(tail.y - c2y, tail.x - c2x) * (180 / Math.PI);
+      tailGroup.setAttribute("transform", `translate(${tail.x}, ${tail.y}) rotate(${tailAngle + 90})`);
+
+      const tailSpade = document.createElementNS(svgNS, "path");
+      tailSpade.setAttribute("d", "M 0 0 L -9 18 L 0 12 L 9 18 Z");
+      tailSpade.setAttribute("fill", p.horn);
+      tailSpade.setAttribute("stroke", p.dark);
+      tailSpade.setAttribute("stroke-width", "1.5");
+      tailGroup.appendChild(tailSpade);
+
+      const tailSpadeGlow = document.createElementNS(svgNS, "path");
+      tailSpadeGlow.setAttribute("d", "M 0 3 L -4 13 L 0 9 L 4 13 Z");
+      tailSpadeGlow.setAttribute("fill", p.accent);
+      tailSpadeGlow.setAttribute("opacity", "0.75");
+      tailGroup.appendChild(tailSpadeGlow);
+
       group.appendChild(tailGroup);
 
       el.boardSvgOverlay.appendChild(group);
@@ -996,16 +1061,16 @@
         if (window.serpientesAudio) {
           window.serpientesAudio.playLadder();
           window.serpientesAudio.speak(
-            `¡${step.player_name} subió por la escalera!`,
-            `${step.player_name} climbed a ladder!`
+            `¡${step.player_name} subió por la escalera rúnica!`,
+            `${step.player_name} climbed a runic ladder!`
           );
         }
       } else {
         if (window.serpientesAudio) {
           window.serpientesAudio.playSnake();
           window.serpientesAudio.speak(
-            `¡${step.player_name} resbaló por la serpiente!`,
-            `${step.player_name} slid down a snake!`
+            `¡El dragón hizo descender a ${step.player_name}!`,
+            `The dragon struck down ${step.player_name}!`
           );
         }
       }
@@ -1021,11 +1086,12 @@
       if (msg) showToast(msg);
 
       if (window.serpientesAudio) {
-        if (step.mystery_applied.kind === "taco" || step.mystery_applied.kind === "chile") {
+        const k = step.mystery_applied.kind;
+        if (k === "potion" || k === "scroll" || k === "taco" || k === "chile") {
           window.serpientesAudio.playLadder();
-        } else if (step.mystery_applied.kind === "pinata") {
+        } else if (k === "chest" || k === "pinata") {
           window.serpientesAudio.playVictory();
-        } else if (step.mystery_applied.kind === "nopal") {
+        } else if (k === "trap" || k === "nopal") {
           window.serpientesAudio.playSnake();
         }
       }
@@ -1038,7 +1104,7 @@
       token.style.transition = "";
     }
 
-    // 3.6 Handle Nopal Trapped Turn Skip
+    // 3.6 Handle Trap Turn Skip
     if (!step.path || step.path.length === 0) {
       if (step.mystery_message_es && step.roll.total === 0) {
         const msg = currentLang === "es" ? step.mystery_message_es : step.mystery_message_en;
@@ -1052,8 +1118,8 @@
       if (window.serpientesAudio) {
         window.serpientesAudio.playVictory();
         window.serpientesAudio.speak(
-          `¡Victoria! ¡${step.player_name} ha ganado la partida!`,
-          `Victory! ${step.player_name} won the game!`
+          `¡Victoria épica! ¡${step.player_name} es el nuevo Dragon Slayer!`,
+          `Epic victory! ${step.player_name} is the new Dragon Slayer!`
         );
       }
       launchConfetti();
@@ -1269,13 +1335,13 @@
         if (boardPill) {
           const sz = (room.board && room.board.total_tiles) || (room.settings && room.settings.board_size) || 100;
           boardPill.textContent = sz === 50
-            ? (currentLang === "es" ? "⚡ Express 50" : "⚡ Express 50")
-            : (currentLang === "es" ? "🗺️ Clásico 100" : "🗺️ Classic 100");
+            ? (currentLang === "es" ? "⚡ Cripta 50" : "⚡ Crypt 50")
+            : (currentLang === "es" ? "🏰 Torre 100" : "🏰 Spire 100");
         }
         if (mysteryPill) {
           const enabled = room.settings.mystery_tiles;
           mysteryPill.style.display = enabled ? "inline-block" : "none";
-          mysteryPill.textContent = currentLang === "es" ? "🎉 Fiesta" : "🎉 Party";
+          mysteryPill.textContent = currentLang === "es" ? "✨ Magia" : "✨ Magic";
         }
       }
 
@@ -2004,7 +2070,7 @@
   }
 
   // -------------------------------------------------------------
-  // 11. Canvas Shareable Victory Card Generator
+  // 11. Canvas Shareable Dragon Slayer Victory Certificate Generator
   // -------------------------------------------------------------
   function generateVictoryCard(winner, players, board) {
     const canvas = document.createElement("canvas");
@@ -2012,70 +2078,82 @@
     canvas.height = 1000;
     const ctx = canvas.getContext("2d");
 
-    // 1. Festive Mexican background
+    // 1. Ancient Obsidian & Dark Granite background
     const bgGrad = ctx.createLinearGradient(0, 0, 800, 1000);
-    bgGrad.addColorStop(0, "#2a1205");
-    bgGrad.addColorStop(0.5, "#180a03");
-    bgGrad.addColorStop(1, "#2a0815");
+    bgGrad.addColorStop(0, "#0f172a");
+    bgGrad.addColorStop(0.5, "#182234");
+    bgGrad.addColorStop(1, "#090d16");
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 800, 1000);
 
-    // Decorative Mexican Folk Border
-    ctx.strokeStyle = "#f59e0b";
-    ctx.lineWidth = 10;
+    // Gilded Heraldic Filigree Border
+    ctx.strokeStyle = "#d97706";
+    ctx.lineWidth = 8;
     ctx.strokeRect(20, 20, 760, 960);
-    ctx.strokeStyle = "#ec4899";
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 2.5;
     ctx.strokeRect(28, 28, 744, 944);
 
-    // Papel picado top garland
-    const garlandColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6", "#06b6d4"];
-    for (let i = 0; i < 8; i++) {
-      ctx.fillStyle = garlandColors[i % garlandColors.length];
-      const gx = 45 + i * 90;
+    // Corner Runic Bosses
+    const corners = [[32, 32], [768, 32], [32, 968], [768, 968]];
+    corners.forEach(([cx, cy]) => {
       ctx.beginPath();
-      ctx.moveTo(gx, 34);
-      ctx.lineTo(gx + 80, 34);
-      ctx.lineTo(gx + 40, 75);
-      ctx.closePath();
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#fbbf24";
       ctx.fill();
+      ctx.strokeStyle = "#78350f";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    // Top Heraldic Crest Garland
+    const heraldicIcons = ["⚔️", "🛡️", "🐉", "🔮", "👑", "✨", "📜"];
+    for (let i = 0; i < 7; i++) {
+      const gx = 85 + i * 95;
+      ctx.font = "24px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(heraldicIcons[i % heraldicIcons.length], gx, 58);
     }
 
     // Title Header
     ctx.textAlign = "center";
     ctx.fillStyle = "#fef08a";
-    ctx.font = "bold 26px 'Lilita One', sans-serif, system-ui";
-    ctx.fillText("🇲🇽 SERPIENTES Y ESCALERAS 🇲🇽", 400, 115);
+    ctx.font = "bold 28px 'Cinzel', serif, Georgia";
+    ctx.fillText(currentLang === "es" ? "🐉 CALABOZOS Y DRAGONES 🐉" : "🐉 DUNGEONS & DRAGONS 🐉", 400, 115);
 
     // Subtitle
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "16px sans-serif";
-    ctx.fillText(currentLang === "es" ? "CERTIFICADO DE GRAN CAMPEÓN" : "GRAND CHAMPION CERTIFICATE", 400, 145);
+    ctx.fillStyle = "#f59e0b";
+    ctx.font = "bold 15px 'Cinzel', serif, Georgia";
+    ctx.fillText(
+      currentLang === "es" ? "✦ CERTIFICADO DE HONOR • DRAGON SLAYER ✦" : "✦ CERTIFICATE OF VALOR • DRAGON SLAYER ✦",
+      400,
+      145
+    );
 
-    // Golden Trophy Circle
+    // Gilded Hero Circle
     ctx.beginPath();
-    ctx.arc(400, 235, 65, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(245, 158, 11, 0.2)";
+    ctx.arc(400, 235, 68, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(217, 119, 6, 0.2)";
     ctx.fill();
-    ctx.strokeStyle = "#f59e0b";
+    ctx.strokeStyle = "#fbbf24";
     ctx.lineWidth = 4;
     ctx.stroke();
 
     // Winner Avatar
-    ctx.font = "68px sans-serif";
-    ctx.fillText(winner.avatar || "🤠", 400, 260);
+    ctx.font = "70px sans-serif";
+    ctx.fillText(winner.avatar || "🧙‍♂️", 400, 260);
 
     // Winner Name
     ctx.fillStyle = "#fde047";
-    ctx.font = "bold 38px 'Lilita One', sans-serif, system-ui";
+    ctx.font = "bold 38px 'Cinzel', serif, Georgia";
     ctx.fillText(winner.player_name, 400, 345);
 
     // Goal reached label
     const totalTiles = (board && board.total_tiles) || 100;
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 18px sans-serif";
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = "bold 17px 'Cinzel', serif, Georgia";
     ctx.fillText(
-      currentLang === "es" ? `¡Llegó a la meta (Casilla ${totalTiles})!` : `Reached the goal (Tile ${totalTiles})!`,
+      currentLang === "es" ? `¡Derrotó al Dragón y conquistó la Casilla ${totalTiles}!` : `Defeated the Dragon & Conquered Tile ${totalTiles}!`,
       400,
       380
     );
@@ -2084,37 +2162,37 @@
     const statBoxes = [
       { label: currentLang === "es" ? "Tiros" : "Rolls", val: winner.total_rolls, icon: "🎲" },
       { label: currentLang === "es" ? "Escaleras" : "Ladders", val: winner.ladders_climbed, icon: "🪜" },
-      { label: currentLang === "es" ? "Serpientes" : "Snakes", val: winner.snakes_hit, icon: "🐍" },
+      { label: currentLang === "es" ? "Dragones" : "Dragons", val: winner.snakes_hit, icon: "🐉" },
     ];
     for (let i = 0; i < 3; i++) {
       const sx = 140 + i * 185;
-      ctx.fillStyle = "rgba(45, 23, 14, 0.9)";
+      ctx.fillStyle = "rgba(30, 41, 59, 0.95)";
       ctx.fillRect(sx, 410, 150, 85);
       ctx.strokeStyle = "#d97706";
       ctx.lineWidth = 2;
       ctx.strokeRect(sx, 410, 150, 85);
 
       ctx.fillStyle = "#fef08a";
-      ctx.font = "bold 28px sans-serif";
+      ctx.font = "bold 28px 'Cinzel', sans-serif";
       ctx.fillText(`${statBoxes[i].icon} ${statBoxes[i].val}`, sx + 75, 452);
 
-      ctx.fillStyle = "#d6d3d1";
+      ctx.fillStyle = "#94a3b8";
       ctx.font = "14px sans-serif";
       ctx.fillText(statBoxes[i].label, sx + 75, 480);
     }
 
-    // Awards Section
+    // Guild Honors Section
     ctx.fillStyle = "#fde047";
-    ctx.font = "bold 20px sans-serif";
-    ctx.fillText(currentLang === "es" ? "🎖️ PREMIOS Y MEDALLAS DE HONOR" : "🎖️ HONORARY BADGES & AWARDS", 400, 535);
+    ctx.font = "bold 19px 'Cinzel', serif, Georgia";
+    ctx.fillText(currentLang === "es" ? "🎖️ HONORES DE LA ORDEN DE AVENTUREROS" : "🎖️ GUILD OF ADVENTURERS HONORS", 400, 535);
 
     const awards = winner.awards || [];
     for (let i = 0; i < Math.min(awards.length, 4); i++) {
       const aw = awards[i];
       const ay = 560 + i * 80;
-      ctx.fillStyle = "rgba(26, 15, 8, 0.85)";
+      ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
       ctx.fillRect(90, ay, 620, 68);
-      ctx.strokeStyle = "rgba(254, 240, 138, 0.3)";
+      ctx.strokeStyle = "rgba(251, 191, 36, 0.35)";
       ctx.lineWidth = 1.5;
       ctx.strokeRect(90, ay, 620, 68);
 
@@ -2123,11 +2201,11 @@
 
       ctx.textAlign = "left";
       ctx.fillStyle = "#fde047";
-      ctx.font = "bold 17px sans-serif";
+      ctx.font = "bold 16px 'Cinzel', serif, Georgia";
       const awTitle = currentLang === "es" ? aw.title_es : aw.title_en;
       ctx.fillText(awTitle, 180, ay + 30);
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#cbd5e1";
       ctx.font = "14px sans-serif";
       const awDetail = currentLang === "es" ? aw.detail_es : aw.detail_en;
       ctx.fillText(`${aw.avatar} ${aw.player_name} • ${awDetail}`, 180, ay + 52);
@@ -2135,23 +2213,31 @@
     }
 
     // Footer info
-    ctx.fillStyle = "#a8a29e";
-    ctx.font = "14px sans-serif";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "13px sans-serif";
     const dateStr = new Date().toLocaleDateString();
-    ctx.fillText(`Sala: ${currentRoom ? currentRoom.code : "SERP"} • ${dateStr} • ¡Juega gratis en línea!`, 400, 930);
+    ctx.fillText(
+      currentLang === "es"
+        ? `Mazmorra: ${currentRoom ? currentRoom.code : "DRAG"} • ${dateStr} • ¡Gesta Inmortalizada en Calabozos y Dragones!`
+        : `Dungeon: ${currentRoom ? currentRoom.code : "DRAG"} • ${dateStr} • Immortalized in Dungeons & Dragons!`,
+      400,
+      930
+    );
 
     // Export & Share/Download
     canvas.toBlob(async (blob) => {
       if (!blob) return;
-      const file = new File([blob], "victoria-serpientes-y-escaleras.png", { type: "image/png" });
+      const cleanName = (winner.player_name || "heroe").toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const fileName = `dragon-slayer-${cleanName}.png`;
+      const file = new File([blob], fileName, { type: "image/png" });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({
-            title: currentLang === "es" ? "¡Gané en Serpientes y Escaleras!" : "I won at Snakes & Ladders!",
+            title: currentLang === "es" ? "¡Victoria en Calabozos y Dragones!" : "Victory in Dungeons & Dragons!",
             text: currentLang === "es"
-              ? `¡${winner.player_name} se coronó Gran Campeón en Serpientes y Escaleras! 🇲🇽🏆`
-              : `${winner.player_name} became Grand Champion in Snakes & Ladders! 🇲🇽🏆`,
+              ? `¡${winner.player_name} se coronó Dragon Slayer en Calabozos y Dragones! 🐉⚔️`
+              : `${winner.player_name} became Dragon Slayer in Dungeons & Dragons! 🐉⚔️`,
             files: [file]
           });
           showToast(i18n[currentLang].cardShared);
@@ -2164,7 +2250,7 @@
       // Download fallback
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "victoria-serpientes-y-escaleras.png";
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

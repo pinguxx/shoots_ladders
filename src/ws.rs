@@ -229,9 +229,9 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                 }
                             }
 
-                            let clean_name = sanitize_name(&player_name, "Jugador 1");
+                            let clean_name = sanitize_name(&player_name, "Aventurero 1");
                             let player_id = format!("p_{:x}", rand::random::<u64>());
-                            let chosen_avatar = sanitize_avatar(avatar, "🤠");
+                            let chosen_avatar = sanitize_avatar(avatar, "🧙‍♂️");
                             let chosen_color = sanitize_color(color, "#ef4444");
 
                             let host_player = Player {
@@ -345,7 +345,16 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                         "#06b6d4", "#f97316", "#14b8a6", "#eab308", "#f43f5e",
                                     ];
                                     let default_avatars = [
-                                        "💀", "🪅", "🌵", "🦜", "🎸", "🌶️", "🐆", "☀️", "🦅", "🦎",
+                                        "🧙‍♂️",
+                                        "⚔️",
+                                        "🏹",
+                                        "🧝",
+                                        "🛡️",
+                                        "🧌",
+                                        "🐉",
+                                        "🧝‍♀️",
+                                        "🧛",
+                                        "🪕",
                                     ];
 
                                     let p_idx = room.players.len();
@@ -638,7 +647,41 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                 "🎺",
                                 "🌶️",
                                 "💀",
-                                // Spanish shouts
+                                "🐉",
+                                "⚔️",
+                                "🛡️",
+                                "🧙‍♂️",
+                                "🔥",
+                                "✨",
+                                "🧪",
+                                "📦",
+                                "📜",
+                                "💥",
+                                // Spanish fantasy shouts
+                                "¡Cuidado con el Dragón! 🐉",
+                                "¡Por el honor y la gloria! ⚔️",
+                                "¡Tirada de salvación! 🛡️",
+                                "¡Golpe crítico! 💥",
+                                "¡Fallo crítico! 💀",
+                                "¡Lanza iniciativa! 🎲",
+                                "¡Bebiendo poción! 🧪",
+                                // English fantasy shouts
+                                "Beware the Dragon! 🐉",
+                                "For glory and honor! ⚔️",
+                                "Saving throw! 🛡️",
+                                "Critical hit! 💥",
+                                "Critical fail! 💀",
+                                "Roll for initiative! 🎲",
+                                "Drinking a potion! 🧪",
+                                // Fantasy shout keys
+                                "shoutDragon",
+                                "shoutHonor",
+                                "shoutSave",
+                                "shoutCrit",
+                                "shoutFail",
+                                "shoutInit",
+                                "shoutPotion",
+                                // Legacy Spanish shouts
                                 "¡Aguas con la víbora! 🐍",
                                 "¡Sube, compadre! 🪜",
                                 "¡Ya merito llego! 🏁",
@@ -646,7 +689,7 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                 "¡Salado me quedé! 🧂",
                                 "¡Ándale, te toca! ⏰",
                                 "¡Pura suerte! 🍀",
-                                // English shouts
+                                // Legacy English shouts
                                 "Watch out for snakes! 🐍",
                                 "Climb that ladder! 🪜",
                                 "Almost at 100! 🏁",
@@ -654,7 +697,7 @@ pub async fn handle_ws_connection(socket: WebSocket, state: AppState) {
                                 "Down I go! 🧂",
                                 "Hurry up, your turn! ⏰",
                                 "Pure luck! 🍀",
-                                // Canonical keys
+                                // Legacy canonical keys
                                 "shoutSnake",
                                 "shoutLadder",
                                 "shoutAlmost",
@@ -1112,6 +1155,37 @@ mod tests {
             "🎺",
             "🌶️",
             "💀",
+            "🐉",
+            "⚔️",
+            "🛡️",
+            "🧙‍♂️",
+            "🔥",
+            "✨",
+            "🧪",
+            "📦",
+            "📜",
+            "💥",
+            "¡Cuidado con el Dragón! 🐉",
+            "¡Por el honor y la gloria! ⚔️",
+            "¡Tirada de salvación! 🛡️",
+            "¡Golpe crítico! 💥",
+            "¡Fallo crítico! 💀",
+            "¡Lanza iniciativa! 🎲",
+            "¡Bebiendo poción! 🧪",
+            "Beware the Dragon! 🐉",
+            "For glory and honor! ⚔️",
+            "Saving throw! 🛡️",
+            "Critical hit! 💥",
+            "Critical fail! 💀",
+            "Roll for initiative! 🎲",
+            "Drinking a potion! 🧪",
+            "shoutDragon",
+            "shoutHonor",
+            "shoutSave",
+            "shoutCrit",
+            "shoutFail",
+            "shoutInit",
+            "shoutPotion",
             "¡Aguas con la víbora! 🐍",
             "¡Sube, compadre! 🪜",
             "¡Ya merito llego! 🏁",
@@ -1137,6 +1211,8 @@ mod tests {
 
         // Valid ones
         assert!(allowed.contains(&"🎉"));
+        assert!(allowed.contains(&"🐉"));
+        assert!(allowed.contains(&"¡Cuidado con el Dragón! 🐉"));
         assert!(allowed.contains(&"¡Aguas con la víbora! 🐍"));
         assert!(allowed.contains(&"Watch out for snakes! 🐍"));
         assert!(allowed.contains(&"shoutSnake"));

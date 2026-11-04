@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="fiesta">
+<html lang="es" data-theme="calabozo">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>¡Serpientes y Escaleras Online! 🇲🇽</title>
+  <title>¡Calabozos y Dragones! 🐉 Mazmorras Online</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#b45309">
-  <link rel="stylesheet" href="style.css?v=5.0">
+  <meta name="theme-color" content="#d97706">
+  <link rel="stylesheet" href="style.css?v=6.0">
 </head>
 <body>
 
@@ -22,7 +22,7 @@
   <div id="reconnecting-overlay" class="reconnecting-overlay" style="display: none;">
     <div class="reconnecting-card">
       <span class="reconnecting-spinner">🎲</span>
-      <span class="reconnecting-text" data-i18n="reconnectingText">Reconectando a la partida...</span>
+      <span class="reconnecting-text" data-i18n="reconnectingText">Reconectando a la mazmorra...</span>
     </div>
   </div>
 
@@ -32,33 +32,32 @@
   <!-- Confetti Canvas for Victory Celebrations -->
   <canvas id="confetti-canvas" aria-hidden="true"></canvas>
 
-  <!-- Papel Picado Festive Garland -->
-  <div class="papel-picado" aria-hidden="true">
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
-    <div class="papel-flag"></div>
+  <!-- Dungeon Heraldic Banners & Castle Pennants -->
+  <div class="dungeon-banners" aria-hidden="true">
+    <div class="dungeon-flag flag-dragon"><span>🐉</span></div>
+    <div class="dungeon-torch"><span>🔥</span></div>
+    <div class="dungeon-flag flag-swords"><span>⚔️</span></div>
+    <div class="dungeon-flag flag-shield"><span>🛡️</span></div>
+    <div class="dungeon-torch"><span>🔥</span></div>
+    <div class="dungeon-flag flag-magic"><span>🔮</span></div>
+    <div class="dungeon-flag flag-crown"><span>👑</span></div>
   </div>
 
   <!-- App Header -->
   <header class="app-header">
     <div class="logo-container">
-      <span class="logo-badge">🐍</span>
+      <span class="logo-badge">🐉</span>
       <div class="logo-text">
         <h1 class="logo-title">
-          <span class="logo-title-1" data-i18n="titlePart1">SERPIENTES Y</span>
-          <span class="logo-title-2" data-i18n="titlePart2">ESCALERAS</span>
+          <span class="logo-title-1" data-i18n="titlePart1">CALABOZOS Y</span>
+          <span class="logo-title-2" data-i18n="titlePart2">DRAGONES</span>
         </h1>
-        <span class="logo-subtitle" data-i18n="appSubtitle">Multijugador en Vivo 🇲🇽</span>
+        <span class="logo-subtitle" data-i18n="appSubtitle">Mazmorras en Vivo ⚔️</span>
       </div>
     </div>
     <div class="header-actions">
       <button id="btn-install-pwa" class="btn-icon" style="display: none;" title="Instalar App / Install App" aria-label="Instalar App">📲</button>
-      <button id="btn-header-leave" class="btn-icon" style="display: none;" title="Salir de la Sala" aria-label="Salir de la Sala">🚪</button>
+      <button id="btn-header-leave" class="btn-icon" style="display: none;" title="Salir de la Mazmorra" aria-label="Salir de la Mazmorra">🚪</button>
       <button id="btn-toggle-theme" class="btn-icon" title="Cambiar Tema" aria-label="Cambiar Tema">🎨</button>
       <button id="btn-toggle-lang" class="btn-icon btn-lang" title="Idioma / Language" aria-label="Cambiar Idioma"><span class="lang-icon">🌐</span> <span class="lang-text-long">Español</span><span class="lang-text-short">ES</span></button>
       <button id="btn-toggle-sound" class="btn-icon" title="Sonido" aria-label="Alternar Sonido">🔊</button>
@@ -98,7 +97,7 @@
         <form id="form-create">
           <div class="form-group">
             <label for="create-name" data-i18n="labelName">Tu Nombre o Apodo</label>
-            <input type="text" id="create-name" class="form-control" placeholder="Ej. Pancho Villa" data-i18n-ph="placeholderName" maxlength="18" autocomplete="nickname" required autofocus>
+            <input type="text" id="create-name" class="form-control" placeholder="Ej. Gandalf el Gris" data-i18n-ph="placeholderName" maxlength="18" autocomplete="nickname" required autofocus>
           </div>
 
           <div class="form-group">
@@ -112,26 +111,26 @@
           </div>
 
           <details class="settings-panel">
-            <summary data-i18n="settingsTitle">Ajustes de la Partida</summary>
+            <summary data-i18n="settingsTitle">Ajustes de la Mazmorra</summary>
             <div class="settings-content">
               <div class="setting-row">
-                <span data-i18n="labelBoardSize">Modo de Tablero:</span>
+                <span data-i18n="labelBoardSize">Modo de Mazmorra:</span>
                 <select id="setting-board-size">
-                  <option value="100" selected data-i18n="board100">Clásico (100 Casillas - 10x10)</option>
-                  <option value="50" data-i18n="board50">Express (50 Casillas - 5x10)</option>
+                  <option value="100" selected data-i18n="board100">Torre del Dragón (100 Casillas - 10x10)</option>
+                  <option value="50" data-i18n="board50">Cripta Express (50 Casillas - 5x10)</option>
                 </select>
               </div>
 
               <div class="setting-row">
-                <span data-i18n="labelMysteryTiles">Casillas Misteriosas (🌮, 🌶️, 🪅, 🌵):</span>
+                <span data-i18n="labelMysteryTiles">Casillas Mágicas (🧪, 📜, 📦, 🕸️):</span>
                 <input type="checkbox" id="setting-mystery-tiles">
               </div>
 
               <div class="setting-row">
                 <span data-i18n="labelDiceCount">Número de Dados:</span>
                 <select id="setting-dice-count">
-                  <option value="1" selected data-i18n="dice1">1 Dado (Clásico)</option>
-                  <option value="2" data-i18n="dice2">2 Dados (Rápido)</option>
+                  <option value="1" selected data-i18n="dice1">1 Dado (Clásico d6)</option>
+                  <option value="2" data-i18n="dice2">2 Dados (Rápido 2d6)</option>
                 </select>
               </div>
 
@@ -165,22 +164,22 @@
             </div>
           </details>
 
-          <button type="submit" class="btn-primary" data-i18n="btnCreate">🎲 Crear Sala & Jugar</button>
+          <button type="submit" class="btn-primary" data-i18n="btnCreate">🎲 Entrar al Calabozo</button>
         </form>
 
         <!-- Join Form -->
         <form id="form-join" style="display: none;">
           <div class="form-group">
-            <label for="join-code" data-i18n="labelRoomCode">Código de la Sala</label>
-            <input type="text" id="join-code" class="form-control font-code" placeholder="Ej. SERP12" data-i18n-ph="placeholderRoomCode" maxlength="8" required>
+            <label for="join-code" data-i18n="labelRoomCode">Código de la Mazmorra</label>
+            <input type="text" id="join-code" class="form-control font-code" placeholder="Ej. DRAG12" data-i18n-ph="placeholderRoomCode" maxlength="8" required>
           </div>
 
           <div class="form-group">
             <label for="join-name" data-i18n="labelName">Tu Nombre o Apodo</label>
-            <input type="text" id="join-name" class="form-control" placeholder="Ej. Emiliano Zapata" data-i18n-ph="placeholderName" maxlength="18" autocomplete="nickname" required>
+            <input type="text" id="join-name" class="form-control" placeholder="Ej. Sir Galahad" data-i18n-ph="placeholderName" maxlength="18" autocomplete="nickname" required>
           </div>
 
-          <button type="submit" class="btn-primary" data-i18n="btnJoin">🚀 Entrar a la Sala</button>
+          <button type="submit" class="btn-primary" data-i18n="btnJoin">🚀 Entrar a la Mazmorra</button>
         </form>
       </div>
     </section>
@@ -289,32 +288,33 @@
             </div>
           </div>
 
-          <!-- Floating Emoji Reactions (At bottom of panel, like in loteria) -->
+          <!-- Floating Emoji Reactions -->
           <div class="reactions-section">
             <div id="reactions-bar" class="reactions-bar" aria-label="Reacciones en vivo">
-              <button class="btn-react" data-emoji="🎉" title="Celebrar">🎉</button>
-              <button class="btn-react" data-emoji="🐍" title="Serpiente">🐍</button>
-              <button class="btn-react" data-emoji="🪜" title="Escalera">🪜</button>
-              <button class="btn-react" data-emoji="😱" title="Susto">😱</button>
+              <button class="btn-react" data-emoji="🐉" title="Dragón">🐉</button>
+              <button class="btn-react" data-emoji="⚔️" title="Espadas">⚔️</button>
+              <button class="btn-react" data-emoji="🛡️" title="Escudo">🛡️</button>
+              <button class="btn-react" data-emoji="🧙‍♂️" title="Mago">🧙‍♂️</button>
               <button class="btn-react" data-emoji="🎲" title="Dado">🎲</button>
-              <button class="btn-react" data-emoji="🌮" title="Taco">🌮</button>
-              <button class="btn-react" data-emoji="🎺" title="Trompeta">🎺</button>
-              <button class="btn-react" data-emoji="🌶️" title="Picante">🌶️</button>
+              <button class="btn-react" data-emoji="🔥" title="Fuego">🔥</button>
+              <button class="btn-react" data-emoji="✨" title="Magia">✨</button>
               <button class="btn-react" data-emoji="💀" title="Calavera">💀</button>
+              <button class="btn-react" data-emoji="🧪" title="Poción">🧪</button>
+              <button class="btn-react" data-emoji="📦" title="Cofre">📦</button>
             </div>
           </div>
 
-          <!-- Gritos y Frases de Feria ("El Cotorreo") -->
+          <!-- Gritos de Guerra & Hechizos -->
           <div class="cotorreo-section">
-            <div class="cotorreo-title" data-i18n="cotorreoTitle">🗣️ ¡Cotorreo de Feria!</div>
-            <div id="cotorreo-bar" class="cotorreo-bar" aria-label="Frases y gritos tradicionales">
-              <button class="btn-cotorreo" data-shout-key="shoutSnake" data-i18n="shoutSnake" data-shout="¡Aguas con la víbora! 🐍">¡Aguas con la víbora! 🐍</button>
-              <button class="btn-cotorreo" data-shout-key="shoutLadder" data-i18n="shoutLadder" data-shout="¡Sube, compadre! 🪜">¡Sube, compadre! 🪜</button>
-              <button class="btn-cotorreo" data-shout-key="shoutAlmost" data-i18n="shoutAlmost" data-shout="¡Ya merito llego! 🏁">¡Ya merito llego! 🏁</button>
-              <button class="btn-cotorreo" data-shout-key="shoutFaith" data-i18n="shoutFaith" data-shout="¡Tírale con fe! 🎲">¡Tírale con fe! 🎲</button>
-              <button class="btn-cotorreo" data-shout-key="shoutUnlucky" data-i18n="shoutUnlucky" data-shout="¡Salado me quedé! 🧂">¡Salado me quedé! 🧂</button>
-              <button class="btn-cotorreo" data-shout-key="shoutYourTurn" data-i18n="shoutYourTurn" data-shout="¡Ándale, te toca! ⏰">¡Ándale, te toca! ⏰</button>
-              <button class="btn-cotorreo" data-shout-key="shoutLucky" data-i18n="shoutLucky" data-shout="¡Pura suerte! 🍀">¡Pura suerte! 🍀</button>
+            <div class="cotorreo-title" data-i18n="cotorreoTitle">⚔️ ¡Gritos de Guerra & Hechizos!</div>
+            <div id="cotorreo-bar" class="cotorreo-bar" aria-label="Gritos de batalla y hechizos">
+              <button class="btn-cotorreo" data-shout-key="shoutDragon" data-i18n="shoutDragon" data-shout="¡Cuidado con el Dragón! 🐉">¡Cuidado con el Dragón! 🐉</button>
+              <button class="btn-cotorreo" data-shout-key="shoutHonor" data-i18n="shoutHonor" data-shout="¡Por el honor y la gloria! ⚔️">¡Por el honor y la gloria! ⚔️</button>
+              <button class="btn-cotorreo" data-shout-key="shoutSave" data-i18n="shoutSave" data-shout="¡Tirada de salvación! 🛡️">¡Tirada de salvación! 🛡️</button>
+              <button class="btn-cotorreo" data-shout-key="shoutCrit" data-i18n="shoutCrit" data-shout="¡Golpe crítico! 💥">¡Golpe crítico! 💥</button>
+              <button class="btn-cotorreo" data-shout-key="shoutFail" data-i18n="shoutFail" data-shout="¡Fallo crítico! 💀">¡Fallo crítico! 💀</button>
+              <button class="btn-cotorreo" data-shout-key="shoutInit" data-i18n="shoutInit" data-shout="¡Lanza iniciativa! 🎲">¡Lanza iniciativa! 🎲</button>
+              <button class="btn-cotorreo" data-shout-key="shoutPotion" data-i18n="shoutPotion" data-shout="¡Bebiendo poción! 🧪">¡Bebiendo poción! 🧪</button>
             </div>
           </div>
 
@@ -351,15 +351,15 @@
   <!-- MODAL: Winner Celebration -->
   <div id="modal-winner" class="modal-overlay" role="dialog" aria-modal="true">
     <div class="modal-dialog">
-      <div id="winner-avatar" class="winner-avatar">🤠</div>
-      <h2 class="winner-title" data-i18n="winnerTitle">¡VICTORIA!</h2>
+      <div id="winner-avatar" class="winner-avatar">🧙‍♂️</div>
+      <h2 class="winner-title" data-i18n="winnerTitle">¡DRAGON SLAYER!</h2>
       <div id="winner-name" class="winner-name">Campeón</div>
-      <p class="modal-sub" data-i18n="winnerSub">¡Ha llegado a la casilla 100 y se corona Campeón!</p>
+      <p class="modal-sub" data-i18n="winnerSub">¡Ha derrotado al dragón y conquistado el calabozo!</p>
 
       <div class="winner-stats-grid">
         <div>
           <div id="winner-stat-rolls" class="winner-stat-val">0</div>
-          <div class="winner-stat-lbl" data-i18n="statRolls">Tiros</div>
+          <div class="winner-stat-lbl" data-i18n="statRolls">Tiradas</div>
         </div>
         <div>
           <div id="winner-stat-ladders" class="winner-stat-val">0</div>
@@ -367,18 +367,18 @@
         </div>
         <div>
           <div id="winner-stat-snakes" class="winner-stat-val">0</div>
-          <div class="winner-stat-lbl" data-i18n="statSnakes">Serpientes</div>
+          <div class="winner-stat-lbl" data-i18n="statSnakes">Dragones</div>
         </div>
       </div>
 
       <!-- Winner Podium & Awards Badges -->
       <div id="winner-podium-section" class="winner-podium-section">
-        <h4 class="podium-title" data-i18n="podiumTitle">🏆 Podio de Honor</h4>
+        <h4 class="podium-title" data-i18n="podiumTitle">🏆 Salón de Campeones</h4>
         <div id="winner-podium-list" class="winner-podium-list"></div>
       </div>
 
       <div id="winner-awards-section" class="winner-awards-section">
-        <h4 class="awards-title" data-i18n="awardsTitle">🎖️ Medallas de la Feria</h4>
+        <h4 class="awards-title" data-i18n="awardsTitle">🎖️ Títulos del Gremio</h4>
         <div id="winner-awards-grid" class="winner-awards-grid"></div>
       </div>
 

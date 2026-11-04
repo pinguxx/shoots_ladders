@@ -1,77 +1,77 @@
-/* Serpientes y Escaleras Online - Premium Mexican Aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+/* Calabozos y Dragones Online - High-Fantasy Dungeon Crawler Aesthetic */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Default Theme: Fiesta Clásica 🇲🇽 */
-  --bg-page-top: #2d1810;
-  --bg-page-bot: #150905;
-  --bg-card: #24130c;
-  --bg-card-rgb: 36, 19, 12;
-  --text-primary: #fffbeb;
-  --text-muted: #d6bb9e;
-  --border-color: rgba(245, 158, 11, 0.25);
-  --primary: #ea580c;
-  --primary-hover: #c2410c;
-  --accent-gold: #f59e0b;
+  /* Default Theme: Calabozo de Obsidiana 🏰 */
+  --bg-page-top: #1e293b;
+  --bg-page-bot: #0f172a;
+  --bg-card: #182234;
+  --bg-card-rgb: 24, 34, 52;
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: rgba(217, 119, 6, 0.35);
+  --primary: #d97706;
+  --primary-hover: #b45309;
+  --accent-gold: #fbbf24;
   --accent-red: #ef4444;
   --accent-green: #10b981;
 
-  /* Board & Tiles (Cream / Maize Parchment Palette for Maximum Contrast) */
-  --board-frame: #b45309;
-  --board-bg: #fffdfa;
-  --tile-bg-light: #fffdfa;
-  --tile-bg-dark: #fef3c7;
-  --tile-border: rgba(180, 83, 9, 0.16);
-  --tile-text: #3b1d0c;
+  /* Board & Tiles: Chiselled Dark Granite & Dungeon Stone */
+  --board-frame: #78350f;
+  --board-bg: #090d16;
+  --tile-bg-light: #1e293b;
+  --tile-bg-dark: #0f172a;
+  --tile-border: rgba(217, 119, 6, 0.22);
+  --tile-text: #fef08a;
 
   --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-title: 'Playfair Display', Georgia, serif;
+  --font-title: 'Cinzel', Georgia, serif;
 }
 
-[data-theme="muertos"] {
-  /* Theme: Día de los Muertos 💀 */
-  --bg-page-top: #230836;
-  --bg-page-bot: #0d0217;
-  --bg-card: #200833;
-  --bg-card-rgb: 32, 8, 51;
-  --text-primary: #fdf4ff;
-  --text-muted: #d8b4fe;
-  --border-color: rgba(251, 191, 36, 0.25);
-  --primary: #c026d3;
-  --primary-hover: #a21caf;
-  --accent-gold: #fbbf24;
+[data-theme="dragon"] {
+  /* Theme: Guarida del Dragón Rojo 🐉 */
+  --bg-page-top: #3b0d0c;
+  --bg-page-bot: #180505;
+  --bg-card: #2c0a0a;
+  --bg-card-rgb: 44, 10, 10;
+  --text-primary: #fff1f2;
+  --text-muted: #fda4af;
+  --border-color: rgba(239, 68, 68, 0.4);
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+  --accent-gold: #f59e0b;
+  --accent-red: #f43f5e;
+  --accent-green: #10b981;
+
+  --board-frame: #991b1b;
+  --board-bg: #1c0606;
+  --tile-bg-light: #380d0d;
+  --tile-bg-dark: #220606;
+  --tile-border: rgba(248, 113, 113, 0.28);
+  --tile-text: #fef08a;
+}
+
+[data-theme="arcano"] {
+  /* Theme: Sanctum Arcano del Mago 🔮 */
+  --bg-page-top: #1e1b4b;
+  --bg-page-bot: #090720;
+  --bg-card: #181440;
+  --bg-card-rgb: 24, 20, 64;
+  --text-primary: #e0e7ff;
+  --text-muted: #a5b4fc;
+  --border-color: rgba(129, 140, 248, 0.4);
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --accent-gold: #38bdf8;
   --accent-red: #f43f5e;
   --accent-green: #34d399;
 
-  --board-frame: #fbbf24;
-  --board-bg: #1c072e;
-  --tile-bg-light: #2c0e47;
-  --tile-bg-dark: #1b072c;
-  --tile-border: rgba(251, 191, 36, 0.15);
-  --tile-text: #fef08a;
-}
-
-[data-theme="selva"] {
-  /* Theme: Selva Maya 🌿 */
-  --bg-page-top: #0a291a;
-  --bg-page-bot: #03140c;
-  --bg-card: #0c3321;
-  --bg-card-rgb: 12, 51, 33;
-  --text-primary: #ecfdf5;
-  --text-muted: #a7f3d0;
-  --border-color: rgba(234, 179, 8, 0.25);
-  --primary: #059669;
-  --primary-hover: #047857;
-  --accent-gold: #eab308;
-  --accent-red: #e11d48;
-  --accent-green: #10b981;
-
-  --board-frame: #ca8a04;
-  --board-bg: #03170e;
-  --tile-bg-light: #0d4231;
-  --tile-bg-dark: #072e21;
-  --tile-border: rgba(234, 179, 8, 0.15);
-  --tile-text: #fef08a;
+  --board-frame: #4338ca;
+  --board-bg: #0c0926;
+  --tile-bg-light: #231d5c;
+  --tile-bg-dark: #120e36;
+  --tile-border: rgba(129, 140, 248, 0.28);
+  --tile-text: #93c5fd;
 }
 
 * {
@@ -112,7 +112,7 @@ body {
   pointer-events: none;
   animation: ambientFloatUp linear infinite;
   opacity: 0;
-  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
 }
 
 @keyframes ambientFloatUp {
@@ -121,47 +121,70 @@ body {
     opacity: 0;
   }
   20% {
-    opacity: 0.28;
+    opacity: 0.32;
   }
   80% {
-    opacity: 0.22;
+    opacity: 0.25;
   }
   100% {
-    transform: translateY(calc(-100vh - 60px)) translateX(var(--drift-x, 20px)) rotate(var(--rot, 35deg)) scale(1.02);
+    transform: translateY(calc(-100vh - 60px)) translateX(var(--drift-x, 20px)) rotate(var(--rot, 35deg)) scale(1.05);
     opacity: 0;
   }
 }
 
-/* Papel Picado Festive Garland */
-.papel-picado {
+/* Dungeon Heraldic Banners & Flickering Torches */
+.dungeon-banners {
   display: flex;
   justify-content: space-around;
+  align-items: flex-start;
   width: 100%;
-  height: clamp(14px, 2.5dvh, 22px);
+  height: clamp(20px, 3dvh, 28px);
   overflow: hidden;
   background: transparent;
   pointer-events: none;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 10;
+  padding: 0 8px;
 }
-.papel-flag {
+.dungeon-flag {
   flex: 1;
+  max-width: 58px;
   height: 100%;
-  clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
-  animation: flutter 4s ease-in-out infinite alternate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  font-size: 0.8rem;
+  animation: bannerSway 4.5s ease-in-out infinite alternate;
 }
-.papel-flag:nth-child(1) { background: #ef4444; animation-delay: 0.1s; }
-.papel-flag:nth-child(2) { background: #f59e0b; animation-delay: 0.4s; }
-.papel-flag:nth-child(3) { background: #10b981; animation-delay: 0.2s; }
-.papel-flag:nth-child(4) { background: #06b6d4; animation-delay: 0.6s; }
-.papel-flag:nth-child(5) { background: #8b5cf6; animation-delay: 0.3s; }
-.papel-flag:nth-child(6) { background: #ec4899; animation-delay: 0.5s; }
-.papel-flag:nth-child(7) { background: #f97316; animation-delay: 0.2s; }
-.papel-flag:nth-child(8) { background: #10b981; animation-delay: 0.4s; }
+.dungeon-flag span {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+}
+.dungeon-flag.flag-dragon { background: linear-gradient(180deg, #991b1b, #7f1d1d); border-top: 2px solid #f59e0b; animation-delay: 0.1s; }
+.dungeon-flag.flag-swords { background: linear-gradient(180deg, #334155, #1e293b); border-top: 2px solid #cbd5e1; animation-delay: 0.3s; }
+.dungeon-flag.flag-shield { background: linear-gradient(180deg, #b45309, #78350f); border-top: 2px solid #fde047; animation-delay: 0.2s; }
+.dungeon-flag.flag-magic { background: linear-gradient(180deg, #4338ca, #312e81); border-top: 2px solid #818cf8; animation-delay: 0.5s; }
+.dungeon-flag.flag-crown { background: linear-gradient(180deg, #854d0e, #713f12); border-top: 2px solid #fbbf24; animation-delay: 0.4s; }
 
-@keyframes flutter {
-  0% { transform: skewX(-2deg) rotate(0.5deg); }
-  100% { transform: skewX(2deg) rotate(-0.5deg); }
+.dungeon-torch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  animation: torchFlicker 1.8s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.7));
+}
+.dungeon-torch:nth-of-type(2) { animation-delay: 0.9s; }
+
+@keyframes bannerSway {
+  0% { transform: rotate(-1.5deg) skewX(-1deg); }
+  100% { transform: rotate(1.5deg) skewX(1deg); }
+}
+@keyframes torchFlicker {
+  0% { transform: scale(0.92); filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.9)); }
+  100% { transform: scale(0.96); filter: drop-shadow(0 0 6px rgba(234, 88, 12, 0.7)); }
 }
 
 /* App Header */
@@ -907,41 +930,46 @@ body {
 }
 
 .tile-number {
+  font-family: var(--font-title);
   font-size: clamp(0.64rem, 2vw, 0.86rem);
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   color: var(--tile-text);
   z-index: 2;
   user-select: none;
+  letter-spacing: -0.5px;
 }
 .tile.tile-goal .tile-number,
 .tile.tile-start .tile-number {
   color: #fff;
   font-weight: 900;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
-/* Subtle hints for ladder bottom / snake mouth */
+/* Subtle hints for ladder bottom / dragon dive */
 .tile-badge-hint {
   align-self: flex-end;
   font-size: clamp(0.48rem, 1.4vw, 0.62rem);
   font-weight: 800;
   line-height: 1;
-  padding: 1px 2px;
+  padding: 1px 2.5px;
   border-radius: 3px;
   z-index: 2;
   user-select: none;
   letter-spacing: -0.3px;
+  font-family: var(--font-main);
 }
 .tile-badge-ladder {
-  color: #92400e;
-  background: rgba(245, 158, 11, 0.25);
-  border: 0.5px solid rgba(180, 83, 9, 0.35);
+  color: #fef08a;
+  background: rgba(217, 119, 6, 0.35);
+  border: 0.5px solid rgba(245, 158, 11, 0.5);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .tile-badge-snake {
-  color: #b91c1c;
-  background: rgba(239, 68, 68, 0.2);
-  border: 0.5px solid rgba(185, 28, 28, 0.35);
+  color: #fca5a5;
+  background: rgba(220, 38, 38, 0.35);
+  border: 0.5px solid rgba(239, 68, 68, 0.5);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .tile.tile-goal .tile-number,
 .tile.tile-start .tile-number {

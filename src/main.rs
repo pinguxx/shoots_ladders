@@ -29,7 +29,7 @@ async fn health_check_api(State(state): State<AppState>) -> impl IntoResponse {
 
     Json(serde_json::json!({
         "status": "ok",
-        "service": "serpientes-y-escaleras-rust",
+        "service": "calabozos-y-dragones-rust",
         "active_rooms": rooms_count,
         "active_connections": connections_count
     }))
@@ -113,7 +113,7 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
 
     println!("\n========================================================");
-    println!("🐍 SERPIENTES Y ESCALERAS ONLINE (RUST / AXUM) 🪜");
+    println!("🐉 CALABOZOS Y DRAGONES ONLINE (RUST / AXUM) 🐉");
     println!("========================================================");
     println!("> Local:   http://localhost:{}", port);
     println!("> Network: http://0.0.0.0:{}", port);
@@ -178,7 +178,7 @@ mod tests {
             .unwrap();
         let json: serde_json::Value = serde_json::from_slice(&body_bytes).unwrap();
         assert_eq!(json["status"], "ok");
-        assert_eq!(json["service"], "serpientes-y-escaleras-rust");
+        assert_eq!(json["service"], "calabozos-y-dragones-rust");
 
         // 2. /api/board
         let req_board = Request::builder()

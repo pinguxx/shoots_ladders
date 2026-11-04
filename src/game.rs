@@ -40,7 +40,7 @@ fn default_turn_timer() -> u64 {
     0 // 0 = Sin límite / Manual (no autoplay)
 }
 fn default_board_theme() -> String {
-    "fiesta".to_string()
+    "calabozo".to_string()
 }
 fn default_board_size() -> u8 {
     100
@@ -182,10 +182,10 @@ pub struct Room {
 
 pub fn generate_room_code() -> String {
     let prefixes = [
-        "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA",
+        "DRAG", "CALA", "MAGO", "FUEG", "ORCO", "ELFO", "RUNA", "ESPA", "TORR", "REIN",
     ];
     let mut rng = rand::thread_rng();
-    let prefix = prefixes.choose(&mut rng).unwrap_or(&"SERP");
+    let prefix = prefixes.choose(&mut rng).unwrap_or(&"DRAG");
     let num: u16 = rng.gen_range(10..99);
     format!("{}{}", prefix, num)
 }
@@ -200,88 +200,91 @@ pub fn current_epoch_secs() -> u64 {
 pub fn calculate_awards(players: &[Player], winner_id: &str, total_tiles: u8) -> Vec<Award> {
     let mut awards = Vec::new();
 
-    // 1. 🪜 El Trepador / The Climber (most ladders climbed, if > 0)
+    // 1. 🪜 Conquistador de Cimas / The Tower Climber (most ladders climbed, if > 0)
     if let Some(climber) = players.iter().max_by_key(|p| p.stats.ladders_climbed) {
         if climber.stats.ladders_climbed > 0 {
             awards.push(Award {
                 key: "climber".to_string(),
                 badge: "🪜".to_string(),
-                title_es: "El Trepador".to_string(),
-                title_en: "The Climber".to_string(),
+                title_es: "Conquistador de Cimas".to_string(),
+                title_en: "The Tower Climber".to_string(),
                 player_name: climber.name.clone(),
                 avatar: climber.avatar.clone(),
                 color: climber.color.clone(),
                 detail_es: format!(
-                    "Subió {} escaleras hacia la gloria.",
+                    "Ascendió {} escaleras mágicas hacia la gloria.",
                     climber.stats.ladders_climbed
                 ),
                 detail_en: format!(
-                    "Climbed {} ladders towards glory.",
+                    "Climbed {} magical ladders towards glory.",
                     climber.stats.ladders_climbed
                 ),
             });
         }
     }
 
-    // 2. 🐍 El Más Salado / The Snake Magnet (most snakes hit, if > 0)
+    // 2. 🐉 Domador de Dragones / The Dragon Survivor (most snakes/dragons hit, if > 0)
     if let Some(snake_victim) = players.iter().max_by_key(|p| p.stats.snakes_hit) {
         if snake_victim.stats.snakes_hit > 0 {
             awards.push(Award {
                 key: "snake_magnet".to_string(),
-                badge: "🐍".to_string(),
-                title_es: "El Más Salado".to_string(),
-                title_en: "The Snake Magnet".to_string(),
+                badge: "🐉".to_string(),
+                title_es: "Domador de Dragones".to_string(),
+                title_en: "The Dragon Survivor".to_string(),
                 player_name: snake_victim.name.clone(),
                 avatar: snake_victim.avatar.clone(),
                 color: snake_victim.color.clone(),
                 detail_es: format!(
-                    "Fue mordido por {} serpientes traicioneras.",
+                    "Sobrevivió a los ataques de {} dragones ancestrales.",
                     snake_victim.stats.snakes_hit
                 ),
-                detail_en: format!("Bitten by {} sneaky snakes.", snake_victim.stats.snakes_hit),
+                detail_en: format!(
+                    "Survived attacks from {} ancient dragons.",
+                    snake_victim.stats.snakes_hit
+                ),
             });
         }
     }
 
-    // 3. 🎲 Mano Bendita / Golden Touch (the winner)
+    // 3. 🎲 Mano del Destino / Hand of Fate (the winner)
     if let Some(winner) = players.iter().find(|p| p.id == winner_id) {
         awards.push(Award {
             key: "golden_touch".to_string(),
             badge: "🎲".to_string(),
-            title_es: "Mano Bendita".to_string(),
-            title_en: "Golden Touch".to_string(),
+            title_es: "Mano del Destino".to_string(),
+            title_en: "Hand of Fate".to_string(),
             player_name: winner.name.clone(),
             avatar: winner.avatar.clone(),
             color: winner.color.clone(),
             detail_es: format!(
-                "Llegó a la meta en solo {} tiros.",
+                "Conquistó la mazmorra en solo {} tiradas.",
                 winner.stats.rolls_count
             ),
             detail_en: format!(
-                "Reached the goal in only {} rolls.",
+                "Conquered the dungeon in only {} rolls.",
                 winner.stats.rolls_count
             ),
         });
     }
 
-    // 4. ⚡ Rayo Veloz / Speedy Runner (runner up or player with highest position)
+    // 4. ⚡ Héroe Veloz / Swift Hero (runner up or player with highest position)
     let mut other_players: Vec<&Player> = players.iter().filter(|p| p.id != winner_id).collect();
     other_players.sort_by_key(|p| std::cmp::Reverse(p.position));
     if let Some(runner_up) = other_players.first() {
         awards.push(Award {
             key: "speedy_runner".to_string(),
             badge: "⚡".to_string(),
-            title_es: "Rayo Veloz".to_string(),
-            title_en: "Speedy Runner".to_string(),
+            title_es: "Héroe Veloz".to_string(),
+            title_en: "Swift Hero".to_string(),
             player_name: runner_up.name.clone(),
             avatar: runner_up.avatar.clone(),
             color: runner_up.color.clone(),
             detail_es: format!(
-                "Subcampeón en la casilla {} de {}.",
+                "Alcanzó la sala {} de {} en el calabozo.",
                 runner_up.position, total_tiles
             ),
             detail_en: format!(
-                "Runner-up at tile {} of {}.",
+                "Reached chamber {} of {} in the dungeon.",
                 runner_up.position, total_tiles
             ),
         });
@@ -423,16 +426,16 @@ impl Room {
             return Err("Room is full (max 10 players)".to_string());
         }
         const BOT_PROFILES: [(&str, &str, &str); 10] = [
-            ("🤖 Bot Pancho", "🤠", "#10b981"),
-            ("🤖 Bot Lupita", "🪅", "#ec4899"),
-            ("🤖 Bot Chuy", "🌮", "#f59e0b"),
-            ("🤖 Bot Frida", "🎨", "#8b5cf6"),
-            ("🤖 Bot El Cotorro", "🦜", "#3b82f6"),
-            ("🤖 Bot Alebrije", "🐆", "#06b6d4"),
-            ("🤖 Bot Cantinflas", "🎭", "#eab308"),
-            ("🤖 Bot Mariachi", "🎺", "#f43f5e"),
-            ("🤖 Bot Sor Juana", "📜", "#14b8a6"),
-            ("🤖 Bot Axolotl", "🦎", "#a855f7"),
+            ("🤖 Sir Galahad", "🛡️", "#3b82f6"),
+            ("🤖 Gandalf", "🧙‍♂️", "#8b5cf6"),
+            ("🤖 Legolas", "🏹", "#10b981"),
+            ("🤖 Conan", "🧌", "#ea580c"),
+            ("🤖 Ignis Dragón", "🐉", "#dc2626"),
+            ("🤖 Vax el Pícaro", "🧝", "#06b6d4"),
+            ("🤖 Morgana", "🧝‍♀️", "#ec4899"),
+            ("🤖 Raistlin", "🧛", "#a855f7"),
+            ("🤖 Jaskier el Bardo", "🪕", "#eab308"),
+            ("🤖 Valquiria", "⚔️", "#14b8a6"),
         ];
         let bot_count = self.players.iter().filter(|p| p.is_bot).count();
         let (name, avatar, color) = BOT_PROFILES[bot_count % BOT_PROFILES.len()];
@@ -499,12 +502,13 @@ impl Room {
                         let mut bot_shout = None;
                         if rand::random::<f32>() < 0.45 {
                             let shouts = [
-                                "¡Ándale! 🎲",
-                                "¡Con todo menos con miedo! 🌮",
-                                "¡Fierro pariente! 🤠",
-                                "¡Pura suerte! 🍀",
-                                "¡Aguas con la víbora! 🐍",
-                                "¡Sube, compadre! 🪜",
+                                "¡Por el honor y la gloria! ⚔️",
+                                "¡Cuidado con el Dragón! 🐉",
+                                "¡Tirada de salvación! 🛡️",
+                                "¡Golpe crítico! 💥",
+                                "¡Fallo crítico! 💀",
+                                "¡Lanza iniciativa! 🎲",
+                                "¡Bebiendo poción! 🧪",
                             ];
                             bot_shout =
                                 Some(shouts.choose(&mut rand::thread_rng()).unwrap().to_string());
@@ -557,11 +561,11 @@ impl Room {
             self.add_log(
                 "trap",
                 &format!(
-                    "🌵 ¡{} está quitándose las espinas del nopal y pierde su turno!",
+                    "🕸️ ¡{} está atrapado en la telaraña del calabozo y pierde su turno!",
                     player_name
                 ),
                 &format!(
-                    "🌵 {} is trapped by the prickly cactus and skips their turn!",
+                    "🕸️ {} is caught in a dungeon spider web and skips their turn!",
                     player_name
                 ),
                 Some(player_id.to_string()),
@@ -575,8 +579,10 @@ impl Room {
                 landed_tile: cur_pos,
                 portal_applied: None,
                 mystery_applied: None,
-                mystery_message_es: Some("🌵 ¡Atrapado en el nopal! Turno perdido.".to_string()),
-                mystery_message_en: Some("🌵 Trapped in cactus! Turn skipped.".to_string()),
+                mystery_message_es: Some("🕸️ ¡Atrapado en la trampa! Turno perdido.".to_string()),
+                mystery_message_en: Some(
+                    "🕸️ Trapped in dungeon spider web! Turn skipped.".to_string(),
+                ),
                 final_tile: cur_pos,
                 won: false,
                 extra_turn: false,
@@ -722,73 +728,84 @@ impl Room {
             if let Some(m) = self.board.get_mystery_tile(tile_after_portal) {
                 mystery_applied = Some(m.clone());
                 match m.kind {
-                    MysteryKind::Taco => {
+                    MysteryKind::Potion => {
                         let boosted = (tile_after_portal + 3).min(total_tiles);
                         for step in (tile_after_portal + 1)..=boosted {
                             path.push(step);
                         }
-                        mystery_message_es =
-                            Some("🌮 ¡Taquitos al pastor! Avanzas 3 casillas extra.".to_string());
-                        mystery_message_en =
-                            Some("🌮 Taco boost! Dash 3 extra tiles forward.".to_string());
+                        mystery_message_es = Some(
+                            "🧪 ¡Poción de Curación! Avanzas 3 casillas por el calabozo."
+                                .to_string(),
+                        );
+                        mystery_message_en = Some(
+                            "🧪 Healing Potion! Dash 3 extra dungeon tiles forward.".to_string(),
+                        );
                         self.add_log(
-                            "mystery_taco",
+                            "mystery_potion",
                             &format!(
-                                "🌮 ¡TACO POWER! {} comió tacos en la casilla {} y avanzó a la {}.",
+                                "🧪 ¡POCIÓN MÁGICA! {} bebió una poción en la casilla {} y avanzó a la {}.",
                                 player_name, m.tile, boosted
                             ),
                             &format!(
-                                "🌮 TACO POWER! {} ate tacos at tile {} and boosted to {}.",
+                                "🧪 HEALING POTION! {} drank a potion at tile {} and dashed to {}.",
                                 player_name, m.tile, boosted
                             ),
                             Some(player_id.to_string()),
                         );
                         boosted
                     }
-                    MysteryKind::Chile => {
+                    MysteryKind::Scroll => {
                         let boosted = (tile_after_portal + 5).min(total_tiles);
                         for step in (tile_after_portal + 1)..=boosted {
                             path.push(step);
                         }
                         mystery_message_es = Some(
-                            "🌶️ ¡Chile picante! Corres 5 casillas hacia adelante.".to_string(),
+                            "📜 ¡Pergamino Arcano! Teletransporte mágico 5 casillas adelante."
+                                .to_string(),
                         );
-                        mystery_message_en =
-                            Some("🌶️ Spicy chili! Dash 5 extra tiles forward.".to_string());
+                        mystery_message_en = Some(
+                            "📜 Arcane Scroll! Teleport 5 tiles forward through the rift."
+                                .to_string(),
+                        );
                         self.add_log(
-                            "mystery_chile",
-                            &format!("🌶️ ¡ENCHILADO! {} probó chile picante en la casilla {} y corrió a la {}.", player_name, m.tile, boosted),
-                            &format!("🌶️ SPICY CHILI! {} tasted hot chili at tile {} and dashed to {}.", player_name, m.tile, boosted),
+                            "mystery_scroll",
+                            &format!("📜 ¡HECHIZO ARCANO! {} leyó un pergamino en la casilla {} y se teletransportó a la {}.", player_name, m.tile, boosted),
+                            &format!("📜 ARCANE RIFT! {} read a scroll at tile {} and teleported to {}.", player_name, m.tile, boosted),
                             Some(player_id.to_string()),
                         );
                         boosted
                     }
-                    MysteryKind::Pinata => {
+                    MysteryKind::Chest => {
                         pinata_bonus = true;
-                        mystery_message_es =
-                            Some("🪅 ¡Rompiste la piñata! ¡Tienes otro tiro!".to_string());
-                        mystery_message_en =
-                            Some("🪅 Smashed the piñata! Extra roll granted!".to_string());
+                        mystery_message_es = Some(
+                            "📦 ¡Cofre del Tesoro! ¡Encontraste dados mágicos y tiras de nuevo!"
+                                .to_string(),
+                        );
+                        mystery_message_en = Some(
+                            "📦 Treasure Chest! Discovered magic dice and roll again!".to_string(),
+                        );
                         self.add_log(
-                            "mystery_pinata",
-                            &format!("🪅 ¡DALE DALE DALE! {} rompió la piñata en la casilla {} y gana otro tiro.", player_name, m.tile),
-                            &format!("🪅 PIÑATA PARTY! {} smashed the piñata at tile {} and gets another roll.", player_name, m.tile),
+                            "mystery_chest",
+                            &format!("📦 ¡COFRE DEL TESORO! {} abrió un cofre en la casilla {} y gana un tiro extra.", player_name, m.tile),
+                            &format!("📦 TREASURE CHEST! {} opened a chest at tile {} and gained an extra roll.", player_name, m.tile),
                             Some(player_id.to_string()),
                         );
                         tile_after_portal
                     }
-                    MysteryKind::Nopal => {
+                    MysteryKind::Trap => {
                         let p_idx = self.turn_index % self.players.len();
                         self.players[p_idx].skipped_turns = 1;
                         mystery_message_es = Some(
-                            "🌵 ¡Te espinaste con el nopal! Quedas atrapado 1 turno.".to_string(),
+                            "🕸️ ¡Trampa de Mazmorra! Caes en una red de telarañas y pierdes 1 turno.".to_string(),
                         );
-                        mystery_message_en =
-                            Some("🌵 Prickly cactus! Trapped for 1 turn.".to_string());
+                        mystery_message_en = Some(
+                            "🕸️ Dungeon Trap! Caught in spider webs and trapped for 1 turn."
+                                .to_string(),
+                        );
                         self.add_log(
-                            "mystery_nopal",
-                            &format!("🌵 ¡AY NOPAL! {} se espinó en la casilla {} y perderá su próximo turno.", player_name, m.tile),
-                            &format!("🌵 PRICKLY CACTUS! {} got stuck at tile {} and misses next turn.", player_name, m.tile),
+                            "mystery_trap",
+                            &format!("🕸️ ¡TRAMPA! {} cayó en una trampa en la casilla {} y perderá su próximo turno.", player_name, m.tile),
+                            &format!("🕸️ DUNGEON TRAP! {} triggered a trap at tile {} and misses next turn.", player_name, m.tile),
                             Some(player_id.to_string()),
                         );
                         tile_after_portal
@@ -961,7 +978,7 @@ mod tests {
         assert!(defaults.exact_win);
         assert!(!defaults.three_sixes_penalty);
         assert_eq!(defaults.turn_timer_seconds, 0);
-        assert_eq!(defaults.board_theme, "fiesta");
+        assert_eq!(defaults.board_theme, "calabozo");
 
         // Deserialization with partial json fills defaults
         let json_data = r#"{"dice_count": 2, "turn_timer_seconds": 25}"#;
@@ -970,7 +987,7 @@ mod tests {
         assert_eq!(deserialized.turn_timer_seconds, 25);
         assert!(deserialized.bonus_on_six);
         assert!(deserialized.exact_win);
-        assert_eq!(deserialized.board_theme, "fiesta");
+        assert_eq!(deserialized.board_theme, "calabozo");
     }
 
     #[test]
@@ -978,7 +995,7 @@ mod tests {
         let code = generate_room_code();
         assert!(code.len() >= 6 && code.len() <= 8);
         let valid_prefixes = [
-            "SERP", "ESCA", "VIBO", "DADO", "META", "CHUT", "LADD", "MAYA", "AZTE", "FIESTA",
+            "DRAG", "CALA", "MAGO", "FUEG", "ORCO", "ELFO", "RUNA", "ESPA", "TORR", "REIN",
         ];
         assert!(valid_prefixes.iter().any(|prefix| code.starts_with(prefix)));
 
@@ -1256,11 +1273,11 @@ mod tests {
         // Add 2 bots
         let bot1 = room.add_bot().unwrap();
         assert!(bot1.is_bot);
-        assert_eq!(bot1.name, "🤖 Bot Pancho");
+        assert_eq!(bot1.name, "🤖 Sir Galahad");
 
         let bot2 = room.add_bot().unwrap();
         assert!(bot2.is_bot);
-        assert_eq!(bot2.name, "🤖 Bot Lupita");
+        assert_eq!(bot2.name, "🤖 Gandalf");
         assert_eq!(room.players.len(), 3);
 
         // Remove 1 bot
